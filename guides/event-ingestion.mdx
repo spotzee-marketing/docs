@@ -1,0 +1,103 @@
+---
+title: "Send events from your backend"
+description: "Track behaviour from your servers so segments, journeys, and reporting can react in real time."
+keywords: ["events", "ingestion", "tracking", "behaviour", "server-side", "external_id", "anonymous_id"]
+icon: "bolt"
+---
+
+Events are the raw signal Spotzee uses to trigger journeys, build behavioural segments, and drive reporting. Send events from your backend whenever a contact does something worth marketing on — completes a checkout, opens a feature for the first time, abandons a cart, hits a usage milestone.
+
+## What you'll build
+
+A backend service that:
+
+1. Captures domain events as they happen.
+2. Forwards each one to Spotzee with the contact's `external_id`.
+3. Batches when traffic is bursty and retries on failure.
+
+## Prerequisites
+
+<Info>
+  You'll need a `sk_` project key with write access. The browser-side equivalent uses a `pk_` publishable key — see [Authentication](/guides/authentication).
+</Info>
+
+## Walkthrough
+
+<Steps>
+  <Step title="Pick stable contact IDs">
+    Identify each event with the same `external_id` you used to sync the contact. If the contact is anonymous (a not-yet-signed-up visitor), use `anonymous_id` instead — Spotzee stitches the two together when the contact later identifies.
+  </Step>
+  <Step title="Choose an event name">
+    Use snake_case verbs: `order_placed`, `subscription_renewed`, `feature_enabled`. Stick to a small catalogue — every event you create is a hook journeys and segments can depend on, so churn in event names breaks downstream automation.
+  </Step>
+  <Step title="Send a single event">
+    `POST /events` accepts a single event or an array of up to 100. Single-event form:
+
+    ```http
+    POST /events HTTP/1.1
+    Host: apix.spotzee.com
+    Authorization: Bearer sk_…
+    Spotzee-Version: 2026-04-28
+    Content-Type: application/json
+
+    {
+      "external_id": "cust_001",
+      "name": "order_placed",
+      "data": {
+        "order_id": "ord_42",
+        "total": 129.50,
+        "currency": "AUD"
+      }
+    }
+    ```
+  </Step>
+  <Step title="Batch when you can">
+    For high-volume sources (queue consumers, ETL jobs, replay scripts), batch up to 100 events per call. Same endpoint — wrap them in an array.
+
+    ```json
+    {
+      "events": [
+        { "external_id": "cust_001", "name": "page_viewed", "data": { "path": "/pricing" } },
+        { "external_id": "cust_002", "name": "page_viewed", "data": { "path": "/pricing" } }
+      ]
+    }
+    ```
+
+    Per-item errors come back in the response — items that succeeded are committed.
+  </Step>
+  <Step title="Add identify alongside the event (optional)">
+    If the event also reveals new contact information — say, a checkout that finally captures the contact's email — include an `identify` block. Spotzee upserts the contact in the same call, so a downstream segment that depends on `email IS NOT NULL` fires correctly.
+
+    ```json
+    {
+      "external_id": "cust_001",
+      "name": "order_placed",
+      "data": { "total": 129.50 },
+      "identify": {
+        "email": "ada@example.com",
+        "first_name": "Ada"
+      }
+    }
+    ```
+  </Step>
+  <Step title="Retry safely on failure">
+    Network blips happen. Add an `Idempotency-Key` so a retry doesn't double-count an event in reporting. A deterministic key (`order_placed:ord_42`) is easier than a UUID for replay scenarios — see [Idempotency](/guides/api-idempotency).
+  </Step>
+</Steps>
+
+## Pitfalls to avoid
+
+<Warning>
+  Don't put PII in the event name. Names are searchable, indexed, and shown to operators in the UI. Keep them generic; put the variable bits in `data`.
+</Warning>
+
+- **Don't send "view" events from your backend** unless you have a real reason to. Page views belong in browser-side tracking with a `pk_` key. Backend events should reflect domain transitions: orders, subscriptions, status changes.
+- **Don't churn the schema.** If you add a field to `data`, keep it. Removing it breaks segments and journeys that already depend on it.
+- **Don't forget `Spotzee-Version`.** It's optional — but pinning a version makes your event payload's behaviour predictable across releases. See [API versioning](/guides/api-versioning).
+
+## Reference
+
+- API surface — see [Main API → Events](/main-api/introduction)
+- Browser-side tracking — see [Authentication → publishable keys](/guides/authentication)
+- Safe retries — see [Idempotency](/guides/api-idempotency)
+- Rate limits — see [Rate limits](/guides/api-rate-limits)

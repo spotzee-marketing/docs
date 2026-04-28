@@ -1,0 +1,94 @@
+---
+title: "Sync contacts from your CRM"
+description: "Push contacts from your existing customer system into Spotzee in batches with idempotent retries."
+keywords: ["contacts", "sync", "crm", "import", "batch", "idempotency", "external_id"]
+icon: "users"
+---
+
+Use this flow when you already have a customer record system (a CRM, a billing platform, your own database) and want Spotzee to mirror those contacts so you can market to them.
+
+## What you'll build
+
+A repeatable job that:
+
+1. Reads a batch of contacts from your source system.
+2. Sends them to Spotzee with `external_id` set to your stable customer ID.
+3. Uses an `Idempotency-Key` so timeouts and retries are safe.
+4. Walks through every page of source data without re-importing what's already in.
+
+## Prerequisites
+
+<Info>
+  You'll need a `sk_` project key with write access. See [Authentication](/guides/authentication) for how to mint one.
+</Info>
+
+## Walkthrough
+
+<Steps>
+  <Step title="Pick a stable identifier">
+    Choose the field in your source system that uniquely identifies a customer and never changes — usually the primary key from your customers table. Pass it to Spotzee as `external_id` on every contact.
+
+    Spotzee uses `external_id` as the upsert key: re-syncing the same external id updates the existing contact rather than creating a duplicate.
+  </Step>
+  <Step title="Map your fields to Spotzee's schema">
+    Spotzee contacts have a small set of first-class fields (`email`, `phone`, `external_id`, `locale`, `timezone`, `first_name`, `last_name`) and a flexible `data` object for anything else. Map your CRM columns to first-class fields where they line up; put everything else into `data`.
+
+    | Your column | Spotzee field |
+    |---|---|
+    | `customers.id` | `external_id` |
+    | `customers.email_address` | `email` |
+    | `customers.phone_e164` | `phone` |
+    | `customers.locale` | `locale` |
+    | _everything else_ | `data.<your_key>` |
+  </Step>
+  <Step title="Batch in groups of 100">
+    `POST /contacts/batch` accepts up to 100 contacts per call. That's the sweet spot for throughput and error handling — a smaller batch limits the blast radius of a partial failure.
+  </Step>
+  <Step title="Send each batch with an idempotency key">
+    Generate a unique key per batch (a UUID derived from the first and last `external_id` works well — it's deterministic, so a retry from a queue uses the same key).
+
+    ```http
+    POST /contacts/batch HTTP/1.1
+    Host: apix.spotzee.com
+    Authorization: Bearer sk_…
+    Idempotency-Key: sync-batch-cust_001-cust_100
+    Spotzee-Version: 2026-04-28
+    Content-Type: application/json
+
+    {
+      "contacts": [
+        {
+          "external_id": "cust_001",
+          "email": "ada@example.com",
+          "first_name": "Ada",
+          "last_name": "Lovelace",
+          "data": { "lifetime_value": 4250 }
+        }
+      ]
+    }
+    ```
+  </Step>
+  <Step title="Handle partial failures">
+    The response includes a per-item `errors[]` array. Items that succeeded are committed; failed items are returned with their `external_id` and a `code` from the [error catalogue](/main-api/errors). Retry only the failed items in a fresh request.
+  </Step>
+  <Step title="Walk every page of source data">
+    Use cursor pagination on your source system the same way you'd page Spotzee — see [Pagination](/guides/api-pagination). Persist the cursor so a crashed job resumes where it stopped.
+  </Step>
+</Steps>
+
+## Pitfalls to avoid
+
+<Warning>
+  Don't use the contact's email address as `external_id`. Emails change. A stable, immutable customer ID — like the primary key of your customers table — is the right shape.
+</Warning>
+
+- **Don't loop one contact at a time.** Single-contact `POST /contacts` works, but you'll burn rate-limit budget needlessly. Always batch.
+- **Don't reuse the same idempotency key for two different batches.** Spotzee returns `409 idempotency_key_mismatch` if you do. See [Idempotency](/guides/api-idempotency) for the exact semantics.
+- **Don't write back to your source from the response.** Spotzee returns its own `id` for each contact, but you should key off `external_id` on your side — that way a re-import doesn't break.
+
+## Reference
+
+- API surface — see [Main API → Contacts](/main-api/introduction)
+- Pagination — see [Pagination](/guides/api-pagination)
+- Safe retries — see [Idempotency](/guides/api-idempotency)
+- Rate limits — see [Rate limits](/guides/api-rate-limits)

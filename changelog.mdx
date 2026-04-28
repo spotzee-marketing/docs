@@ -1,0 +1,53 @@
+---
+title: "Changelog"
+description: "Per-version changes to the Spotzee API — additions, deprecations, and removals."
+keywords: ["changelog", "release notes", "versions", "api", "breaking changes", "deprecations"]
+icon: "clock-rotate-left"
+---
+
+The Spotzee API uses date-based versions. Pin a version with the `Spotzee-Version` request header — see [API versioning](/guides/api-versioning) for the full pinning model.
+
+## 2026-04-28
+
+The first publicly-versioned release of the Spotzee API.
+
+### New surface
+
+- Project-scoped surface at `https://apix.spotzee.com/api/client` with `sk_` (secret) and `pk_` (publishable) keys.
+- Organisation-scoped surface at `https://apix.spotzee.com/api/admin` with `ok_` keys for cross-project administration.
+
+### New conventions
+
+- **Versioning** — `Spotzee-Version` request header (date-based). Echoed back on every response.
+- **Idempotency** — `Idempotency-Key` header on `POST` and `PATCH`. 24-hour TTL, scoped per API key. Same key + same body returns the cached response; same key + different body returns `409 idempotency_key_mismatch`.
+- **Rate limits** — per-key sliding window, separate read and write buckets, generous tiers for MCP and agent workloads (`x-spotzee-client-type: mcp` doubles the base limit).
+- **Errors** — RFC 7807 `application/problem+json` envelope with stable string `code`, `title`, `message`, `request_id`, optional `param` and `errors[]` for per-field validation breakdowns.
+- **Correlation** — every response carries an `X-Request-Id` header (Stripe-style `req_<ULID>`). Quote it in support tickets.
+
+### New endpoints
+
+Public surface for the first time:
+
+- **Contacts** — list, get, upsert (single + batch up to 100), delete. Public name is **Contact**.
+- **Lists** — full CRUD. Static and dynamic flavours; dynamic lists are how you express segments via the API.
+- **Subscriptions** — opt-in management per channel.
+- **Templates** — multi-channel template management with preview and proof endpoints.
+- **Campaigns** — full CRUD plus duplicate, preview, and trigger.
+- **Journeys** — full CRUD plus trigger. Live status required for entrances.
+- **Tags** — full CRUD.
+- **Events** — single + batch ingestion (up to 100 events per call), publishable-key-allowlisted for browser use.
+- **Project API keys** — manage your own `sk_` and `pk_` keys.
+- **Organisation API keys** — manage `ok_` keys (admin role required).
+- **Webhook endpoints** — manage outgoing webhook subscriptions and signing secrets.
+
+### Migration notes
+
+This is the first dated release, so there's nothing to migrate from.
+
+## Coming soon
+
+- Cross-repo schema sharing between the Main and Extended APIs.
+- Auto-generated SDKs from the published spec, starting with JavaScript.
+- Per-API-key version pinning so `Spotzee-Version` defaults to the version a key was created on.
+
+Subscribe to the changelog page in your reader of choice for future releases.

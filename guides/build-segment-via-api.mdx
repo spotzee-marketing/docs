@@ -1,0 +1,113 @@
+---
+title: "Build a segment via the API"
+description: "Define a dynamic membership rule programmatically so segments stay in sync with code-driven attributes."
+keywords: ["segments", "lists", "dynamic", "rules", "api", "membership", "filter"]
+icon: "filter"
+---
+
+Most segments are best authored in the Spotzee UI — operators iterate quickly, preview membership, and version their work. Use the API when the rules themselves are derived from your code or config: a generated cohort per pricing plan, a per-region segment driven by a feature-flag rollout, or a backfill that needs to recreate dozens of segments at once.
+
+<Info>
+  Today the API exposes segments as **dynamic lists**. There is no separate `/segments` endpoint — a segment is a list with `type: "dynamic"` and a rule tree. Static lists (explicit member add/remove) use the same endpoints with `type: "static"`.
+</Info>
+
+## What you'll build
+
+A script that creates a dynamic list with a rule tree, then walks its members.
+
+## Prerequisites
+
+You'll need a `sk_` project key with write access. See [Authentication](/guides/authentication).
+
+## Walkthrough
+
+<Steps>
+  <Step title="Decide what membership means">
+    A segment is a boolean rule that yields true or false for any contact. Common shapes:
+
+    - **Attribute filter** — `data.plan = "professional"`
+    - **Behavioural filter** — contacts who triggered `order_placed` in the last 30 days
+    - **Combined** — `plan = "professional"` AND triggered `order_placed` in the last 30 days
+
+    Sketch the rule as plain language first; the JSON shape follows from there.
+  </Step>
+  <Step title="Build the rule tree">
+    Spotzee rules are nested groups. The top level is a group with an operator (`and` / `or`) and a list of children. Each child is either another group or a leaf comparing a field to a value.
+
+    ```json
+    {
+      "type": "group",
+      "operator": "and",
+      "children": [
+        {
+          "type": "user",
+          "path": "data.plan",
+          "operator": "=",
+          "value": "professional"
+        },
+        {
+          "type": "event",
+          "name": "order_placed",
+          "operator": "count",
+          "frequency": { "period": "days", "amount": 30, "value": 1 }
+        }
+      ]
+    }
+    ```
+
+    Leaf shapes:
+
+    | `type` | What it does |
+    |---|---|
+    | `user` | Compares a field on the contact (`email`, `external_id`, `data.<key>`) to a value |
+    | `event` | Filters by an event name with optional frequency window |
+  </Step>
+  <Step title="Create the list">
+    `POST /lists` with `type: "dynamic"`:
+
+    ```http
+    POST /lists HTTP/1.1
+    Host: apix.spotzee.com
+    Authorization: Bearer sk_…
+    Idempotency-Key: segment-pro-monthly
+    Spotzee-Version: 2026-04-28
+    Content-Type: application/json
+
+    {
+      "name": "Pro plan, active in last 30 days",
+      "type": "dynamic",
+      "rule": { /* the tree from step 2 */ }
+    }
+    ```
+
+    The response includes the list `id`. Save it — that's how you'll reference the segment from journeys, campaigns, and member-listing endpoints.
+  </Step>
+  <Step title="Walk the members">
+    Members are computed asynchronously — give Spotzee a moment after creation, then page the list:
+
+    ```http
+    GET /lists/{listId}/users?limit=100&cursor=…
+    ```
+
+    See [Pagination](/guides/api-pagination) for the cursor pattern.
+  </Step>
+  <Step title="Update the rule">
+    `PATCH /lists/{listId}` with a new `rule` block. Spotzee re-computes membership in the background. Existing members are reconciled — those who still match stay, those who don't drop out.
+  </Step>
+</Steps>
+
+## Pitfalls to avoid
+
+<Warning>
+  Don't build a hot loop that recreates the same segment every minute. Recomputation is cheap but not free. Update the rule in place with `PATCH` rather than deleting and recreating.
+</Warning>
+
+- **Don't filter on fields you haven't populated yet.** A rule on `data.plan` returns zero members until at least one contact has that field. Sync your contacts first ([Sync contacts](/guides/sync-contacts)), then build segments.
+- **Don't bury the rule in too many layers.** Spotzee accepts deeply nested groups, but a rule that spans more than two `and`/`or` layers is hard for operators to read in the UI.
+
+## Reference
+
+- API surface — see [Main API → Lists](/main-api/introduction)
+- Sync contacts first — see [Sync contacts from your CRM](/guides/sync-contacts)
+- Pagination — see [Pagination](/guides/api-pagination)
+- Conceptual overview — see [Segments](/guides/segments)

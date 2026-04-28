@@ -58,7 +58,26 @@
               "guides/api-rate-limits",
               "guides/api-idempotency",
               "guides/api-pagination",
-              "guides/api-webhooks"
+              "guides/api-webhooks",
+              "guides/api-client-type"
+            ]
+          },
+          {
+            "group": "Recipes",
+            "icon": "code",
+            "pages": [
+              "guides/sync-contacts",
+              "guides/event-ingestion",
+              "guides/build-segment-via-api",
+              "guides/trigger-campaign",
+              "guides/journey-trigger"
+            ]
+          },
+          {
+            "group": "Releases",
+            "icon": "clock-rotate-left",
+            "pages": [
+              "changelog"
             ]
           }
         ]
