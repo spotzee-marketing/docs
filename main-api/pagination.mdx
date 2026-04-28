@@ -1,0 +1,94 @@
+---
+title: "Pagination"
+description: "Cursor pagination, sort directions, and result counts for list endpoints."
+keywords: ["pagination", "cursor", "next_cursor", "prev_cursor", "list", "sort"]
+icon: "list"
+---
+
+Every list endpoint in the Main API uses **cursor pagination**. Cursors are stable across inserts and deletes, so you never miss or duplicate a record while paging.
+
+## Request parameters
+
+| Parameter | Default | Notes |
+|---|---|---|
+| `limit` | `25` | 1 – 100 inclusive |
+| `cursor` | _none_ | Opaque cursor returned by a previous page |
+| `direction` | `forward` | `forward` (older → newer) or `backward` |
+| `sort` | endpoint-specific | Field to sort on. Prefix with `-` for descending, e.g. `-created_at` |
+| `q` | _none_ | Free-text search where the endpoint supports it |
+
+## Response shape
+
+```json
+{
+  "results": [ /* up to `limit` records */ ],
+  "nextCursor": "eyJpZCI6Mzg2OTI1fQ",
+  "prevCursor": "eyJpZCI6Mzg2ODk2fQ",
+  "limit": 25
+}
+```
+
+| Field | Meaning |
+|---|---|
+| `results` | The records on this page |
+| `nextCursor` | Cursor for the next page; `null` when you've reached the end |
+| `prevCursor` | Cursor for the previous page; `null` on the first page |
+| `limit` | Echoes the limit you asked for |
+
+`has_more` is derivable: it's `nextCursor !== null`.
+
+## Response headers
+
+For convenience, list endpoints also emit:
+
+| Header | Meaning |
+|---|---|
+| `X-Total-Count` | Total records that match the query (best-effort; large collections may return an estimate) |
+| `X-Page` | Page index when one is meaningful |
+| `X-Limit` | Echoes the `limit` query parameter |
+
+## Walking a list
+
+```javascript
+async function* listAllContacts(token) {
+  let cursor = null
+  do {
+    const url = new URL('https://apix.spotzee.com/api/client/contacts')
+    url.searchParams.set('limit', '100')
+    if (cursor) url.searchParams.set('cursor', cursor)
+
+    const res = await fetch(url, { headers: { Authorization: `Bearer ${token}` } })
+    const page = await res.json()
+    yield* page.results
+
+    cursor = page.nextCursor
+  } while (cursor)
+}
+```
+
+## Sort
+
+Pass `sort` as a single field name. Prefix with `-` for descending order:
+
+```http
+GET /contacts?sort=-created_at
+```
+
+Endpoints document their valid sort fields. Sorting on a non-indexed field returns `400 parameter_invalid_format`.
+
+## Filtering
+
+For v1, use simple `?key=value` filters where supported. The fielded query language (AIP-160 syntax) is on the roadmap.
+
+## Limits in practice
+
+- Use `limit=100` for bulk processing — fewer round-trips, predictable headers.
+- Use `limit=25` (the default) for interactive UIs.
+- Going above `100` returns `400 parameter_invalid_format`.
+
+## Next
+
+<Columns cols={2}>
+  <Card title="Rate limits" icon="gauge" href="/main-api/rate-limits">Stay under your per-second budget while paging.</Card>
+  <Card title="Errors" icon="circle-exclamation" href="/main-api/errors">Status codes and the `code` catalogue.</Card>
+</Columns>

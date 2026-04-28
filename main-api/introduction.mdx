@@ -23,38 +23,42 @@ Authorization: Bearer YOUR_API_KEY
 
 ## Surfaces
 
-The Main API exposes two surfaces, distinguished by URL prefix:
+The Main API exposes two surfaces, distinguished by URL prefix and key type:
 
-| Prefix | Audience | Auth |
+| Prefix | Key prefix | Use |
 |---|---|---|
-| `/client/*` | Third-party integrations and customer-built tools | Organisation-scoped API key |
-| `/admin/*` | Admin UI control plane (organisations, users, billing) | Session-based (UI use) |
+| `/client/*` | `sk_` (secret), `pk_` (publishable) | Third-party integrations, agent workloads, browser/mobile clients (publishable only on an explicit allowlist) |
+| `/admin/*` | `ok_` (organisation) | Cross-project administration: create projects, mint project keys |
 
-Public docs cover the `/client/*` surface only. The `/admin/*` surface is reserved for first-party use.
+See [Authentication](/main-api/authentication) for how to choose between key types.
 
-## Versioning
+## Conventions
 
-The current version is `v1`. Breaking changes will be released under a new version prefix; non-breaking additions land in the current version.
-
-## Rate limits
-
-Standard rate limits apply per API key. Exceeding the limit returns `429 Too Many Requests` with a `Retry-After` header indicating when to retry.
+| Concern | Convention |
+|---|---|
+| Versioning | `Spotzee-Version` header, date-based — see [Versioning](/main-api/versioning) |
+| Rate limits | Per-key budgets, `X-RateLimit-*` response headers — see [Rate limits](/main-api/rate-limits) |
+| Idempotency | `Idempotency-Key` header on `POST` and `PATCH` — see [Idempotency](/main-api/idempotency) |
+| Pagination | Cursor-based with `nextCursor` / `prevCursor` — see [Pagination](/main-api/pagination) |
+| Errors | RFC 7807 `application/problem+json` — see [Errors](/main-api/errors) |
+| Correlation | Every response includes an `X-Request-Id` header — quote it when reporting issues |
 
 ## Endpoints
 
 <Info>
-  Endpoint pages are auto-generated from the OpenAPI specification. See the navigation sidebar for the full list, grouped by resource (Contacts, Segments, Journeys, Campaigns, Lists, Templates, Events, Projects).
+  Endpoint pages are auto-generated from the OpenAPI specification. See the navigation sidebar for the full list, grouped by resource (Contacts, Lists, Subscriptions, Campaigns, Journeys, Templates, Events, Tags, Projects, API keys, Organisation).
 </Info>
 
-OpenAPI spec URL: `<<TBD: Main API OpenAPI spec URL — spec generation pending>>`
-
-## Errors
-
-Spotzee returns conventional HTTP status codes and a machine-readable error body. See the [Main API errors reference](/main-api/errors).
+OpenAPI spec URL: `https://apix.spotzee.com/api/openapi.json`
 
 ## Next
 
 <Columns cols={2}>
-  <Card title="Authentication" icon="key" href="/guides/authentication">API keys and scopes.</Card>
-  <Card title="Errors" icon="circle-exclamation" href="/main-api/errors">Status codes and error bodies.</Card>
+  <Card title="Authentication" icon="key" href="/main-api/authentication">Key types, scopes, and rotation.</Card>
+  <Card title="Versioning" icon="tag" href="/main-api/versioning">Pin a date-based release.</Card>
+  <Card title="Rate limits" icon="gauge" href="/main-api/rate-limits">Per-key budgets and headers.</Card>
+  <Card title="Idempotency" icon="shield" href="/main-api/idempotency">Safe retries on writes.</Card>
+  <Card title="Pagination" icon="list" href="/main-api/pagination">Cursors and sort.</Card>
+  <Card title="Webhooks" icon="webhook" href="/main-api/webhooks">Outgoing webhook signing and retries.</Card>
+  <Card title="Errors" icon="circle-exclamation" href="/main-api/errors">Status codes and code catalogue.</Card>
 </Columns>

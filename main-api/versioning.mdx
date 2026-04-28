@@ -1,0 +1,66 @@
+---
+title: "Versioning"
+description: "How the Spotzee API versions, how to pin a release, and how breaking changes are managed."
+keywords: ["versioning", "api version", "spotzee-version", "breaking changes", "deprecation"]
+icon: "tag"
+---
+
+The Main API uses **date-based versions** identified by the day a release shipped. Pin a version with the `Spotzee-Version` request header.
+
+```http
+Spotzee-Version: 2026-04-28
+```
+
+The current release is `2026-04-28`.
+
+## How it works
+
+- **Send the header**: every response is computed against that version.
+- **Omit the header**: requests run against the latest version your API key was created on. New keys default to today's release.
+- Every response echoes the version in a `Spotzee-Version` response header so you can confirm what you ran against.
+
+```http
+HTTP/1.1 200 OK
+Spotzee-Version: 2026-04-28
+```
+
+## Choosing a version pin
+
+<Tabs>
+  <Tab title="New integrations">
+    Pin to the latest version when you build, then schedule periodic upgrades — for example, once per quarter. Every breaking change earns a new dated release; the version you pinned keeps working until its deprecation window closes.
+  </Tab>
+  <Tab title="Existing integrations">
+    Stay on the version you originally built against. Migrations are opt-in: a new dated release does not change the behaviour of an older pin.
+  </Tab>
+</Tabs>
+
+## Version errors
+
+| HTTP | `code` | When |
+|---|---|---|
+| `400` | `version_unsupported` | The `Spotzee-Version` header value isn't a known release |
+| `400` | `parameter_invalid_format` | The header is present but isn't an ISO `YYYY-MM-DD` date |
+
+## Breaking vs non-breaking changes
+
+A new dated release ships when we make a **breaking** change. Adding a new endpoint, response field, or enum value is **non-breaking** and lands in the current release without a new pin.
+
+We treat the following as breaking:
+
+- Removing or renaming a field
+- Tightening validation (rejecting input that previously succeeded)
+- Changing the type or shape of an existing field
+- Changing the meaning of an enum value
+- Changing default behaviour when a parameter is omitted
+
+## Deprecation windows
+
+Endpoints, fields, or behaviours that are scheduled for removal carry a `deprecated: true` marker in the OpenAPI spec along with the date after which they stop working. We aim for a **12-month** deprecation window.
+
+## Next
+
+<Columns cols={2}>
+  <Card title="Errors" icon="circle-exclamation" href="/main-api/errors">Status codes and the `code` catalogue.</Card>
+  <Card title="Idempotency" icon="shield" href="/main-api/idempotency">Safe retries on writes.</Card>
+</Columns>

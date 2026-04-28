@@ -1,0 +1,77 @@
+---
+title: "Authentication"
+description: "API key types, scopes, and rotation for the Spotzee Main API."
+keywords: ["authentication", "api keys", "bearer token", "scopes", "publishable key", "secret key", "organisation key"]
+icon: "key"
+---
+
+The Main API uses bearer tokens. Pass your API key in the `Authorization` header on every request:
+
+```http
+Authorization: Bearer YOUR_API_KEY
+```
+
+## Key types
+
+Spotzee issues three API key types, each with a different prefix and scope.
+
+| Prefix | Type | Scope | Where it's used |
+|---|---|---|---|
+| `sk_` | **Secret** | One project | Server-to-server integrations. Full read + write within the issued project. |
+| `pk_` | **Publishable** | One project, allowlisted endpoints only | Browser, mobile, or any untrusted client. Safe to embed because each endpoint must explicitly allow `pk_`. |
+| `ok_` | **Organisation** | One organisation | Cross-project administration: create, list, and update projects under your organisation, and manage team API keys. |
+
+Treat `sk_` and `ok_` keys as secrets — never commit them to source control or embed in clients you do not control. Rotate immediately if you suspect a leak.
+
+## Choosing a key
+
+<Tabs>
+  <Tab title="Server backend (recommended)">
+    Use a **`sk_`** project key. It can call every endpoint in the project surface and is the primary integration path for sync, automation, and admin scripts.
+  </Tab>
+  <Tab title="Browser / mobile app">
+    Use a **`pk_`** publishable key. It works only for endpoints explicitly allowlisted for browser use:
+
+    - `POST /events` — capture behaviour from your front-end
+    - `GET /contacts/me` — read the current contact's preferences (when scoped by a contact token)
+    - `PATCH /subscriptions/me` — let the contact update their own opt-ins
+
+    Any other endpoint returns `401 authentication_required` when called with a `pk_` key.
+  </Tab>
+  <Tab title="Cross-project automation">
+    Use an **`ok_`** organisation key. These authenticate against the organisation surface (`https://apix.spotzee.com/api/admin`) and let you create projects, mint new `sk_`/`pk_` keys, and read organisation-level metadata.
+  </Tab>
+</Tabs>
+
+## Surfaces
+
+Each key type maps to a base URL.
+
+| Key type | Base URL |
+|---|---|
+| `sk_` / `pk_` | `https://apix.spotzee.com/api/client` |
+| `ok_` | `https://apix.spotzee.com/api/admin` |
+
+Sending a key to the wrong surface returns `401 authentication_required`.
+
+## Rotation
+
+1. Mint the replacement key in **Settings → API keys**.
+2. Roll the new key out to your integration.
+3. Confirm traffic on the new key, then revoke the old one.
+
+Revoked keys begin returning `401 authentication_required` immediately.
+
+## Errors
+
+| HTTP | `code` | When |
+|---|---|---|
+| `401` | `authentication_required` | Missing, malformed, or revoked key |
+| `403` | `permission_denied` | Key lacks the role needed for this resource |
+
+## Next
+
+<Columns cols={2}>
+  <Card title="Versioning" icon="tag" href="/main-api/versioning">Pin a date-based release.</Card>
+  <Card title="Errors" icon="circle-exclamation" href="/main-api/errors">Status codes and the `code` catalogue.</Card>
+</Columns>

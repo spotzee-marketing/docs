@@ -1,0 +1,103 @@
+---
+title: "Idempotency"
+description: "How to make POST and PATCH requests safely retryable with Idempotency-Key."
+keywords: ["idempotency", "idempotency-key", "retries", "duplicate prevention", "409"]
+icon: "shield"
+---
+
+Network failures, timeouts, and retries are unavoidable. Spotzee supports **idempotency keys** so a retried `POST` or `PATCH` returns the original response instead of running the operation twice.
+
+## How it works
+
+1. Generate a unique key per logical request — typically a UUID, a hash, or your own primary key.
+2. Send it as the `Idempotency-Key` header on the first attempt.
+3. If the request times out or fails partially, **retry with the exact same key and exact same body**.
+4. Spotzee replays the original response — same status, same body, same `request_id`.
+
+```http
+POST /contacts HTTP/1.1
+Host: apix.spotzee.com
+Authorization: Bearer sk_…
+Idempotency-Key: 1f6f4f7c-7a44-4cf6-9b3e-3b8a3a3b3a3a
+Content-Type: application/json
+
+{ "external_id": "user-9876", "email": "ada@example.com" }
+```
+
+## Scope and TTL
+
+- **Scope** — keys are scoped per API key, so you can reuse the same key string across keys without collision.
+- **TTL** — cached responses live for **24 hours**. After that, a request with the same key runs as a brand-new operation.
+- **Eligible methods** — `POST` and `PATCH`. `GET`, `HEAD`, and `DELETE` are idempotent by definition and ignore the header.
+
+## What Spotzee does on replay
+
+| Replay scenario | Outcome |
+|---|---|
+| Same key, **same** body | Original response is returned. The `Idempotent-Replayed: true` response header confirms it's a replay. |
+| Same key, **different** body | `409 idempotency_key_mismatch` — keys are tied to the exact request body. Use a fresh key for distinct requests. |
+| Same key, in-flight | `409 idempotency_in_progress` with `Retry-After`. The original request is still running; retry shortly. |
+
+## Errors
+
+```json
+{
+  "status": "error",
+  "code": "idempotency_key_mismatch",
+  "title": "Idempotency key mismatch",
+  "message": "The Idempotency-Key was reused with a different request body. Use a fresh key for distinct requests.",
+  "type": "https://docs.spotzee.com/main-api/errors#idempotency_key_mismatch",
+  "request_id": "req_01HXY…"
+}
+```
+
+| HTTP | `code` | When |
+|---|---|---|
+| `400` | `idempotency_key_invalid` | Empty or longer than 255 characters |
+| `409` | `idempotency_key_mismatch` | Same key reused with a different body |
+| `409` | `idempotency_in_progress` | Original request still running — retry after `Retry-After` |
+
+## Generating keys
+
+Any opaque string up to 255 characters works. Pick a generator that suits your platform:
+
+<Tabs>
+  <Tab title="JavaScript">
+    ```javascript
+    crypto.randomUUID()
+    ```
+  </Tab>
+  <Tab title="Python">
+    ```python
+    import uuid
+    str(uuid.uuid4())
+    ```
+  </Tab>
+  <Tab title="Go">
+    ```go
+    import "github.com/google/uuid"
+    uuid.NewString()
+    ```
+  </Tab>
+</Tabs>
+
+## When not to reuse a key
+
+Reuse a key for **the same logical operation** — for example, retrying the same "create contact" request after a timeout. Mint a **fresh** key when:
+
+- The user submits the form a second time after deciding to change a field.
+- You're processing a queue and each message is a distinct operation.
+- You're running a backfill — each row is its own logical request.
+
+## Caching rules
+
+- `2xx` responses are cached.
+- `4xx` responses are cached (your retry would have failed the same way).
+- `5xx` and `429` responses are **not** cached so retries can succeed when the platform recovers.
+
+## Next
+
+<Columns cols={2}>
+  <Card title="Rate limits" icon="gauge" href="/main-api/rate-limits">Per-key budgets and headers.</Card>
+  <Card title="Errors" icon="circle-exclamation" href="/main-api/errors">Status codes and the `code` catalogue.</Card>
+</Columns>

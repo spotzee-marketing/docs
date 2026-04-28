@@ -1,60 +1,111 @@
 ---
 title: "Errors"
-description: "HTTP status codes, error body shape, and common error codes for the Main API."
-keywords: ["errors", "http status", "error codes", "troubleshooting"]
+description: "HTTP status codes, error body shape, and the full code catalogue for the Main API."
+keywords: ["errors", "http status", "error codes", "rfc 7807", "problem details", "request id"]
 icon: "circle-exclamation"
 ---
 
-The Main API returns standard HTTP status codes and a JSON error body for every non-2xx response.
+The Main API returns standard HTTP status codes and a structured error body for every non-2xx response. The body follows the [RFC 7807 Problem Details](https://www.rfc-editor.org/rfc/rfc7807) shape with a few Spotzee-specific extensions.
 
 ## Error body shape
 
 ```json
 {
-  "error": {
-    "code": "string",
-    "message": "string",
-    "details": { }
-  }
+  "status": "error",
+  "code": "resource_missing",
+  "title": "Resource missing",
+  "message": "Contact cnt_01HXY7Z9K8M5J2N4P6Q8R0S1T2 was not found in this project.",
+  "type": "https://docs.spotzee.com/main-api/errors#resource_missing",
+  "request_id": "req_01HXY7Z9K8M5J2N4P6Q8R0S1T2",
+  "param": "id",
+  "errors": []
 }
 ```
 
+Error responses set `Content-Type: application/problem+json`.
+
 | Field | Type | Description |
 |---|---|---|
-| `code` | string | Machine-readable identifier (e.g. `validation_failed`, `not_found`) |
-| `message` | string | Human-readable summary, safe to show to your users |
-| `details` | object | Optional context — field-level validation errors, conflict details, etc. |
+| `status` | string | Always `"error"` for non-2xx responses |
+| `code` | string | Stable, machine-readable identifier from the catalogue below |
+| `title` | string | RFC 7807 short title — same for every response with this `code` |
+| `message` | string | Human-readable explanation, may include identifiers; safe to display in logs |
+| `type` | string | URL of the docs entry for this `code` |
+| `request_id` | string | Per-request correlation id (also returned as the `X-Request-Id` response header) |
+| `param` | string | Optional — names the offending parameter (e.g. `id`, `Spotzee-Version`) |
+| `errors` | array | Optional — per-field validation breakdown when multiple fields are invalid |
+
+### Per-field errors
+
+When `code` is `validation_failed`, the `errors` array lists every offending field:
+
+```json
+{
+  "status": "error",
+  "code": "validation_failed",
+  "title": "Request validation failed",
+  "message": "One or more fields failed validation. See errors[] for details.",
+  "type": "https://docs.spotzee.com/main-api/errors#validation_failed",
+  "request_id": "req_01HXY…",
+  "errors": [
+    { "param": "email", "code": "parameter_invalid_format", "message": "Must be a valid email address" },
+    { "param": "external_id", "code": "parameter_missing", "message": "Required" }
+  ]
+}
+```
 
 ## Status codes
 
 | Status | Meaning | Typical cause |
 |---|---|---|
-| `400 Bad Request` | Validation failed | Missing required field, invalid format, payload too large |
-| `401 Unauthorized` | Missing or invalid token | No `Authorization` header, expired key, revoked key |
-| `403 Forbidden` | Authenticated but not allowed | Key scope insufficient, resource belongs to another organisation |
-| `404 Not Found` | Resource does not exist | Wrong ID, resource deleted |
-| `409 Conflict` | State conflict | Duplicate `email` on contact, segment name in use |
-| `422 Unprocessable Entity` | Business rule violation | Sending to an unsubscribed contact, invalid journey graph |
-| `429 Too Many Requests` | Rate limited | Retry after the `Retry-After` header |
-| `500 Internal Server Error` | Unexpected platform error | Retry with backoff; if persistent, contact support |
+| `400 Bad Request` | Malformed request | Invalid header value, malformed JSON, bad parameter format |
+| `401 Unauthorized` | Missing or invalid credential | Missing `Authorization` header, expired or revoked key |
+| `402 Payment Required` | Quota exhausted | Credit-metered operation with insufficient balance |
+| `403 Forbidden` | Authenticated but not allowed | Key lacks the role for this resource |
+| `404 Not Found` | Resource missing | Wrong id, resource deleted, or scoped to a different project |
+| `409 Conflict` | State conflict | Unique-constraint violation, idempotency mismatch |
+| `422 Unprocessable Entity` | Validation failed | One or more fields failed schema validation |
+| `429 Too Many Requests` | Rate limited | Honour the `Retry-After` header before retrying |
+| `500 Internal Server Error` | Unexpected error | Retry with backoff; if persistent, include the `request_id` when contacting support |
 | `503 Service Unavailable` | Temporary capacity issue | Retry with backoff |
 
-## Common error codes
+## Code catalogue
 
-| `code` | When it appears |
-|---|---|
-| `validation_failed` | One or more fields failed schema validation; see `details` |
-| `not_found` | The referenced resource does not exist or is not visible to your key |
-| `forbidden` | Your key lacks the required scope |
-| `duplicate` | A unique constraint was violated |
-| `quota_exceeded` | Plan limit reached (contacts, sends, etc.) |
-| `provider_error` | Your configured provider rejected the operation; see `details` |
+The `code` field is stable and documented. Add new codes to your switch statement only when you need to handle them differently — the catalogue is additive.
+
+| `code` | HTTP | Meaning |
+|---|---|---|
+| `resource_missing` | `404` | The referenced resource does not exist or isn't visible to this key |
+| `resource_already_exists` | `409` | Unique-constraint violation on create |
+| `parameter_missing` | `400` | A required field is absent |
+| `parameter_invalid_empty` | `400` | A required field is present but empty |
+| `parameter_invalid_format` | `400` | A field is present but malformed |
+| `parameter_unknown` | `400` | A field isn't recognised by this version |
+| `validation_failed` | `422` | One or more entries are returned in `errors[]` |
+| `authentication_required` | `401` | No credential or invalid credential |
+| `permission_denied` | `403` | Credential lacks the role for this resource |
+| `idempotency_key_mismatch` | `409` | Same `Idempotency-Key` replayed with a different body |
+| `idempotency_key_invalid` | `400` | Empty or longer than 255 characters |
+| `idempotency_in_progress` | `409` | Original request still running — retry after `Retry-After` |
+| `rate_limited` | `429` | Per-second budget exhausted; check `Retry-After` |
+| `version_unsupported` | `400` | `Spotzee-Version` value is not a known release |
+| `version_required` | `400` | Endpoint requires a pinned version (rare) |
+| `webhook_signature_invalid` | `400` | HMAC verification failed on inbound webhook configuration |
+| `quota_exceeded` | `402` | Credit-metered operation with insufficient balance |
+| `internal_error` | `500` | Unhandled platform error — report the `request_id` |
 
 ## Retry guidance
 
 - **Idempotent reads** (`GET`): retry freely on `5xx` and `429`.
-- **Mutations** (`POST`/`PUT`/`PATCH`/`DELETE`): include an `Idempotency-Key` header so retries are safe. Retry on `5xx` and `429`; do not retry on `4xx`.
+- **Mutations** (`POST` / `PATCH`): include an [`Idempotency-Key`](/main-api/idempotency) header so retries are safe. Retry on `5xx` and `429`; do not retry `4xx` (with the exception of `idempotency_in_progress`, which is explicitly retryable).
 
 ## Reporting bugs
 
-Include the `request_id` from the response headers when reporting an error. It lets us trace your specific request end-to-end.
+Always include the `request_id` (in the response body or the `X-Request-Id` header) when reporting an error. It lets us trace your specific request end-to-end.
+
+## Next
+
+<Columns cols={2}>
+  <Card title="Idempotency" icon="shield" href="/main-api/idempotency">Make retries safe.</Card>
+  <Card title="Rate limits" icon="gauge" href="/main-api/rate-limits">Avoid `429` with self-throttling.</Card>
+</Columns>
