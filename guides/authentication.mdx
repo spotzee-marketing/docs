@@ -1,0 +1,46 @@
+---
+title: "Authentication"
+description: "API keys, scopes, and how to authenticate against the Main API and Extended API."
+keywords: ["authentication", "api keys", "bearer token", "scopes"]
+icon: "key"
+---
+
+Both APIs use bearer-token authentication. Pass the token in the `Authorization` header on every request:
+
+```http
+Authorization: Bearer YOUR_API_KEY
+```
+
+## Where keys live
+
+API keys are issued at the **organisation** level and scoped to one or more **projects**. Generate a key in the Spotzee app under **Settings → API keys**.
+
+<Warning>
+  Treat API keys as secrets. Never commit a key to source control, never embed in client-side code, and rotate immediately if you suspect a leak.
+</Warning>
+
+## Key scopes
+
+| Scope | Purpose |
+|---|---|
+| `read` | Read-only access to contacts, segments, journeys, campaigns |
+| `write` | Read + write for the same resources |
+| `secret` | Full read + write, including export/import and webhook configuration |
+
+Pick the **least-privilege** scope your integration actually needs.
+
+## Main API vs Extended API
+
+- The **Main API** (`apix.spotzee.com/api/client`) accepts organisation-scoped API keys.
+- The **Extended API** (`app.spotzee.com/api/ext`) accepts the same API keys — Spotzee resolves which surface owns the requested resource.
+
+## Errors
+
+A missing or invalid token returns `401 Unauthorized`. A valid token without sufficient scope returns `403 Forbidden`. See the per-tab error reference: [Main API errors](/main-api/errors), [Extended API errors](/extended-api/errors).
+
+## Next
+
+<Columns cols={2}>
+  <Card title="Main API reference" icon="terminal" href="/main-api/introduction">All endpoints, request/response shapes.</Card>
+  <Card title="Extended API reference" icon="bolt" href="/extended-api/introduction">Edge utilities and validation.</Card>
+</Columns>

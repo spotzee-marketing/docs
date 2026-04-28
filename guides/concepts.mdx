@@ -1,0 +1,72 @@
+---
+title: "Core concepts"
+description: "The building blocks of Spotzee — organisations, projects, contacts, segments, journeys, and channels."
+keywords: ["concepts", "data model", "contacts", "segments", "journeys", "channels"]
+icon: "book"
+---
+
+This page introduces the objects you'll work with throughout the product and the API.
+
+## Organisation
+
+The top-level container. An organisation owns billing, users, projects, and audit history. Most customers operate one organisation; agencies and groups operate several.
+
+## Project
+
+A workspace inside an organisation. A project owns its own contacts, segments, journeys, campaigns, templates, and providers. Use separate projects to isolate brands, regions, or production-vs-staging workloads.
+
+## Contact
+
+A person or account that can be marketed to. Every contact has standard identifiers (email, phone) plus arbitrary custom attributes you define. Contacts can sit in many segments at once.
+
+## Segment
+
+A dynamic audience defined by a query (attributes + behaviour). Membership recalculates as data changes — you do not maintain segment membership manually.
+
+## List
+
+A static, named collection of contacts. Unlike a segment, a list's membership is set explicitly. Use lists for one-off imports and historical exports.
+
+## Journey
+
+A visual multi-step automation. Spotzee journeys support eleven step types — `send`, `delay`, `gate` (conditional split), `experiment` (A/B), `balancer`, `update`, `event`, `exit`, `link`, `wait-for-event`, and triggers (event-based or scheduled).
+
+## Channel
+
+A delivery surface. Spotzee supports email, SMS, WhatsApp, push, in-app, and webhooks. Each channel uses a configured **provider** to do the actual delivery.
+
+## Provider
+
+The vendor account that actually sends messages. On Starter, you bring your own (any supported email or SMS provider). Professional and Enterprise tiers include managed delivery infrastructure as well as BYO support.
+
+## Template
+
+A reusable message body — for any channel — with merge tags that resolve from contact attributes and event data at send time.
+
+## Campaign
+
+A one-off send to a segment or list. Campaigns are simpler than journeys when you only need a single broadcast.
+
+## Event
+
+A behaviour signal sent into Spotzee — a page view, a purchase, a custom action. Events feed segments, trigger journeys, and personalise content.
+
+## Tier-gated capabilities
+
+| Capability | Starter | Professional | Enterprise |
+|---|---|---|---|
+| Multi-channel messaging (BYO providers) | ✓ | ✓ | ✓ |
+| Visual journeys (11 step types) | ✓ | ✓ | ✓ |
+| Smart segments | ✓ | ✓ | ✓ |
+| AI content generation | ✓ | ✓ | ✓ |
+| Managed delivery infrastructure | — | ✓ | ✓ |
+| Compliance workflows + archiving | — | ✓ | ✓ |
+| Financial data triggers | — | ✓ | ✓ |
+| Managed services | — | ✓ | ✓ |
+
+## Next
+
+<Columns cols={2}>
+  <Card title="Build a journey" icon="route" href="/guides/journeys">Sequence, branch, test, exit.</Card>
+  <Card title="Smart segments" icon="filter" href="/guides/segments">Define dynamic audiences.</Card>
+</Columns>

@@ -1,0 +1,45 @@
+---
+title: "Channels"
+description: "Send via email, SMS, WhatsApp, push, in-app, and webhooks — from one platform."
+keywords: ["channels", "email", "sms", "whatsapp", "push", "in-app", "webhooks"]
+icon: "broadcast-tower"
+---
+
+Spotzee sends across six channels. Each channel uses a configured **provider** to do the actual delivery.
+
+## Email
+
+Transactional and marketing email. On Starter, bring your own delivery provider. On Professional and Enterprise, managed delivery infrastructure is included alongside any BYO provider you configure.
+
+## SMS
+
+Text messaging via your configured SMS provider. Per-message pricing applies on top of platform pricing.
+
+## WhatsApp
+
+WhatsApp Business messaging. Templates must be approved by WhatsApp before use.
+
+## Push
+
+Mobile push notifications via the standard mobile platforms.
+
+## In-app
+
+Messages rendered inside your own product, served via the API.
+
+## Webhooks
+
+Outbound HTTP callbacks. Use webhooks to forward events to your own systems, trigger third-party integrations, or update CRMs.
+
+## Provider configuration
+
+Providers are configured per project. A project can hold multiple providers per channel — Spotzee routes a send to the configured default unless you specify otherwise.
+
+<Info>
+  See [Bring your own provider](/guides/providers) for the supported vendor list and credential requirements.
+</Info>
+
+## Reference
+
+- Send a message — see [Main API → Campaigns / Journeys](/main-api/introduction)
+- Test message deliverability — see [Extended API → Email health](/extended-api/introduction)

@@ -1,0 +1,59 @@
+---
+title: "Errors"
+description: "HTTP status codes, error body shape, and common error codes for the Extended API."
+keywords: ["errors", "http status", "error codes", "extended api"]
+icon: "circle-exclamation"
+---
+
+The Extended API returns standard HTTP status codes and a JSON error body for every non-2xx response.
+
+## Error body shape
+
+```json
+{
+  "error": {
+    "code": "string",
+    "message": "string",
+    "details": { }
+  }
+}
+```
+
+| Field | Type | Description |
+|---|---|---|
+| `code` | string | Machine-readable identifier |
+| `message` | string | Human-readable summary, safe to show to your users |
+| `details` | object | Optional context — upstream lookup data, validation field map, etc. |
+
+## Status codes
+
+| Status | Meaning | Typical cause |
+|---|---|---|
+| `400 Bad Request` | Invalid input | Malformed email, invalid domain, bad payload |
+| `401 Unauthorized` | Missing or invalid token | No `Authorization` header, expired key |
+| `403 Forbidden` | Authenticated but not allowed | Key scope insufficient |
+| `404 Not Found` | Resource or record not present | Domain has no DNS record of the requested type |
+| `408 Request Timeout` | Upstream lookup exceeded timeout | DNS or upstream provider slow — retry once |
+| `429 Too Many Requests` | Rate limited or quota exhausted | Honour `Retry-After`; check your remaining quota |
+| `500 Internal Server Error` | Unexpected platform error | Retry with backoff |
+| `503 Service Unavailable` | Temporary capacity issue | Retry with backoff |
+
+## Common error codes
+
+| `code` | When it appears |
+|---|---|
+| `invalid_email` | Address fails syntactic or domain validation |
+| `invalid_domain` | Domain does not resolve or is malformed |
+| `dns_lookup_failed` | DNS query returned an error or timed out |
+| `quota_exhausted` | Daily or plan-level credit limit reached |
+| `provider_error` | Upstream delivery provider rejected the operation |
+| `timeout` | The upstream lookup did not return within the configured window |
+
+## Quota errors
+
+Validation and AI-scoring endpoints are credit-metered. A `429` with `code: "quota_exhausted"` includes a `details.reset_at` timestamp indicating when the quota window resets.
+
+## Retry guidance
+
+- **Lookups** (`GET`): retry on `5xx`, `408`, and `429` with exponential backoff.
+- **SMS dispatch** (`POST`): include an `Idempotency-Key` to make retries safe. Do not retry `4xx`.

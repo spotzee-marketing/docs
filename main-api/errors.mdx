@@ -1,0 +1,60 @@
+---
+title: "Errors"
+description: "HTTP status codes, error body shape, and common error codes for the Main API."
+keywords: ["errors", "http status", "error codes", "troubleshooting"]
+icon: "circle-exclamation"
+---
+
+The Main API returns standard HTTP status codes and a JSON error body for every non-2xx response.
+
+## Error body shape
+
+```json
+{
+  "error": {
+    "code": "string",
+    "message": "string",
+    "details": { }
+  }
+}
+```
+
+| Field | Type | Description |
+|---|---|---|
+| `code` | string | Machine-readable identifier (e.g. `validation_failed`, `not_found`) |
+| `message` | string | Human-readable summary, safe to show to your users |
+| `details` | object | Optional context — field-level validation errors, conflict details, etc. |
+
+## Status codes
+
+| Status | Meaning | Typical cause |
+|---|---|---|
+| `400 Bad Request` | Validation failed | Missing required field, invalid format, payload too large |
+| `401 Unauthorized` | Missing or invalid token | No `Authorization` header, expired key, revoked key |
+| `403 Forbidden` | Authenticated but not allowed | Key scope insufficient, resource belongs to another organisation |
+| `404 Not Found` | Resource does not exist | Wrong ID, resource deleted |
+| `409 Conflict` | State conflict | Duplicate `email` on contact, segment name in use |
+| `422 Unprocessable Entity` | Business rule violation | Sending to an unsubscribed contact, invalid journey graph |
+| `429 Too Many Requests` | Rate limited | Retry after the `Retry-After` header |
+| `500 Internal Server Error` | Unexpected platform error | Retry with backoff; if persistent, contact support |
+| `503 Service Unavailable` | Temporary capacity issue | Retry with backoff |
+
+## Common error codes
+
+| `code` | When it appears |
+|---|---|
+| `validation_failed` | One or more fields failed schema validation; see `details` |
+| `not_found` | The referenced resource does not exist or is not visible to your key |
+| `forbidden` | Your key lacks the required scope |
+| `duplicate` | A unique constraint was violated |
+| `quota_exceeded` | Plan limit reached (contacts, sends, etc.) |
+| `provider_error` | Your configured provider rejected the operation; see `details` |
+
+## Retry guidance
+
+- **Idempotent reads** (`GET`): retry freely on `5xx` and `429`.
+- **Mutations** (`POST`/`PUT`/`PATCH`/`DELETE`): include an `Idempotency-Key` header so retries are safe. Retry on `5xx` and `429`; do not retry on `4xx`.
+
+## Reporting bugs
+
+Include the `request_id` from the response headers when reporting an error. It lets us trace your specific request end-to-end.

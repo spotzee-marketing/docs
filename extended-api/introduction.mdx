@@ -1,0 +1,67 @@
+---
+title: "Extended API"
+description: "Edge utilities — email validation, DNS lookups, SMS, AI text tools, and customer data services."
+keywords: ["extended api", "email validation", "dns", "sms", "ai tools", "edge api"]
+icon: "bolt"
+---
+
+The **Extended API** is a set of low-latency edge utilities that complement the Main API. Use it for high-volume operations where round-trip latency matters: email address validation, DNS lookups for domain setup, SMS dispatch, and AI text scoring.
+
+## Base URL
+
+```
+https://app.spotzee.com/api/ext
+```
+
+## Authentication
+
+All requests require a bearer token. The same API keys used for the Main API are accepted here. See [Authentication](/guides/authentication).
+
+```http
+Authorization: Bearer YOUR_API_KEY
+```
+
+## Capabilities
+
+| Group | What it does |
+|---|---|
+| Email health | Validate addresses, detect role accounts, check domain reputation |
+| DNS | Look up SPF, DKIM, DMARC, MX records — used by domain-setup wizards |
+| SMS | Dispatch SMS messages and check delivery |
+| AI text tools | Score, classify, and generate content snippets |
+| Customer data | Read-only lookups for enriched customer records |
+| Quota | Inspect remaining credits on metered operations |
+
+## When to use Extended over Main
+
+| Use Extended API for… | Use Main API for… |
+|---|---|
+| Per-request validation in a signup form | CRUD on contacts, segments, journeys |
+| Domain-setup wizards in your own UI | Triggering campaigns and journeys |
+| High-volume scoring at the edge | Reading reporting and analytics data |
+| Quota and credit lookups | Managing organisation and project state |
+
+## Versioning
+
+The current version is `v1`. The OpenAPI specification is published at:
+
+```
+https://app.spotzee.com/api/ext/openapi.json
+```
+
+Interactive Swagger UI is available at `https://app.spotzee.com/api/ext/docs`.
+
+## Rate limits
+
+Per-API-key rate limits apply. Quota-metered endpoints (validation, scoring) deduct credits on success — check `Quota` endpoints before high-volume runs.
+
+## Errors
+
+See the [Extended API errors reference](/extended-api/errors).
+
+## Next
+
+<Columns cols={2}>
+  <Card title="Authentication" icon="key" href="/guides/authentication">API keys and scopes.</Card>
+  <Card title="Errors" icon="circle-exclamation" href="/extended-api/errors">Status codes and error bodies.</Card>
+</Columns>

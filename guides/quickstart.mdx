@@ -1,0 +1,59 @@
+---
+title: "Quickstart"
+description: "Create your account, import contacts, and send your first campaign."
+keywords: ["quickstart", "getting started", "first campaign", "spotzee setup"]
+icon: "play"
+---
+
+This guide walks you through sending your first campaign on the **Starter** tier. You'll create an account, import a small list, build a one-step journey, and send.
+
+<Info>
+  Starter is free up to 250 contacts and uses your own delivery providers (BYO). To use Spotzee's managed delivery infrastructure or financial-services features, contact sales about Professional or Enterprise.
+</Info>
+
+## Prerequisites
+
+- A Spotzee account — sign up at `<<TBD: signup URL>>`
+- A delivery provider account (any supported email or SMS vendor)
+- A test contact list (CSV or copy-pasted addresses)
+
+## Steps
+
+<Steps>
+  <Step title="Create your organisation">
+    After signing in, you'll be prompted to create an **organisation**. This is the top-level container that holds your projects, users, and billing.
+  </Step>
+
+  <Step title="Connect a delivery provider">
+    From your project, go to **Settings → Providers** and add your email or SMS sending account. You'll be asked for the credentials your provider issues — usually an API key.
+  </Step>
+
+  <Step title="Import contacts">
+    Go to **Contacts → Import** and upload a CSV. The first row should be column headers. Spotzee maps standard fields (email, phone, first name) automatically and stores the rest as custom attributes.
+  </Step>
+
+  <Step title="Build a one-step journey">
+    Go to **Journeys → New** and pick the **Send** template. Choose the channel, pick or compose a message, and save.
+  </Step>
+
+  <Step title="Send and monitor">
+    Trigger the journey for your imported contacts. Watch delivery, opens, and clicks live in **Reporting**.
+  </Step>
+</Steps>
+
+## Next steps
+
+<Columns cols={2}>
+  <Card title="Core concepts" icon="book" href="/guides/concepts">
+    The building blocks: contacts, segments, journeys, channels.
+  </Card>
+  <Card title="Build a multi-step journey" icon="route" href="/guides/journeys">
+    Add delays, splits, and A/B tests.
+  </Card>
+  <Card title="Smart segments" icon="filter" href="/guides/segments">
+    Audiences that update as customer data changes.
+  </Card>
+  <Card title="API access" icon="terminal" href="/main-api/introduction">
+    Trigger campaigns and sync contacts from your own systems.
+  </Card>
+</Columns>

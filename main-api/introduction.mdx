@@ -1,0 +1,60 @@
+---
+title: "Main API"
+description: "Programmatic access to contacts, segments, journeys, campaigns, projects, and organisation management."
+keywords: ["api", "rest", "main api", "spotzee api"]
+icon: "terminal"
+---
+
+The **Main API** is the primary way to integrate Spotzee with your own systems. Use it to sync contacts, trigger campaigns, build segments, manage journeys, and administer projects and organisations.
+
+## Base URL
+
+```
+https://apix.spotzee.com/api
+```
+
+## Authentication
+
+All requests require a bearer token. See [Authentication](/guides/authentication).
+
+```http
+Authorization: Bearer YOUR_API_KEY
+```
+
+## Surfaces
+
+The Main API exposes two surfaces, distinguished by URL prefix:
+
+| Prefix | Audience | Auth |
+|---|---|---|
+| `/client/*` | Third-party integrations and customer-built tools | Organisation-scoped API key |
+| `/admin/*` | Admin UI control plane (organisations, users, billing) | Session-based (UI use) |
+
+Public docs cover the `/client/*` surface only. The `/admin/*` surface is reserved for first-party use.
+
+## Versioning
+
+The current version is `v1`. Breaking changes will be released under a new version prefix; non-breaking additions land in the current version.
+
+## Rate limits
+
+Standard rate limits apply per API key. Exceeding the limit returns `429 Too Many Requests` with a `Retry-After` header indicating when to retry.
+
+## Endpoints
+
+<Info>
+  Endpoint pages are auto-generated from the OpenAPI specification. See the navigation sidebar for the full list, grouped by resource (Contacts, Segments, Journeys, Campaigns, Lists, Templates, Events, Projects).
+</Info>
+
+OpenAPI spec URL: `<<TBD: Main API OpenAPI spec URL — spec generation pending>>`
+
+## Errors
+
+Spotzee returns conventional HTTP status codes and a machine-readable error body. See the [Main API errors reference](/main-api/errors).
+
+## Next
+
+<Columns cols={2}>
+  <Card title="Authentication" icon="key" href="/guides/authentication">API keys and scopes.</Card>
+  <Card title="Errors" icon="circle-exclamation" href="/main-api/errors">Status codes and error bodies.</Card>
+</Columns>

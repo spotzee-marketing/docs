@@ -1,0 +1,57 @@
+---
+title: "Smart segments"
+description: "Define dynamic audiences that update as customer data and behaviour change."
+keywords: ["segments", "audiences", "filtering", "behavioural targeting"]
+icon: "filter"
+---
+
+A **segment** is a query that resolves to a set of contacts. Membership is recalculated continuously — you do not maintain it by hand.
+
+## What you can segment on
+
+- **Contact attributes** — any standard or custom field on a contact
+- **Engagement** — opens, clicks, sends, deliveries, bounces, unsubscribes
+- **Events** — any tracked event (count, recency, properties)
+- **Journey state** — currently in journey X, completed journey Y
+- **List membership** — in/not-in any static list
+
+## Operators
+
+`equals`, `not equals`, `contains`, `starts with`, `ends with`, `greater than`, `less than`, `between`, `in (list)`, `is set`, `is not set`, `within last N days`.
+
+## Build a segment
+
+<Steps>
+  <Step title="Pick a base">
+    Start from **all contacts** or from another segment.
+  </Step>
+  <Step title="Add filters">
+    Combine conditions with **AND** / **OR**. Group conditions with parentheses for complex logic.
+  </Step>
+  <Step title="Preview">
+    The segment editor shows live count and a sample of matched contacts.
+  </Step>
+  <Step title="Save and use">
+    Reference the segment from any journey trigger, campaign, or send step.
+  </Step>
+</Steps>
+
+## Common patterns
+
+- **Engaged in last 30 days** — opened or clicked any message in the last 30 days
+- **At-risk** — last engagement > 60 days ago, but lifetime value > threshold
+- **High-intent** — viewed pricing page in last 7 days AND not yet a customer
+- **Renewal due** — `policy_renewal_date` within next 30 days *(financial-services attribute)*
+
+## Reference
+
+Segments are read/write via the API:
+
+- Create / list / update / delete / preview-count — see [Main API → Segments](/main-api/introduction)
+
+## Next
+
+<Columns cols={2}>
+  <Card title="Build a journey" icon="route" href="/guides/journeys">Use a segment as the trigger.</Card>
+  <Card title="Events" icon="bolt" href="/guides/events">Send behaviour signals into Spotzee.</Card>
+</Columns>
