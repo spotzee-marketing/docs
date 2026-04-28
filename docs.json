@@ -112,12 +112,23 @@
     }
   },
   "contextual": {
-    "options": ["copy", "view", "claude", "cursor"]
+    "options": [
+      "copy",
+      "view",
+      "chatgpt",
+      "claude",
+      "perplexity",
+      "mcp",
+      "cursor",
+      "vscode"
+    ]
   },
   "footer": {
     "socials": {
-      "x": "https://x.com/spotzee",
-      "linkedin": "https://linkedin.com/company/spotzee"
+      "x": "https://www.twitter.com/spotzeemarketin",
+      "linkedin": "https://www.linkedin.com/company/spotzee-marketing",
+      "facebook": "https://www.facebook.com/spotzeemarketing",
+      "github": "https://github.com/spotzee-marketing"
     }
   },
   "fonts": {
