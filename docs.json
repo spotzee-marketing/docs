@@ -66,7 +66,6 @@
       },
       {
         "tab": "Extended API",
-        "openapi": "https://app.spotzee.com/api/ext/openapi.json",
         "groups": [
           {
             "group": "Overview",
@@ -95,8 +94,8 @@
     }
   },
   "logo": {
-    "light": "/logo/light.svg",
-    "dark": "/logo/dark.svg",
+    "light": "/images/logo-light.svg",
+    "dark": "/images/logo-dark.svg",
     "href": "https://docs.spotzee.com"
   },
   "navbar": {
