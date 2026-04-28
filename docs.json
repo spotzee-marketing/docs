@@ -66,6 +66,7 @@
       },
       {
         "tab": "Extended API",
+        "openapi": "https://app.spotzee.com/api/ext/openapi.json",
         "groups": [
           {
             "group": "Overview",
