@@ -102,8 +102,8 @@
   "navbar": {
     "links": [
       {
-        "label": "Support",
-        "href": "mailto:contact@spotzee.com"
+        "label": "Website",
+        "href": "https://spotzee.com"
       }
     ],
     "primary": {
