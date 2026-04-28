@@ -97,15 +97,15 @@ The `code` field is stable and documented. Add new codes to your switch statemen
 ## Retry guidance
 
 - **Idempotent reads** (`GET`): retry freely on `5xx` and `429`.
-- **Mutations** (`POST` / `PATCH`): include an [`Idempotency-Key`](/main-api/idempotency) header so retries are safe. Retry on `5xx` and `429`; do not retry `4xx` (with the exception of `idempotency_in_progress`, which is explicitly retryable).
+- **Mutations** (`POST` / `PATCH`): include an [`Idempotency-Key`](/guides/api-idempotency) header so retries are safe. Retry on `5xx` and `429`; do not retry `4xx` (with the exception of `idempotency_in_progress`, which is explicitly retryable).
 
 ## Reporting bugs
 
 Always include the `request_id` (in the response body or the `X-Request-Id` header) when reporting an error. It lets us trace your specific request end-to-end.
 
-## Next
+## Next steps
 
 <Columns cols={2}>
-  <Card title="Idempotency" icon="shield" href="/main-api/idempotency">Make retries safe.</Card>
-  <Card title="Rate limits" icon="gauge" href="/main-api/rate-limits">Avoid `429` with self-throttling.</Card>
+  <Card title="Idempotency" icon="shield" href="/guides/api-idempotency">Make retries safe.</Card>
+  <Card title="Rate limits" icon="gauge" href="/guides/api-rate-limits">Avoid `429` with self-throttling.</Card>
 </Columns>

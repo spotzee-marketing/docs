@@ -48,6 +48,17 @@
               "guides/channels",
               "guides/authentication"
             ]
+          },
+          {
+            "group": "API conventions",
+            "icon": "book",
+            "pages": [
+              "guides/api-versioning",
+              "guides/api-rate-limits",
+              "guides/api-idempotency",
+              "guides/api-pagination",
+              "guides/api-webhooks"
+            ]
           }
         ]
       },
@@ -59,55 +70,7 @@
             "group": "Overview",
             "icon": "terminal",
             "pages": [
-              "main-api/introduction"
-            ]
-          },
-          {
-            "group": "Authentication",
-            "icon": "key",
-            "pages": [
-              "main-api/authentication"
-            ]
-          },
-          {
-            "group": "Versioning",
-            "icon": "tag",
-            "pages": [
-              "main-api/versioning"
-            ]
-          },
-          {
-            "group": "Rate limits",
-            "icon": "gauge",
-            "pages": [
-              "main-api/rate-limits"
-            ]
-          },
-          {
-            "group": "Idempotency",
-            "icon": "shield",
-            "pages": [
-              "main-api/idempotency"
-            ]
-          },
-          {
-            "group": "Pagination",
-            "icon": "list",
-            "pages": [
-              "main-api/pagination"
-            ]
-          },
-          {
-            "group": "Webhooks",
-            "icon": "webhook",
-            "pages": [
-              "main-api/webhooks"
-            ]
-          },
-          {
-            "group": "Errors",
-            "icon": "circle-exclamation",
-            "pages": [
+              "main-api/introduction",
               "main-api/errors"
             ]
           }

@@ -5,60 +5,53 @@ keywords: ["api", "rest", "main api", "spotzee api"]
 icon: "terminal"
 ---
 
-The **Main API** is the primary way to integrate Spotzee with your own systems. Use it to sync contacts, trigger campaigns, build segments, manage journeys, and administer projects and organisations.
+The Main API is the primary way to integrate Spotzee with your own systems. Use it to sync contacts, trigger campaigns, build segments, manage journeys, and administer projects and organisations.
 
 ## Base URL
 
-```
+```text
 https://apix.spotzee.com/api
 ```
 
+The public surface is split across two prefixes:
+
+| Prefix | Key prefix | Use |
+|---|---|---|
+| `/client/*` | `sk_` (secret), `pk_` (publishable) | Third-party integrations, agent workloads, browser/mobile clients (publishable on an explicit allowlist) |
+| `/admin/*` | `ok_` (organisation) | Cross-project administration |
+
 ## Authentication
 
-All requests require a bearer token. See [Authentication](/guides/authentication).
+All requests require a bearer token. See the [Authentication](/guides/authentication) guide for key types, scopes, and rotation.
 
 ```http
 Authorization: Bearer YOUR_API_KEY
 ```
 
-## Surfaces
-
-The Main API exposes two surfaces, distinguished by URL prefix and key type:
-
-| Prefix | Key prefix | Use |
-|---|---|---|
-| `/client/*` | `sk_` (secret), `pk_` (publishable) | Third-party integrations, agent workloads, browser/mobile clients (publishable only on an explicit allowlist) |
-| `/admin/*` | `ok_` (organisation) | Cross-project administration: create projects, mint project keys |
-
-See [Authentication](/main-api/authentication) for how to choose between key types.
-
 ## Conventions
 
-| Concern | Convention |
+Common request and response conventions live in the Guides tab:
+
+| Concern | Read |
 |---|---|
-| Versioning | `Spotzee-Version` header, date-based — see [Versioning](/main-api/versioning) |
-| Rate limits | Per-key budgets, `X-RateLimit-*` response headers — see [Rate limits](/main-api/rate-limits) |
-| Idempotency | `Idempotency-Key` header on `POST` and `PATCH` — see [Idempotency](/main-api/idempotency) |
-| Pagination | Cursor-based with `nextCursor` / `prevCursor` — see [Pagination](/main-api/pagination) |
-| Errors | RFC 7807 `application/problem+json` — see [Errors](/main-api/errors) |
-| Correlation | Every response includes an `X-Request-Id` header — quote it when reporting issues |
+| Versioning | [API versioning](/guides/api-versioning) — `Spotzee-Version` header |
+| Rate limits | [Rate limits](/guides/api-rate-limits) — `X-RateLimit-*` headers, MCP doubling |
+| Idempotency | [Idempotency](/guides/api-idempotency) — `Idempotency-Key` on `POST` and `PATCH` |
+| Pagination | [Pagination](/guides/api-pagination) — cursor-based with `nextCursor` / `prevCursor` |
+| Webhooks | [Webhooks](/guides/api-webhooks) — outgoing signing and retries |
+| Correlation | Every response includes `X-Request-Id` — quote it when reporting issues |
 
 ## Endpoints
 
 <Info>
-  Endpoint pages are auto-generated from the OpenAPI specification. See the navigation sidebar for the full list, grouped by resource (Contacts, Lists, Subscriptions, Campaigns, Journeys, Templates, Events, Tags, Projects, API keys, Organisation).
+  Endpoint pages are auto-generated from the OpenAPI specification. See the sidebar for the full list, grouped by resource (Contacts, Lists, Subscriptions, Campaigns, Journeys, Templates, Events, Tags, Projects, API keys, Organisation).
 </Info>
 
 OpenAPI spec URL: `https://apix.spotzee.com/api/openapi.json`
 
-## Next
+## Next steps
 
 <Columns cols={2}>
-  <Card title="Authentication" icon="key" href="/main-api/authentication">Key types, scopes, and rotation.</Card>
-  <Card title="Versioning" icon="tag" href="/main-api/versioning">Pin a date-based release.</Card>
-  <Card title="Rate limits" icon="gauge" href="/main-api/rate-limits">Per-key budgets and headers.</Card>
-  <Card title="Idempotency" icon="shield" href="/main-api/idempotency">Safe retries on writes.</Card>
-  <Card title="Pagination" icon="list" href="/main-api/pagination">Cursors and sort.</Card>
-  <Card title="Webhooks" icon="webhook" href="/main-api/webhooks">Outgoing webhook signing and retries.</Card>
-  <Card title="Errors" icon="circle-exclamation" href="/main-api/errors">Status codes and code catalogue.</Card>
+  <Card title="Authentication" icon="key" href="/guides/authentication">Key types, scopes, and rotation.</Card>
+  <Card title="Errors" icon="circle-exclamation" href="/main-api/errors">Status codes and the `code` catalogue.</Card>
 </Columns>

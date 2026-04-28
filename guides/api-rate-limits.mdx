@@ -1,6 +1,6 @@
 ---
 title: "Rate limits"
-description: "Per-key rate limits, response headers, and retry strategy for the Spotzee Main API."
+description: "Per-key rate limits, response headers, and retry strategy for the Spotzee API."
 keywords: ["rate limits", "throttling", "429", "retry-after", "backoff", "mcp"]
 icon: "gauge"
 ---
@@ -9,7 +9,7 @@ Every API key has a per-second budget for read and write operations. Limits are 
 
 ## Limits per plan
 
-Limits are **per second per API key**, with a 10-second sliding window that absorbs short bursts.
+Limits are per second per API key, with a 10-second sliding window that absorbs short bursts.
 
 | Plan | Read req/s | Write req/s | Burst (10s window) |
 |---|---|---|---|
@@ -17,11 +17,11 @@ Limits are **per second per API key**, with a 10-second sliding window that abso
 | Professional | 1,000 | 500 | 1.5× |
 | Enterprise | 5,000 | 2,500 | 2× |
 
-Read = `GET`, `HEAD`, `OPTIONS`. Write = `POST`, `PATCH`, `PUT`, `DELETE`.
+Read covers `GET`, `HEAD`, `OPTIONS`. Write covers `POST`, `PATCH`, `PUT`, `DELETE`.
 
 ### MCP and agent workloads
 
-If you're driving the API from an MCP server or agent runtime, send the `x-spotzee-client-type: mcp` header. We **double** your base limits when this header is present so parallel tool calls don't run out of budget mid-task.
+If you're driving the API from an MCP server or agent runtime, send the `x-spotzee-client-type: mcp` header. Spotzee doubles your base limits when this header is present so parallel tool calls don't run out of budget mid-task.
 
 ```http
 x-spotzee-client-type: mcp
@@ -101,9 +101,9 @@ async function callApi(path, init) {
 
 A small set of endpoints (validation, scoring, and other quota-billed operations) consumes credits in addition to the per-second budget. Hitting your credit balance returns `402 quota_exceeded` even when your rate-limit headers show capacity remaining.
 
-## Next
+## Next steps
 
 <Columns cols={2}>
-  <Card title="Idempotency" icon="shield" href="/main-api/idempotency">Safe retries on writes.</Card>
+  <Card title="Idempotency" icon="shield" href="/guides/api-idempotency">Make retries safe.</Card>
   <Card title="Errors" icon="circle-exclamation" href="/main-api/errors">Status codes and the `code` catalogue.</Card>
 </Columns>

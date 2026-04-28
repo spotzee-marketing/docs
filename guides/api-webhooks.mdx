@@ -7,7 +7,7 @@ icon: "webhook"
 
 Spotzee delivers events to your endpoints via signed HTTP `POST`. Verify the signature on every incoming webhook before you trust the payload.
 
-## Configuring an endpoint
+## Configure an endpoint
 
 Create or rotate webhook endpoints from **Settings → Webhooks** in the Spotzee app, or via the API. Each endpoint has:
 
@@ -30,20 +30,20 @@ Content-Type: application/json
 | `t=` | Unix timestamp (seconds) when Spotzee signed the request |
 | `v1=` | Hex-encoded HMAC-SHA256 of `<t>.<raw_body>` using your endpoint's signing secret |
 
-## Verifying the signature
+## Verify the signature
 
 <Steps>
   <Step title="Read the timestamp and signature">
     Parse the `Spotzee-Signature` header into `t` and `v1` values.
   </Step>
   <Step title="Reject stale timestamps">
-    Reject the request if `t` is more than **5 minutes** off your current clock — that's the replay-protection window.
+    Reject the request if `t` is more than 5 minutes off your current clock — that's the replay-protection window.
   </Step>
   <Step title="Compute the expected HMAC">
     Concatenate `<t>.<raw_body>` (period separator) and HMAC-SHA256 it with your signing secret. Hex-encode the result.
   </Step>
   <Step title="Compare with constant-time equality">
-    Use a constant-time comparison (e.g. `crypto.timingSafeEqual` in Node, `hmac.compare_digest` in Python). Reject on mismatch.
+    Use a constant-time comparison (e.g. `crypto.timingSafeEqual` in JavaScript, `hmac.compare_digest` in Python). Reject on mismatch.
   </Step>
 </Steps>
 
@@ -71,18 +71,18 @@ export function verifyWebhook(rawBody, header, secret) {
 ```
 
 <Warning>
-  Sign the **raw** request body, not a parsed-and-re-stringified version. JSON re-encoding can change byte-for-byte content and break the signature.
+  Sign the raw request body, not a parsed-and-re-stringified version. JSON re-encoding can change byte-for-byte content and break the signature.
 </Warning>
 
 ## Errors
 
-If signature verification fails on Spotzee's side (e.g. you flipped the secret without rotating), we surface `webhook_signature_invalid`:
+If signature verification fails on Spotzee's side (for example, you flipped the secret without rotating), Spotzee surfaces `webhook_signature_invalid`:
 
 | HTTP | `code` | When |
 |---|---|---|
 | `400` | `webhook_signature_invalid` | HMAC didn't match the expected value |
 
-## Rotating the signing secret
+## Rotate the signing secret
 
 <Steps>
   <Step title="Add a new signing secret">
@@ -110,15 +110,15 @@ Spotzee retries 5xx responses and connection errors with exponential backoff:
 | 6 | 6 hours |
 | 7 | 24 hours (final) |
 
-After the final attempt, the delivery is marked failed and surfaced in **Settings → Webhooks → Deliveries**. Replies with `2xx` (any) confirm receipt; `4xx` is a permanent failure and **stops** retrying.
+After the final attempt, the delivery is marked failed and surfaced in **Settings → Webhooks → Deliveries**. Replies with any `2xx` confirm receipt; `4xx` is a permanent failure and stops retrying.
 
 ## Idempotency on the receiving side
 
-Webhooks are at-least-once. Stamp each event with its `event_id` and discard duplicates on your side, or use the `Idempotency-Key`-style pattern in your own database to make the handler safe to call twice.
+Webhooks are at-least-once. Stamp each event with its `event_id` and discard duplicates on your side, or use the same idempotency-key pattern in your own database to make the handler safe to call twice.
 
-## Next
+## Next steps
 
 <Columns cols={2}>
   <Card title="Errors" icon="circle-exclamation" href="/main-api/errors">Status codes and the `code` catalogue.</Card>
-  <Card title="Authentication" icon="key" href="/main-api/authentication">Choose the right key type for outgoing API calls.</Card>
+  <Card title="Authentication" icon="key" href="/guides/authentication">Choose the right key type for outgoing API calls.</Card>
 </Columns>

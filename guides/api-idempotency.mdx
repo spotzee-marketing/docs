@@ -5,14 +5,24 @@ keywords: ["idempotency", "idempotency-key", "retries", "duplicate prevention", 
 icon: "shield"
 ---
 
-Network failures, timeouts, and retries are unavoidable. Spotzee supports **idempotency keys** so a retried `POST` or `PATCH` returns the original response instead of running the operation twice.
+Network failures, timeouts, and retries are unavoidable. Spotzee supports idempotency keys so a retried `POST` or `PATCH` returns the original response instead of running the operation twice.
 
 ## How it works
 
-1. Generate a unique key per logical request — typically a UUID, a hash, or your own primary key.
-2. Send it as the `Idempotency-Key` header on the first attempt.
-3. If the request times out or fails partially, **retry with the exact same key and exact same body**.
-4. Spotzee replays the original response — same status, same body, same `request_id`.
+<Steps>
+  <Step title="Generate a key">
+    Generate a unique key per logical request — typically a UUID, a hash, or your own primary key.
+  </Step>
+  <Step title="Send it on the first attempt">
+    Add an `Idempotency-Key` header to your `POST` or `PATCH`.
+  </Step>
+  <Step title="Retry with the same key and body">
+    If the request times out or fails partially, retry with the exact same key and exact same body.
+  </Step>
+  <Step title="Receive the cached response">
+    Spotzee replays the original response — same status, same body, same `request_id`.
+  </Step>
+</Steps>
 
 ```http
 POST /contacts HTTP/1.1
@@ -27,15 +37,15 @@ Content-Type: application/json
 ## Scope and TTL
 
 - **Scope** — keys are scoped per API key, so you can reuse the same key string across keys without collision.
-- **TTL** — cached responses live for **24 hours**. After that, a request with the same key runs as a brand-new operation.
+- **TTL** — cached responses live for 24 hours. After that, a request with the same key runs as a brand-new operation.
 - **Eligible methods** — `POST` and `PATCH`. `GET`, `HEAD`, and `DELETE` are idempotent by definition and ignore the header.
 
 ## What Spotzee does on replay
 
 | Replay scenario | Outcome |
 |---|---|
-| Same key, **same** body | Original response is returned. The `Idempotent-Replayed: true` response header confirms it's a replay. |
-| Same key, **different** body | `409 idempotency_key_mismatch` — keys are tied to the exact request body. Use a fresh key for distinct requests. |
+| Same key, same body | Original response is returned. The `Idempotent-Replayed: true` response header confirms it's a replay. |
+| Same key, different body | `409 idempotency_key_mismatch` — keys are tied to the exact request body. Use a fresh key for distinct requests. |
 | Same key, in-flight | `409 idempotency_in_progress` with `Retry-After`. The original request is still running; retry shortly. |
 
 ## Errors
@@ -61,29 +71,25 @@ Content-Type: application/json
 
 Any opaque string up to 255 characters works. Pick a generator that suits your platform:
 
-<Tabs>
-  <Tab title="JavaScript">
-    ```javascript
-    crypto.randomUUID()
-    ```
-  </Tab>
-  <Tab title="Python">
-    ```python
-    import uuid
-    str(uuid.uuid4())
-    ```
-  </Tab>
-  <Tab title="Go">
-    ```go
-    import "github.com/google/uuid"
-    uuid.NewString()
-    ```
-  </Tab>
-</Tabs>
+<CodeGroup>
+```javascript JavaScript
+crypto.randomUUID()
+```
+
+```python Python
+import uuid
+str(uuid.uuid4())
+```
+
+```go Go
+import "github.com/google/uuid"
+uuid.NewString()
+```
+</CodeGroup>
 
 ## When not to reuse a key
 
-Reuse a key for **the same logical operation** — for example, retrying the same "create contact" request after a timeout. Mint a **fresh** key when:
+Reuse a key for the same logical operation — for example, retrying the same "create contact" request after a timeout. Mint a fresh key when:
 
 - The user submits the form a second time after deciding to change a field.
 - You're processing a queue and each message is a distinct operation.
@@ -93,11 +99,11 @@ Reuse a key for **the same logical operation** — for example, retrying the sam
 
 - `2xx` responses are cached.
 - `4xx` responses are cached (your retry would have failed the same way).
-- `5xx` and `429` responses are **not** cached so retries can succeed when the platform recovers.
+- `5xx` and `429` responses are not cached so retries can succeed when the platform recovers.
 
-## Next
+## Next steps
 
 <Columns cols={2}>
-  <Card title="Rate limits" icon="gauge" href="/main-api/rate-limits">Per-key budgets and headers.</Card>
+  <Card title="Rate limits" icon="gauge" href="/guides/api-rate-limits">Per-key budgets and headers.</Card>
   <Card title="Errors" icon="circle-exclamation" href="/main-api/errors">Status codes and the `code` catalogue.</Card>
 </Columns>
