@@ -46,6 +46,7 @@
               "guides/journeys",
               "guides/segments",
               "guides/channels",
+              "guides/providers",
               "guides/authentication"
             ]
           },
