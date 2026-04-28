@@ -85,11 +85,6 @@
           "anchor": "App",
           "href": "https://app.spotzee.com",
           "icon": "gauge"
-        },
-        {
-          "anchor": "Website",
-          "href": "https://spotzee.com",
-          "icon": "globe"
         }
       ]
     }
