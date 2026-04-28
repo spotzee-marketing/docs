@@ -1,13 +1,30 @@
 {
   "$schema": "https://mintlify.com/docs.json",
-  "theme": "mint",
+  "theme": "almond",
   "name": "Spotzee",
+  "description": "Marketing automation for every business — purpose-built for financial services",
   "colors": {
-    "primary": "#16A34A",
-    "light": "#22C55E",
-    "dark": "#15803D"
+    "primary": "#6a75f1",
+    "light": "#5a84e9",
+    "dark": "#004aad"
   },
   "favicon": "/favicon.svg",
+  "api": {
+    "playground": {
+      "display": "interactive"
+    },
+    "params": {
+      "expanded": "all"
+    },
+    "examples": {
+      "languages": ["curl", "python", "javascript", "go"],
+      "defaults": "required",
+      "autogenerate": true
+    },
+    "spec": {
+      "download": true
+    }
+  },
   "navigation": {
     "tabs": [
       {
@@ -49,6 +66,7 @@
       },
       {
         "tab": "Extended API",
+        "openapi": "https://app.spotzee.com/api/ext/openapi.json",
         "groups": [
           {
             "group": "Overview",
@@ -64,51 +82,58 @@
     "global": {
       "anchors": [
         {
-          "anchor": "Status",
-          "href": "https://status.spotzee.com",
-          "icon": "signal"
+          "anchor": "App",
+          "href": "https://app.spotzee.com",
+          "icon": "gauge"
         },
         {
-          "anchor": "Support",
-          "href": "mailto:support@spotzee.com",
-          "icon": "envelope"
+          "anchor": "Website",
+          "href": "https://spotzee.com",
+          "icon": "globe"
         }
       ]
     }
   },
   "logo": {
     "light": "/logo/light.svg",
-    "dark": "/logo/dark.svg"
+    "dark": "/logo/dark.svg",
+    "href": "https://docs.spotzee.com"
   },
   "navbar": {
     "links": [
       {
-        "label": "Sign in",
-        "href": "https://app.spotzee.com/sign-in"
+        "label": "Support",
+        "href": "mailto:contact@spotzee.com"
       }
     ],
     "primary": {
       "type": "button",
-      "label": "Get started",
-      "href": "https://app.spotzee.com/sign-up"
+      "label": "App",
+      "href": "https://app.spotzee.com"
     }
   },
   "contextual": {
-    "options": [
-      "copy",
-      "view",
-      "chatgpt",
-      "claude",
-      "perplexity",
-      "mcp",
-      "cursor",
-      "vscode"
-    ]
+    "options": ["copy", "view", "claude", "cursor"]
   },
   "footer": {
     "socials": {
       "x": "https://x.com/spotzee",
       "linkedin": "https://linkedin.com/company/spotzee"
     }
+  },
+  "fonts": {
+    "family": "Lato",
+    "weight": 400,
+    "heading": {
+      "family": "Lato",
+      "weight": 900
+    },
+    "body": {
+      "family": "Lato",
+      "weight": 400
+    }
+  },
+  "appearance": {
+    "default": "system"
   }
 }
