@@ -36,6 +36,7 @@ Content-Type: application/json
 ## Scope and TTL
 
 - **Scope** — keys are scoped per API key, so you can reuse the same key string across keys without collision.
+- **Per-surface scope** — the Main API and Extended API maintain independent caches. The same `Idempotency-Key` sent to both surfaces is treated as two distinct requests; pick a fresh key per surface if you want isolation, or reuse it deliberately knowing each surface will replay independently.
 - **TTL** — cached responses live for 24 hours. After that, a request with the same key runs as a brand-new operation.
 - **Eligible methods** — `POST` and `PATCH`. `GET`, `HEAD`, and `DELETE` are idempotent by definition and ignore the header.
 
@@ -45,7 +46,8 @@ Content-Type: application/json
 |---|---|
 | Same key, same body | Original response is returned. The `Idempotent-Replayed: true` response header confirms it's a replay. |
 | Same key, different body | `409 idempotency_key_mismatch` — keys are tied to the exact request body. Use a fresh key for distinct requests. |
-| Same key, in-flight | `409 idempotency_in_progress` with `Retry-After`. The original request is still running; retry shortly. |
+| Same key, in-flight (Main API) | `409 idempotency_in_progress` with `Retry-After`. The original request is still running; retry shortly. |
+| Same key, in-flight (Extended API) | The duplicate runs and is cached on completion — there is no in-flight 409 on this surface. Successive replays after the first response lands return the cached copy. |
 
 ## Errors
 
@@ -64,7 +66,7 @@ Content-Type: application/json
 |---|---|---|
 | `400` | `idempotency_key_invalid` | Empty or longer than 255 characters |
 | `409` | `idempotency_key_mismatch` | Same key reused with a different body |
-| `409` | `idempotency_in_progress` | Original request still running — retry after `Retry-After` |
+| `409` | `idempotency_in_progress` | Original request still running — retry after `Retry-After`. Main API only. |
 
 ## Generating keys
 
