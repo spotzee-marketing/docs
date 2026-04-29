@@ -8,11 +8,13 @@ Spotzee delivers events to your endpoints via signed HTTP `POST`. Verify the sig
 
 ## Configure an endpoint
 
-Create or rotate webhook endpoints from **Settings → Webhooks** in the Spotzee app, or via the API. Each endpoint has:
+Create or rotate webhook endpoints from **Settings → Webhooks** in the Spotzee app, or via the **Webhooks** tag in the API reference. Each endpoint has:
 
 - A target URL (must be `https://`)
 - A list of subscribed event types
-- A signing secret (issued on creation, rotatable)
+- A signing secret (issued on creation; rotate via `POST /webhooks/{endpointId}/rotate-secret`)
+
+The plaintext signing secret is returned **exactly once** — on the create response and on every rotate. Persist it immediately; it cannot be re-fetched.
 
 ## The signature header
 
@@ -83,15 +85,17 @@ If signature verification fails on Spotzee's side (for example, you flipped the 
 
 ## Rotate the signing secret
 
+Call `POST /webhooks/{endpointId}/rotate-secret` — or use **Settings → Webhooks → Rotate** in the Spotzee app — to get a fresh signing secret.
+
 <Steps>
-  <Step title="Add a new signing secret">
-    Generate a new secret in **Settings → Webhooks**. Both the old and new secrets are valid for the rotation window.
+  <Step title="Generate a new secret">
+    The rotate call returns the new plaintext signing secret exactly once. Persist it immediately.
   </Step>
-  <Step title="Update your verifier">
-    Accept signatures verified against either secret while you cut over.
+  <Step title="Roll forward your verifier">
+    Update your verifier to the new secret. The previous secret stops verifying deliveries the moment the rotate call returns, so plan the rotation for a brief window where missed events are acceptable, or temporarily accept signatures verified against either value during cut-over by reading both from your secret store.
   </Step>
-  <Step title="Promote the new secret">
-    Confirm traffic is verified by the new secret, then revoke the old one.
+  <Step title="Confirm">
+    Watch your delivery logs to confirm the new secret is verifying inbound events.
   </Step>
 </Steps>
 
@@ -121,3 +125,5 @@ Webhooks are at-least-once. Stamp each event with its `event_id` and discard dup
   <Card title="Errors" icon="circle-exclamation" href="/main-api/errors">Status codes and the `code` catalogue.</Card>
   <Card title="Authentication" icon="key" href="/guides/authentication">Choose the right key type for outgoing API calls.</Card>
 </Columns>
+
+The full webhook CRUD operations — list, create, get, update, delete, and rotate-secret — appear under the **Webhooks** tag in the [API reference](/main-api/introduction).
