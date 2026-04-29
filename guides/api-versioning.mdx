@@ -14,8 +14,8 @@ The current release is `2026-04-28`.
 
 ## How it works
 
-- **Send the header**: every response is computed against that version.
-- **Omit the header**: requests run against the latest version your API key was created on. New keys default to the current release.
+- **Send the header**: the request runs against that version.
+- **Omit the header**: the request runs against the current default release. The default moves forward only when a new dated release ships; pin a version explicitly if you want behaviour to stay stable across upgrades.
 - Every response echoes the version in a `Spotzee-Version` response header so you can confirm what you ran against.
 
 ```http
