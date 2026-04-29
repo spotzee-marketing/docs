@@ -7,6 +7,30 @@ icon: "clock-rotate-left"
 
 The Spotzee API uses date-based versions. Pin a version with the `Spotzee-Version` request header — see [API versioning](/guides/api-versioning) for the full pinning model.
 
+## Tooling — 2026-04-29 (afternoon)
+
+### Extended API consolidated onto `apix.spotzee.com`
+
+Both the Main API and Extended API now serve from the same hostname. Update your client configuration:
+
+| Surface | Old base URL | New base URL |
+|---|---|---|
+| Main API | `https://apix.spotzee.com/api/client` | _unchanged_ |
+| Extended API | `https://app.spotzee.com/api/ext` | **`https://apix.spotzee.com/api/ext`** |
+| Extended API spec | `https://app.spotzee.com/api/ext/openapi.json` | **`https://apix.spotzee.com/api/ext/openapi.json`** |
+
+This is a hard cutover with no overlap. Update your integrations.
+
+### Extended API conventions aligned with Main API
+
+The Extended API now ships the same wire-level conventions as the Main API:
+
+- **`Spotzee-Version` header** — required to be either `2026-04-28` or omitted (server defaults to current). Echoed on every response.
+- **`X-Request-Id` header** — Stripe-style `req_<id>` on every response. Globally unique per request. Quote it in support tickets.
+- **`application/problem+json`** — error responses now use the RFC 7807 media type.
+- **OpenAPI 3.1** — the published spec is now OpenAPI 3.1.0 (was 3.0.0).
+- **Canonical error envelope** — `{status, code, title, message, error, type, request_id}` matches the Main API exactly. The legacy `error` field is kept as the canonical envelope's optional mirror until a future major version.
+
 ## 2026-04-28
 
 The first publicly-versioned release of the Spotzee API.
