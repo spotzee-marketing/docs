@@ -2,7 +2,6 @@
 title: "Idempotency"
 description: "How to make POST and PATCH requests safely retryable with Idempotency-Key."
 keywords: ["idempotency", "idempotency-key", "retries", "duplicate prevention", "409"]
-icon: "shield"
 ---
 
 Network failures, timeouts, and retries are unavoidable. Spotzee supports idempotency keys so a retried `POST` or `PATCH` returns the original response instead of running the operation twice.

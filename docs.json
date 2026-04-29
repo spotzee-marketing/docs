@@ -17,7 +17,12 @@
       "expanded": "all"
     },
     "examples": {
-      "languages": ["curl", "python", "javascript", "go"],
+      "languages": [
+        "curl",
+        "python",
+        "javascript",
+        "go"
+      ],
       "defaults": "required",
       "autogenerate": true
     },
@@ -32,7 +37,6 @@
         "groups": [
           {
             "group": "Get started",
-            "icon": "rocket",
             "pages": [
               "index",
               "guides/quickstart",
@@ -41,7 +45,6 @@
           },
           {
             "group": "Build",
-            "icon": "wrench",
             "pages": [
               "guides/journeys",
               "guides/segments",
@@ -52,7 +55,6 @@
           },
           {
             "group": "API conventions",
-            "icon": "book",
             "pages": [
               "guides/api-versioning",
               "guides/api-rate-limits",
@@ -64,7 +66,6 @@
           },
           {
             "group": "Recipes",
-            "icon": "code",
             "pages": [
               "guides/sync-contacts",
               "guides/event-ingestion",
@@ -75,7 +76,6 @@
           },
           {
             "group": "Releases",
-            "icon": "clock-rotate-left",
             "pages": [
               "changelog"
             ]
@@ -88,7 +88,6 @@
         "groups": [
           {
             "group": "Overview",
-            "icon": "terminal",
             "pages": [
               "main-api/introduction",
               "main-api/errors"
@@ -146,7 +145,6 @@
         "groups": [
           {
             "group": "Overview",
-            "icon": "bolt",
             "pages": [
               "extended-api/introduction",
               "extended-api/errors"
