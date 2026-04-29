@@ -93,6 +93,50 @@
               "main-api/introduction",
               "main-api/errors"
             ]
+          },
+          {
+            "group": "Projects",
+            "tag": "Projects"
+          },
+          {
+            "group": "Contacts",
+            "tag": "Contacts"
+          },
+          {
+            "group": "Events",
+            "tag": "Events"
+          },
+          {
+            "group": "Lists",
+            "tag": "Lists"
+          },
+          {
+            "group": "Subscriptions",
+            "tag": "Subscriptions"
+          },
+          {
+            "group": "Templates",
+            "tag": "Templates"
+          },
+          {
+            "group": "Campaigns",
+            "tag": "Campaigns"
+          },
+          {
+            "group": "Journeys",
+            "tag": "Journeys"
+          },
+          {
+            "group": "Tags",
+            "tag": "Tags"
+          },
+          {
+            "group": "API keys",
+            "tag": "API keys"
+          },
+          {
+            "group": "Organisation",
+            "tag": "Organisation"
           }
         ]
       },
