@@ -136,6 +136,10 @@
           {
             "group": "Organisation",
             "tag": "Organisation"
+          },
+          {
+            "group": "Webhooks",
+            "tag": "Webhooks"
           }
         ]
       },
@@ -149,6 +153,30 @@
               "extended-api/introduction",
               "extended-api/errors"
             ]
+          },
+          {
+            "group": "AI",
+            "tag": "AI"
+          },
+          {
+            "group": "DNS",
+            "tag": "DNS"
+          },
+          {
+            "group": "Email",
+            "tag": "Email"
+          },
+          {
+            "group": "SMS",
+            "tag": "SMS"
+          },
+          {
+            "group": "Text",
+            "tag": "Text"
+          },
+          {
+            "group": "Data",
+            "tag": "Data"
           }
         ]
       }
