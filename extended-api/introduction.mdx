@@ -10,8 +10,10 @@ The **Extended API** is a set of low-latency edge utilities that complement the 
 ## Base URL
 
 ```
-https://app.spotzee.com/api/ext
+https://apix.spotzee.com/api/ext
 ```
+
+Both the Main API and Extended API now serve from the same hostname. The same `Spotzee-Version`, `X-Request-Id`, and error envelope conventions apply on both surfaces — see [API conventions](/guides/api-versioning) for the full set.
 
 ## Authentication
 
@@ -43,13 +45,13 @@ Authorization: Bearer YOUR_API_KEY
 
 ## Versioning
 
-The current version is `v1`. The OpenAPI specification is published at:
+The Extended API is dated like the Main API. Pin a version with the `Spotzee-Version` request header (see [API versioning](/guides/api-versioning)). The current release is `2026-04-28`.
+
+The OpenAPI specification is published at:
 
 ```
-https://app.spotzee.com/api/ext/openapi.json
+https://apix.spotzee.com/api/ext/openapi.json
 ```
-
-Interactive Swagger UI is available at `https://app.spotzee.com/api/ext/docs`.
 
 ## Rate limits
 

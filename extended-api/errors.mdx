@@ -5,31 +5,39 @@ keywords: ["errors", "http status", "error codes", "extended api"]
 icon: "circle-exclamation"
 ---
 
-The Extended API returns standard HTTP status codes and a JSON error body for every non-2xx response.
+The Extended API and Main API share one error envelope, served as `application/problem+json` (RFC 7807). Every non-2xx response carries the same fields.
 
 ## Error body shape
 
 ```json
 {
-  "error": {
-    "code": "string",
-    "message": "string",
-    "details": { }
-  }
+  "status": "error",
+  "code": "authentication_required",
+  "title": "Authentication required",
+  "message": "Invalid API key. Please ensure you copied it correctly.",
+  "error": "Invalid API key. Please ensure you copied it correctly.",
+  "type": "https://docs.spotzee.com/main-api/errors#authentication_required",
+  "request_id": "req_9f3bad665eabf0d6"
 }
 ```
 
 | Field | Type | Description |
 |---|---|---|
-| `code` | string | Machine-readable identifier |
-| `message` | string | Human-readable summary, safe to show to your users |
-| `details` | object | Optional context — upstream lookup data, validation field map, etc. |
+| `status` | string | Always `"error"` for non-2xx responses. |
+| `code` | string | Stable, machine-readable identifier. Safe to switch on; never localised. |
+| `title` | string | Short human-readable summary suitable for a heading. en-AU. |
+| `message` | string | Human-readable explanation. May reference identifiers. |
+| `error` | string | Legacy mirror of `message`. Retained while existing integrations migrate; new code should read `message`. |
+| `type` | string | Documentation URL for this error class (RFC 7807). |
+| `request_id` | string | Server-generated correlation ID. Echoed in the `X-Request-Id` response header. Quote it in support tickets. |
+| `param` | string | Optional. Names the offending parameter when a single field is at fault. |
+| `errors[]` | array | Optional. Field-level breakdown when multiple parameters fail validation. Each entry: `{ param, code, message }`. |
 
 ## Status codes
 
 | Status | Meaning | Typical cause |
 |---|---|---|
-| `400 Bad Request` | Invalid input | Malformed email, invalid domain, bad payload |
+| `400 Bad Request` | Invalid input | Malformed email, invalid domain, bad payload, unsupported `Spotzee-Version` |
 | `401 Unauthorized` | Missing or invalid token | No `Authorization` header, expired key |
 | `403 Forbidden` | Authenticated but not allowed | Key scope insufficient |
 | `404 Not Found` | Resource or record not present | Domain has no DNS record of the requested type |
@@ -40,18 +48,22 @@ The Extended API returns standard HTTP status codes and a JSON error body for ev
 
 ## Common error codes
 
+The full code catalogue is shared with the Main API:
+
 | `code` | When it appears |
 |---|---|
-| `invalid_email` | Address fails syntactic or domain validation |
-| `invalid_domain` | Domain does not resolve or is malformed |
-| `dns_lookup_failed` | DNS query returned an error or timed out |
-| `quota_exhausted` | Daily or plan-level credit limit reached |
-| `provider_error` | Upstream delivery provider rejected the operation |
-| `timeout` | The upstream lookup did not return within the configured window |
+| `authentication_required` | No credential or invalid credential. |
+| `permission_denied` | Credential lacks scope or role. |
+| `parameter_missing` / `parameter_invalid_format` | Field absent or malformed (e.g. invalid email, bad domain). |
+| `validation_failed` | One or more `errors[]` entries present. |
+| `quota_exceeded` | Credit-metered operation; insufficient balance. |
+| `rate_limited` | Token bucket exhausted; check `Retry-After`. |
+| `version_unsupported` / `version_required` | `Spotzee-Version` header value not a known release. |
+| `internal_error` | Unhandled — quote `request_id` in support tickets. |
 
 ## Quota errors
 
-Validation and AI-scoring endpoints are credit-metered. A `429` with `code: "quota_exhausted"` includes a `details.reset_at` timestamp indicating when the quota window resets.
+Validation and AI-scoring endpoints are credit-metered. A `quota_exceeded` response indicates the daily or plan-level credit limit has been reached. Inspect remaining credits via the `Quota` endpoints before high-volume runs.
 
 ## Retry guidance
 
