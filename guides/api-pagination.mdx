@@ -49,7 +49,7 @@ For convenience, list endpoints also emit:
 ## Walking a list
 
 ```javascript
-async function* listAllContacts(token) {
+async function* listAllUsers(token) {
   let cursor = null
   do {
     const url = new URL('https://apix.spotzee.com/api/client/users')
