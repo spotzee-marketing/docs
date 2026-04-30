@@ -68,7 +68,8 @@
               "guides/custom-domains",
               "guides/locales",
               "guides/data-schema",
-              "guides/subscription-preferences"
+              "guides/subscription-preferences",
+              "guides/webhook-endpoints"
             ]
           },
           {

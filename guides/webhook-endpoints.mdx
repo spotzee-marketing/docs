@@ -1,0 +1,123 @@
+---
+title: "Subscribe to webhook events"
+description: "Configure outbound webhook endpoints, subscribe to delivery events, rotate the signing secret, and run a test from Spotzee."
+keywords: ["webhooks", "events", "subscriptions", "endpoints", "signing", "delivery"]
+---
+
+Webhook endpoints let downstream systems receive events from Spotzee instead of polling. Spotzee tracks 27 delivery and reputation events across the email pipeline. You add an endpoint, pick which events you care about, and your endpoint receives signed JSON whenever those events fire.
+
+<Note>
+Endpoint configuration is **live today**: you can create endpoints, subscribe to events, run test calls from the Spotzee UI, and rotate signing secrets right now. **Outbound delivery of catalogued events is on the roadmap.** Subscriptions you set up today will start receiving events once the dispatch loop ships. The test affordance lets you validate signature verification before that.
+</Note>
+
+<Info>
+Webhook endpoint management lives under **Settings** → **Webhook Endpoints** and requires the project `admin` role.
+</Info>
+
+## Add an endpoint
+
+<Steps>
+<Step title="Open Settings → Webhook Endpoints">
+Inside the project, open **Settings** and pick the **Webhook Endpoints** tab.
+</Step>
+
+<Step title="Create the endpoint">
+Choose **Add endpoint**, then complete:
+- **Name**. Recognisable label (for example, `analytics-pipeline`).
+- **Description**. Optional. Useful for documenting what the endpoint is for.
+- **URL**. Where Spotzee will POST events. Must be HTTPS.
+- **Events**. Pick the events to subscribe to. See the catalogue below.
+</Step>
+
+<Step title="Save">
+Save. Spotzee generates a signing secret and shows it once. Copy the secret into your endpoint's secrets manager. Subsequent reads return the secret in masked form.
+</Step>
+</Steps>
+
+## Pick events
+
+The 27 events split into seven categories. Pick whichever match the signal you need.
+
+| Category | Events | Use for |
+|---|---|---|
+| **Queue** | `queue.queue-message-authenticated`, `queue.rescheduled`, `queue.quota-exceeded`, `delivery.concurrency-limit-exceeded` | Pipeline observability, capacity planning |
+| **Delivery lifecycle** | `delivery.attempt-start`, `delivery.attempt-end`, `delivery.completed` | Per-attempt audit trail |
+| **Delivery success** | `delivery.delivered` | The "this landed" signal |
+| **Delivery bounces** | `delivery.dsn-perm-fail`, `delivery.dsn-temp-fail`, `delivery.failed`, `delivery.mail-from-rejected`, `delivery.message-rejected`, `delivery.rcpt-to-rejected`, `delivery.rcpt-to-failed` | Bounce classification, list hygiene |
+| **Delivery infrastructure** | `delivery.mx-lookup-failed`, `delivery.ip-lookup-failed`, `delivery.null-mx`, `delivery.connect-error`, `delivery.greeting-failed`, `delivery.ehlo-rejected` | Infrastructure failures (DNS, network, SMTP handshake) |
+| **Delivery TLS** | `delivery.start-tls-error`, `delivery.start-tls-unavailable`, `delivery.implicit-tls-error` | TLS negotiation failures |
+| **Reputation** | `incoming-report.abuse-report`, `incoming-report.fraud-report`, `incoming-report.virus-report` | Sender-reputation feedback |
+
+You can subscribe to as many events as you like. Each event Spotzee sends carries the event type, the message identifier, the project identifier, and event-specific payload data.
+
+For the wire-level format (signature scheme, payload shape, retry policy plans), see [Webhook conventions](/guides/api-webhooks).
+
+## Test the endpoint
+
+The test affordance fires a sample payload at your endpoint right now, before outbound delivery ships. Use it to validate that your signature verification works.
+
+<Steps>
+<Step title="Open the endpoint">
+In **Settings** → **Webhook Endpoints**, open the row for the endpoint.
+</Step>
+
+<Step title="Run a test">
+Use the **Send test** action. Spotzee posts a sample payload signed with the test-path scheme: `X-Spotzee-Signature: sha256=<hex>` where the hex is the HMAC-SHA256 of the request body using your endpoint's signing secret.
+</Step>
+
+<Step title="Verify the signature">
+Your endpoint should compute the same HMAC over the request body and compare it to the header value. A match confirms the request came from Spotzee. Reject any request whose signature doesn't match.
+</Step>
+</Steps>
+
+The production-dispatch scheme will switch to a Stripe-style timestamped envelope (`Spotzee-Signature: t=...,v1=...`) when the outbound loop ships. Until then, build your verifier against the test scheme.
+
+## Rotate the signing secret
+
+Rotate when a secret might have been exposed (committed to source, shared in a chat, leaked in a log).
+
+<Steps>
+<Step title="Open the endpoint">
+In **Settings** → **Webhook Endpoints**, open the row for the endpoint.
+</Step>
+
+<Step title="Rotate the secret">
+Use the **Rotate secret** action. Spotzee generates a new signing secret and shows it once. Copy it into your secrets manager.
+</Step>
+
+<Step title="Update your verifier">
+Update your endpoint to use the new secret. Once outbound delivery ships, only the new secret is valid; the old secret stops verifying immediately on rotation.
+</Step>
+</Steps>
+
+## Endpoint status
+
+Endpoints carry one of three statuses:
+
+| Status | Meaning |
+|---|---|
+| `active` | Endpoint accepts events. The default after creation. |
+| `inactive` | Manually paused by an admin. No events are dispatched. |
+| `disabled` | Auto-disabled by Spotzee after persistent delivery failures. Re-enable manually after fixing the endpoint. |
+
+Inactive and disabled endpoints don't dispatch events but their configuration is preserved. Re-enable to resume.
+
+## Next steps
+
+<Columns cols={2}>
+<Card title="Webhook conventions" icon="webhook" href="/guides/api-webhooks">
+The wire-level signing scheme and event payload shape.
+</Card>
+
+<Card title="Trigger a campaign" icon="send" href="/guides/trigger-campaign">
+Send a campaign and watch its delivery events flow into your endpoint.
+</Card>
+
+<Card title="Manage API keys" icon="key" href="/guides/manage-api-keys">
+Issue project keys for downstream integrations.
+</Card>
+
+<Card title="Concepts" icon="book-open" href="/guides/concepts">
+Brush up on Users, Journeys, Segments, Channels, and Providers.
+</Card>
+</Columns>
