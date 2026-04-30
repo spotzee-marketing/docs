@@ -1,0 +1,127 @@
+---
+title: "Configure sync rules"
+description: "Pick which Salesforce objects to sync and filter records with up to ten operators combined with AND or OR logic."
+keywords: ["salesforce", "sync", "rules", "filters", "operators", "objects"]
+---
+
+Sync rules decide what comes through. Pick the object types you want, then layer filters on top so only the records you actually need flow into Spotzee.
+
+<Info>
+Sync rules live on each Salesforce integration record. Open the integration from your project's **Integrations** menu and configure rules from there. Saving rules schedules the next sync to use them.
+</Info>
+
+## Pick objects to sync
+
+You can pick any combination of three object types.
+
+<Steps>
+<Step title="Open the integration">
+Inside the project, open **Integrations** → **Salesforce** and pick the integration.
+</Step>
+
+<Step title="Open the configuration">
+Pick **Configure** on the integration card.
+</Step>
+
+<Step title="Toggle objects on">
+In the **Objects to sync** section, pick the objects you want. Each toggle turns the object on or off. Selected objects show a highlight.
+</Step>
+
+<Step title="Save">
+Save. The next sync run will pull from every selected object type.
+</Step>
+</Steps>
+
+### Lead vs Contact
+
+Both work. Pick the one that matches the audience you're sending to:
+
+- **Sync Leads** for prospects. Top-of-funnel marketing, nurture sequences, awareness campaigns.
+- **Sync Contacts** for existing customers. Renewals, upsell, product updates, customer comms.
+- **Sync both** when you need to message prospects and customers separately. Most B2B teams sync both.
+
+### CampaignMember
+
+CampaignMember syncs people who belong to specific Salesforce campaigns. The targeting is already done in Salesforce, so you don't need filter rules on top.
+
+A common pattern: sales runs a `Q1 Product Launch` campaign in Salesforce. You sync only that campaign's members into Spotzee, name the resulting Spotzee list after the campaign, and trigger your launch journey from there.
+
+## Filter records with sync rules
+
+Each rule has three parts:
+
+- **Field**: a Salesforce field on the object you're syncing (`Status`, `Country`, `Industry`, `AnnualRevenue`, custom fields).
+- **Operator**: how to compare the field value.
+- **Value**: what to compare against.
+
+Multiple rules combine with **AND** (all must match) or **OR** (any can match).
+
+### The ten operators
+
+| Operator | What it does | Example |
+|---|---|---|
+| `equals` | Exact match | `Status equals "Hot"` |
+| `not_equals` | Doesn't match | `Status not_equals "Closed"` |
+| `contains` | Text includes | `Email contains "@company.com"` |
+| `not_contains` | Text excludes | `Email not_contains "test"` |
+| `starts_with` | Begins with | `Phone starts_with "+61"` |
+| `ends_with` | Ends with | `Email ends_with ".edu"` |
+| `greater_than` | Numeric/date comparison | `AnnualRevenue greater_than 100000` |
+| `less_than` | Numeric/date comparison | `CreatedDate less_than 2024-01-01` |
+| `is_set` | Field has any value | `MobilePhone is_set` |
+| `is_not_set` | Field is empty | `Email is_not_set` |
+
+### Configure rules
+
+<Steps>
+<Step title="Open Sync rules">
+Scroll to the **Sync rules** section in the integration's configuration view.
+</Step>
+
+<Step title="Add rules">
+Choose **Add rule**, pick the field, choose the operator, and enter the value. Repeat for as many rules as you need.
+</Step>
+
+<Step title="Combine with AND or OR">
+Pick **AND** to require every rule to match. Pick **OR** to allow any rule to match.
+</Step>
+
+<Step title="Preview and save">
+Use the preview action to see how many records match before saving. If the count looks wrong, refine and re-preview. Save once it's right.
+</Step>
+</Steps>
+
+### Worked examples
+
+A few rule combinations that come up often:
+
+- **Hot leads only**: `Status equals "Hot"`. One rule, AND.
+- **Australian customers**: `BillingCountry equals "Australia"` AND `IsDeleted equals false`. Two rules, AND.
+- **Mid-market or above**: `AnnualRevenue greater_than 1000000` OR `NumberOfEmployees greater_than 50`. Two rules, OR.
+- **Recent leads, excluding test data**: `CreatedDate greater_than 2026-01-01` AND `Email not_contains "test"`. Two rules, AND.
+
+The preview count tells you whether you've got the rule right before you commit to a sync.
+
+## Empty result sets
+
+If a sync returns zero records, the most common cause is rules that are too restrictive (or the connecting user lacking access to records that match). Use the preview count to diagnose. If the count is non-zero but the sync still imports nothing, check the integration's logs and field permissions.
+
+## Next steps
+
+<Columns cols={2}>
+<Card title="Map fields" icon="arrow-right-left" href="/guides/salesforce/field-mapping">
+Decide which Salesforce fields land on which Spotzee user property.
+</Card>
+
+<Card title="Operations" icon="activity" href="/guides/salesforce/operations">
+Manual sync, frequency, and monitoring.
+</Card>
+
+<Card title="Troubleshoot" icon="life-buoy" href="/guides/salesforce/troubleshoot">
+What to do when no records come through.
+</Card>
+
+<Card title="Salesforce overview" icon="info" href="/guides/salesforce/overview">
+What the integration does and what data flows.
+</Card>
+</Columns>

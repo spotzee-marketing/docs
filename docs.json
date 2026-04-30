@@ -73,6 +73,22 @@
             ]
           },
           {
+            "group": "Integrate",
+            "pages": [
+              {
+                "group": "Salesforce",
+                "pages": [
+                  "guides/salesforce/overview",
+                  "guides/salesforce/connect",
+                  "guides/salesforce/sync-rules",
+                  "guides/salesforce/field-mapping",
+                  "guides/salesforce/operations",
+                  "guides/salesforce/troubleshoot"
+                ]
+              }
+            ]
+          },
+          {
             "group": "API conventions",
             "pages": [
               "guides/api-versioning",

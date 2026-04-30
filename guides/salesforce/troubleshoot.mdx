@@ -1,0 +1,140 @@
+---
+title: "Troubleshoot Salesforce sync"
+description: "Diagnose OAuth failures, missing records, duplicate users, sync timeouts, and other common Salesforce integration issues."
+keywords: ["salesforce", "troubleshooting", "errors", "oauth", "duplicates", "debugging"]
+---
+
+Salesforce integration issues mostly cluster around OAuth, sync rule mismatches, field changes, and duplicate detection. This page walks through the patterns that come up most often.
+
+## OAuth connection fails
+
+**Symptoms.** You can't connect, the redirect lands back on an error page, or logs show "Invalid OAuth token".
+
+**Causes and fixes.**
+
+| Cause | Fix |
+|---|---|
+| Connected app not approved in Salesforce | Ask your Salesforce admin to approve third-party OAuth apps in **Setup** → **Connected Apps** |
+| Connecting user doesn't have API access | Make sure the user has the **API Enabled** permission |
+| Wrong environment selected | Try production vs sandbox vs custom domain. Custom-domain orgs require the full `<yourdomain>.my.salesforce.com` hostname |
+| Browser blocking popups | Allow popups from Spotzee, then retry |
+| Salesforce session policy timeout | Sign in to Salesforce again, then retry the connect flow |
+
+If none of these fix it, try a different browser or an incognito window to rule out extensions interfering with the OAuth redirect.
+
+## No records importing
+
+**Symptoms.** Sync completes successfully but reports zero imports and zero updates.
+
+**Check these in order.**
+
+1. **Sync rules too restrictive.** Open the rules and use **Preview count** to see how many records actually match. Zero matches means the rules are too narrow. Loosen and re-preview.
+
+2. **No records in Salesforce.** The selected object type might genuinely be empty. Check Salesforce reports for the object to confirm.
+
+3. **Already synced.** If this isn't your first run, zero new imports is normal when nothing changed in Salesforce since the previous sync. Look at `records_updated` in the logs to confirm updates are still flowing.
+
+4. **Field permissions.** The connecting user might not have read access to the records that match your rules. Check Salesforce sharing rules and OWD settings.
+
+5. **Modified-date staleness.** Incremental sync only pulls records where `LastModifiedDate` is newer than the last successful sync. If nothing has changed since then, that's expected zero. Force a full re-sync if you suspect missed records.
+
+## Duplicate users created
+
+**Symptoms.** The same person appears multiple times in Spotzee with slightly different data.
+
+**Why this happens.**
+
+Spotzee identifies records by an external ID combining integration, object type, and Salesforce record ID. The pattern is `sf_<integrationId>_<objectType>_<salesforceId>`. Duplicates surface when:
+
+- You created multiple integrations syncing the same Salesforce object (each integration generates its own external ID).
+- The same person exists as both a `Lead` and a `Contact` in Salesforce, and you sync both objects (different external IDs because object type differs).
+- A Salesforce record was deleted and recreated with a new ID (the new record looks new to Spotzee).
+
+**Fixes.**
+
+- **Multiple integrations on one org**: consolidate into a single integration. Spotzee blocks new connections to an already-connected org but won't auto-merge historical duplicates.
+- **Lead/Contact split**: pick one or the other for any given audience, or build segments that explicitly de-duplicate by email.
+- **Recreated records**: use the merge or de-duplication flow on the affected Spotzee users.
+
+## Sync runs forever or fails
+
+**Symptoms.** Sync status sticks on "Syncing..." or you see `sync_failed` in the logs.
+
+**Common causes.**
+
+- **Salesforce API limits exceeded.** The integration's API limits health check should flag this. Confirm in Salesforce **Setup** → **System Overview**.
+- **Network timeout** to the Salesforce instance URL. Transient issue, usually resolves on the next scheduled run.
+- **Field mapping references a deleted field.** The field-mappings health check flags this. Update the mapping to remove or replace the missing field.
+- **Massive incremental delta.** A bulk update in Salesforce can produce a huge `LastModifiedDate` window, causing the sync to take a while. Wait it out or shorten the sync rule scope.
+
+If syncs keep failing, set the integration to **Inactive** to stop the retry storm, fix the underlying cause, and re-activate.
+
+## Mapped field disappeared
+
+**Symptoms.** Logs show "Field not found" or the field-mappings health check fails.
+
+**What happened.**
+
+Someone in Salesforce renamed the field, deleted it, or changed permissions so the connecting user can no longer read it.
+
+**Fix.**
+
+<Steps>
+<Step title="Open Field mappings">
+In the integration configuration, open the **Field mappings** section.
+</Step>
+
+<Step title="Identify the broken row">
+The row referencing the missing field shows an error indicator. The Salesforce field dropdown shows the old name struck through or marked as missing.
+</Step>
+
+<Step title="Repair">
+Pick the new field name (if renamed), or remove the row if the field was permanently deleted.
+</Step>
+
+<Step title="Save and resync">
+Save and run a manual sync. The health check should clear on the next pass.
+</Step>
+</Steps>
+
+## Opt-out not propagating
+
+**Symptoms.** Someone unsubscribed in Salesforce, but they're still receiving Spotzee emails.
+
+**Check.**
+
+1. **Mapping exists.** Confirm `HasOptedOutOfEmail` is mapped to a Spotzee opt-out property.
+2. **Property type.** The destination Spotzee property must be `boolean`. A string property won't drive the opt-out logic.
+3. **Subscription wired up.** Spotzee subscriptions read from the property to decide unsubscribed state. Check **Settings** → **Subscriptions** to confirm a subscription type is bound to the opt-out property.
+4. **Sync ran.** Check the logs for a recent `sync_completed` event. Opt-outs only propagate on the next sync after the change in Salesforce.
+
+If everything looks correct but the opt-out still hasn't moved, run a manual sync and re-test. If it still doesn't propagate, drop a row in the logs to confirm the field value Spotzee is reading.
+
+## Still stuck
+
+If you've worked through the patterns above and still have a stuck sync:
+
+- Check the **Logs** tab for the most recent `sync_failed` event and read the error message verbatim.
+- Run a fresh manual sync to surface the latest error.
+- Try **Reconnect** to refresh OAuth credentials.
+- Pause the integration to stop retry storms while you investigate.
+
+## Next steps
+
+<Columns cols={2}>
+<Card title="Operations" icon="activity" href="/guides/salesforce/operations">
+Health checks, status badges, and the logs view.
+</Card>
+
+<Card title="Map fields" icon="arrow-right-left" href="/guides/salesforce/field-mapping">
+Repair broken mappings and add new ones.
+</Card>
+
+<Card title="Configure sync rules" icon="filter" href="/guides/salesforce/sync-rules">
+Tighten or loosen filter rules.
+</Card>
+
+<Card title="Connect Salesforce" icon="link" href="/guides/salesforce/connect">
+Reconnect to refresh OAuth credentials.
+</Card>
+</Columns>

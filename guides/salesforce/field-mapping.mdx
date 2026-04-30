@@ -1,0 +1,120 @@
+---
+title: "Map Salesforce fields"
+description: "Map Salesforce fields onto Spotzee user properties, create new properties on the fly, and sync email opt-out automatically."
+keywords: ["salesforce", "field-mapping", "properties", "opt-out", "unsubscribe"]
+---
+
+Field mapping decides which Salesforce data lands on which Spotzee user property. The integration ships with sensible defaults for the standard email-and-name fields. You add more mappings for the custom fields that matter to your campaigns.
+
+<Info>
+Field mappings are configured per integration. Open the integration from **Integrations** → **Salesforce** and use the **Field mappings** section in its configuration view.
+</Info>
+
+## Default mappings
+
+When you connect a Salesforce org, Spotzee sets up these mappings automatically:
+
+| Salesforce field | Spotzee property |
+|---|---|
+| `Email` | `email` |
+| `FirstName` | `first_name` |
+| `LastName` | `last_name` |
+| `Phone` | `phone` |
+
+You can change defaults or add more rows. Defaults are a starting point, not a constraint.
+
+## Add a mapping
+
+<Steps>
+<Step title="Open Field mappings">
+In the integration's configuration view, scroll to the **Field mappings** section.
+</Step>
+
+<Step title="Pick a Salesforce field">
+The Salesforce field dropdown lists every field on the objects you're syncing. Standard fields appear first, custom fields after.
+</Step>
+
+<Step title="Pick or create a Spotzee property">
+The Spotzee property dropdown shows existing properties. Pick one to map onto an existing property, or type a new name and pick **Create "your_property_name"** to create one on the fly.
+</Step>
+
+<Step title="Add more rows or save">
+Choose **Add mapping** to add another row, or save when done.
+</Step>
+</Steps>
+
+New properties created from the mapping screen default to `string` type. Adjust the type later under **Settings** → **Data Schema** if you need numeric, date, or boolean handling.
+
+## Type compatibility
+
+Spotzee converts Salesforce types automatically for the common cases:
+
+| Salesforce type | Becomes in Spotzee |
+|---|---|
+| `Text`, `Picklist`, `Email`, `Phone`, `URL` | `string` |
+| `Number`, `Currency`, `Percent` | `number` |
+| `Checkbox` | `boolean` |
+| `Date`, `DateTime` | `date` |
+| `MultiPicklist` | `array` of strings |
+
+If a field's data doesn't match the destination property's type (for example, mapping a Salesforce text field onto a numeric Spotzee property), the value is dropped and the row appears in the integration logs as a type-mismatch warning.
+
+## Sync email opt-out automatically
+
+Salesforce tracks email opt-out via the `HasOptedOutOfEmail` boolean field on Lead and Contact records. Mapping that field into Spotzee keeps your unsubscribe state aligned across both systems.
+
+<Steps>
+<Step title="Add the opt-out mapping">
+In **Field mappings**, add a row with:
+- Salesforce field: `HasOptedOutOfEmail`.
+- Spotzee property: `unsubscribed` (or your preferred boolean opt-out property).
+</Step>
+
+<Step title="Save">
+Save. The next sync reads the opt-out field and writes the corresponding boolean onto the user.
+</Step>
+</Steps>
+
+How it lands in Spotzee:
+
+- `True` in Salesforce sets the user as `unsubscribed` for the email subscription tied to the property.
+- `False` keeps them subscribed.
+
+Spotzee re-checks the field on every incremental sync, so opt-outs that happen in Salesforce between Spotzee runs catch up automatically.
+
+### One-way sync caveat
+
+The opt-out sync only flows from Salesforce **into** Spotzee. If a user unsubscribes via a Spotzee email link or preference centre, that change stays in Spotzee and isn't pushed back to Salesforce.
+
+To keep both systems aligned, either:
+
+- **Treat Salesforce as the source of truth** and only opt users out from Salesforce.
+- **Build a manual reconciliation** to update Salesforce when a Spotzee unsubscribe happens (separate webhook integration or scheduled job, neither shipped by Spotzee).
+
+### CampaignMember and opt-out
+
+The `HasOptedOutOfEmail` field exists on Lead and Contact, not on CampaignMember. If you sync CampaignMember, opt-out has to be mapped from the parent Lead or Contact record. Salesforce exposes the parent record's opt-out value through campaign-member relationship traversal in the field selector; pick that traversal target when adding the mapping row.
+
+## Test a mapping
+
+After saving a new mapping, run a manual sync from the integration's overview page. Open one of the imported users in Spotzee and verify the mapped fields show the values you expect from Salesforce. Adjust if anything looks off.
+
+## Next steps
+
+<Columns cols={2}>
+<Card title="Operations" icon="activity" href="/guides/salesforce/operations">
+Manual sync, frequency, and monitoring health.
+</Card>
+
+<Card title="Define custom user attributes" icon="database" href="/guides/data-schema">
+Set the type and visibility on the new properties you just created.
+</Card>
+
+<Card title="Subscription preferences" icon="bell-off" href="/guides/subscription-preferences">
+Connect the opt-out field to an actual subscription type.
+</Card>
+
+<Card title="Salesforce overview" icon="info" href="/guides/salesforce/overview">
+What the integration does and what data flows.
+</Card>
+</Columns>

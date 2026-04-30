@@ -1,0 +1,89 @@
+---
+title: "Connect Salesforce"
+description: "OAuth into your Salesforce org from Spotzee, pick the right environment, and authorise the connection in two minutes."
+keywords: ["salesforce", "oauth", "connect", "environment", "setup"]
+---
+
+Connecting Salesforce takes about two minutes and doesn't involve sharing your password. Spotzee uses OAuth, so authorisation flows through Salesforce's consent screen and you stay in control of permissions.
+
+<Info>
+You need admin access to your Salesforce org or at least permission to authorise third-party OAuth apps. Connecting also requires the Spotzee project `admin` role.
+</Info>
+
+## Pick your Salesforce environment
+
+Three environment types are supported. Pick the one that matches the org you want to sync.
+
+| Environment | When to use | Login URL |
+|---|---|---|
+| **Production** | Your live Salesforce org | `login.salesforce.com` |
+| **Sandbox** | Testing or staging | `test.salesforce.com` |
+| **Custom domain** | Your org uses My Domain | `<yourdomain>.my.salesforce.com` |
+
+If your org uses a custom domain, make sure to enter the full hostname when prompted. Spotzee uses it to generate the correct OAuth authorisation URL.
+
+## Connect the integration
+
+<Steps>
+<Step title="Open the Salesforce integration">
+Inside the project, open **Integrations** and pick **Salesforce**.
+</Step>
+
+<Step title="Start the connection">
+Choose **Connect**. Spotzee asks you to pick the environment (production, sandbox, or custom domain).
+</Step>
+
+<Step title="Authorise on Salesforce">
+You'll be redirected to the Salesforce login page. Sign in with the user account that should hold the integration credentials. Review the requested permissions and approve.
+
+The authorising user matters: the OAuth token Spotzee stores inherits that user's record visibility. Use a user with access to all the records you want to sync.
+</Step>
+
+<Step title="Land back in Spotzee">
+On approval, Salesforce redirects you back to Spotzee with a success message. The integration record is created with status **Incomplete** until you finish setup.
+</Step>
+</Steps>
+
+## What happens next
+
+The integration is connected but not yet syncing. Status shows **Incomplete** until you finish three more steps:
+
+1. [Pick objects and configure sync rules](/guides/salesforce/sync-rules).
+2. [Map Salesforce fields to Spotzee properties](/guides/salesforce/field-mapping).
+3. The integration flips to **Active** automatically once both are saved.
+
+The initial sync runs immediately after the integration goes Active.
+
+## Reconnecting
+
+OAuth tokens expire and can be revoked. You'll need to reconnect when:
+
+- The Salesforce admin revokes the connected app.
+- The connecting user is deactivated or has their permissions changed.
+- Salesforce expires the OAuth refresh token (rare on long-lived integrations).
+
+To reconnect, open the integration and choose **Reconnect**. The flow is identical to the initial connection. Reconnecting preserves your sync rules, field mappings, and history. Only the OAuth credentials are refreshed.
+
+## One org per integration
+
+Each Salesforce integration connects to exactly one Salesforce org. If you try to connect the same org twice, Spotzee detects the duplicate and stops you. Use multiple integrations only when you have multiple distinct Salesforce orgs to sync (for example, separate orgs per business unit).
+
+## Next steps
+
+<Columns cols={2}>
+<Card title="Configure sync rules" icon="filter" href="/guides/salesforce/sync-rules">
+Pick which objects to sync and filter records.
+</Card>
+
+<Card title="Map fields" icon="arrow-right-left" href="/guides/salesforce/field-mapping">
+Map Salesforce fields to Spotzee user properties.
+</Card>
+
+<Card title="Salesforce overview" icon="info" href="/guides/salesforce/overview">
+What the integration does and what data flows.
+</Card>
+
+<Card title="Troubleshoot" icon="life-buoy" href="/guides/salesforce/troubleshoot">
+OAuth failures and common connection issues.
+</Card>
+</Columns>

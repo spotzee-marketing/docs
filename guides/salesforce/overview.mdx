@@ -1,0 +1,67 @@
+---
+title: "Salesforce overview"
+description: "Sync Salesforce Leads, Contacts, and CampaignMembers into Spotzee with one-way OAuth integration, filter rules, and field mapping."
+keywords: ["salesforce", "integration", "crm", "sync", "overview"]
+---
+
+The Salesforce integration pulls your CRM data into Spotzee on a recurring schedule. No CSV exports, no manual imports. Connect once via OAuth, pick the objects you want, and Spotzee keeps your audience data current.
+
+<Info>
+The Salesforce integration is a **one-way** sync from Salesforce into Spotzee. Spotzee never writes back to Salesforce. Setup requires the project `admin` role.
+</Info>
+
+## What gets synced
+
+You can sync three Salesforce object types, individually or in any combination:
+
+| Object | What it represents | Use it for |
+|---|---|---|
+| **Lead** | Prospects who haven't converted yet | Top-of-funnel marketing, nurture sequences |
+| **Contact** | Existing customers and qualified prospects | Customer comms, upsell, retention |
+| **CampaignMember** | People tied to specific Salesforce campaigns | Targeted sends keyed off Salesforce campaign membership |
+
+For each synced object, Spotzee pulls the fields you map: email, name, phone, plus any custom fields you nominate during setup.
+
+## How sync works
+
+Two mechanisms keep Spotzee current:
+
+- **Initial sync.** When you finish setup, Spotzee runs a full pull of every record matching your sync rules.
+- **Incremental sync.** After the initial pull, every subsequent run only fetches records whose `LastModifiedDate` is newer than the previous successful sync. That keeps API usage low and runs fast even on large orgs.
+
+Each synced record gets tagged with a unique external ID combining your integration, object type, and Salesforce record ID. That's how Spotzee dedupes across runs and matches Salesforce records back to Spotzee users.
+
+## Setup at a glance
+
+Bringing the integration live takes four steps:
+
+1. **Connect** your Salesforce org via OAuth.
+2. **Pick the objects** you want to sync (Lead, Contact, CampaignMember, or any combination).
+3. **Configure sync rules** to filter which records flow in.
+4. **Map fields** from Salesforce to Spotzee user properties.
+
+Until all four are complete, the integration sits in **Incomplete** status and won't sync. Once they're done, status flips to **Active** and the initial sync kicks off.
+
+## Multiple Salesforce orgs
+
+You can connect more than one Salesforce org per project. Each gets its own integration record, sync rules, and field mappings. One restriction: a single Salesforce org can only connect to one Spotzee project at a time.
+
+## Next steps
+
+<Columns cols={2}>
+<Card title="Connect Salesforce" icon="link" href="/guides/salesforce/connect">
+OAuth flow, environment selection, what happens after authorisation.
+</Card>
+
+<Card title="Configure sync rules" icon="filter" href="/guides/salesforce/sync-rules">
+Pick which objects to sync and filter records with rules.
+</Card>
+
+<Card title="Map fields" icon="arrow-right-left" href="/guides/salesforce/field-mapping">
+Map Salesforce fields to Spotzee user properties, including opt-out.
+</Card>
+
+<Card title="Operations" icon="activity" href="/guides/salesforce/operations">
+Manual sync, frequency, health checks, logs, status badges.
+</Card>
+</Columns>

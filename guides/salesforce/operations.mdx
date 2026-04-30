@@ -1,0 +1,166 @@
+---
+title: "Salesforce operations"
+description: "Run manual syncs, change frequency, read health checks and sync logs, and understand the four integration status badges."
+keywords: ["salesforce", "sync", "operations", "logs", "health", "status", "frequency"]
+---
+
+Once your Salesforce integration is set up, day-to-day operations come down to a handful of actions: trigger a sync on demand, change how often automatic syncs run, watch the health of the integration, and read the logs when something looks off.
+
+<Info>
+The integration's overview page shows status, last-sync time, and quick actions. Health and logs are tabs on the same page.
+</Info>
+
+## Run a manual sync
+
+Manual sync is useful for four cases:
+
+- You just connected Salesforce and want to confirm sync works.
+- You changed sync rules and want to see the new result set immediately.
+- New records arrived in Salesforce that you need in Spotzee right now.
+- You're troubleshooting and want to watch a sync happen in real time.
+
+<Steps>
+<Step title="Open the integration">
+Inside the project, open **Integrations** → **Salesforce** and pick the integration.
+</Step>
+
+<Step title="Trigger Sync now">
+Choose **Sync now** on the integration card. The button shows progress while the sync runs.
+</Step>
+
+<Step title="Wait for completion">
+Sync time depends on how many records match your rules. Anywhere from seconds for small filtered sets up to a couple of minutes for large ones. The card switches back to a **Last synced** label with the completion timestamp.
+</Step>
+</Steps>
+
+What Spotzee does during a sync:
+
+1. Connects to Salesforce using the saved OAuth credentials.
+2. Queries for records matching your sync rules.
+3. Compares them against existing Spotzee users by external ID.
+4. Creates new Spotzee users for new records.
+5. Updates existing users where Salesforce data has changed.
+6. Logs the outcome (counts, errors, durations) to the **Logs** tab.
+
+## Change sync frequency
+
+By default, Spotzee runs the integration every 60 minutes. Adjust the frequency per integration if you need fresher data or want to consume fewer Salesforce API calls.
+
+<Steps>
+<Step title="Open the configuration">
+In the integration's configuration view, find the **Sync frequency** field.
+</Step>
+
+<Step title="Set the interval">
+Enter the desired interval in minutes. The minimum is shown next to the field.
+</Step>
+
+<Step title="Save">
+Save. The new frequency takes effect from the next scheduled sync.
+</Step>
+</Steps>
+
+### Choosing the right interval
+
+A few rules of thumb:
+
+- **High-velocity sales orgs** (lots of leads converting fast) tend toward 15-30 minute syncs so changes propagate quickly.
+- **Stable customer bases** (low daily change) tend toward 4-12 hour syncs to conserve API calls.
+- **Small Salesforce orgs** can afford 5-minute syncs because the incremental delta is tiny.
+- **Large enterprise orgs** with API limits in mind run hourly or every few hours.
+
+The default of 60 minutes is a sensible middle ground.
+
+## Incremental sync
+
+After the initial full sync, Spotzee runs incremental syncs by default. Each incremental run pulls only records whose `LastModifiedDate` is newer than the previous successful sync. That's why most syncs return small numbers even when your org has hundreds of thousands of records: only the changed ones come through.
+
+A few notes on what counts as "modified" in Salesforce:
+
+- Any field value changing.
+- Record owner changing.
+- Related-record changes that propagate (depending on your Salesforce sharing config).
+- Manual touches by admins.
+
+So a record might sync even when none of the fields you mapped changed, as long as something else on the record was modified.
+
+## Health checks
+
+Spotzee runs four automated health checks against every Salesforce integration:
+
+| Check | What it verifies | Failure means |
+|---|---|---|
+| **Credentials** | The OAuth tokens still authorise calls to Salesforce | Reconnect to refresh the OAuth grant |
+| **Field mappings** | Every mapped Salesforce field still exists on the object | A field was renamed, deleted, or the user lost permission to read it |
+| **API limits** | Remaining Salesforce API quota is above 10% | You're running low on Salesforce API calls; check usage in Salesforce Setup |
+| **Sync staleness** | Most recent successful sync is within twice the configured frequency | Syncs are failing or stuck; investigate the logs |
+
+The integration's overview page surfaces the latest health-check result. Drilling in shows which specific check passed or failed and the timestamp.
+
+## Status badges
+
+Each integration carries one of four statuses:
+
+| Status | Colour | Meaning | Action |
+|---|---|---|---|
+| **Active** | Green | Healthy. Syncs running on schedule. | None. |
+| **Error** | Red | Something failed. Health check or sync. | Drill in, check logs, fix. |
+| **Incomplete** | Amber | Setup not finished. | Pick objects, configure rules, map fields. |
+| **Inactive** | Grey | Manually disabled by an admin. | Re-enable when ready. |
+
+Status updates as syncs run. Resolving the underlying issue and running a successful sync flips status back to **Active** automatically.
+
+## Read the logs
+
+Every sync writes log entries. Use the **Logs** tab to see what happened on each run.
+
+Event types you'll see:
+
+| Event | Meaning |
+|---|---|
+| `sync_started` | A sync job began. |
+| `sync_completed` | The sync finished without fatal errors. |
+| `sync_failed` | The sync hit an unrecoverable error and stopped. |
+| `records_imported` | New users were created from Salesforce records. |
+| `records_updated` | Existing users were updated with new Salesforce data. |
+| `health_check` | A scheduled health check ran. |
+
+Each entry shows timestamp, event type, record counts, error messages where applicable, and operation duration. Click an entry to expand the full details.
+
+The logs view supports filtering by event type and date range, useful when you've got hundreds of entries and want to find the moment something went wrong.
+
+## Pause and resume
+
+Set status to **Inactive** to pause syncs without losing configuration:
+
+<Steps>
+<Step title="Open the integration">
+Inside the project, open **Integrations** → **Salesforce**.
+</Step>
+
+<Step title="Pause">
+Use the pause action on the integration card. Status flips to **Inactive** immediately.
+</Step>
+</Steps>
+
+To resume, re-activate from the same card. Sync rules, field mappings, and OAuth credentials are preserved. The next scheduled sync runs after re-activation.
+
+## Next steps
+
+<Columns cols={2}>
+<Card title="Troubleshoot" icon="life-buoy" href="/guides/salesforce/troubleshoot">
+Solutions for OAuth failures, missing records, duplicates.
+</Card>
+
+<Card title="Map fields" icon="arrow-right-left" href="/guides/salesforce/field-mapping">
+Adjust field mappings when fields rename or new ones land.
+</Card>
+
+<Card title="Configure sync rules" icon="filter" href="/guides/salesforce/sync-rules">
+Refine which records flow in.
+</Card>
+
+<Card title="Salesforce overview" icon="info" href="/guides/salesforce/overview">
+What the integration does and what data flows.
+</Card>
+</Columns>
