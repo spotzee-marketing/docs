@@ -1,10 +1,10 @@
 ---
 title: "Extended API"
-description: "Edge utilities — email validation, DNS lookups, SMS, AI text tools, and customer data services."
-keywords: ["extended api", "email validation", "dns", "sms", "ai tools", "edge api", "api"]
+description: "Edge utilities for email health, DNS, SMS validation, subject-line AI, readability, and synthetic data generation."
+keywords: ["extended api", "email validation", "dns", "sms", "ai subject lines", "readability", "data generation"]
 ---
 
-The **Extended API** is a set of low-latency edge utilities that complement the Main API. Use it for high-volume operations where round-trip latency matters: email address validation, DNS lookups for domain setup, SMS dispatch, and AI text scoring.
+The **Extended API** is a set of low-latency edge utilities that complement the Main API. Use it for high-volume operations where round-trip latency matters: email address validation, DNS lookups for domain setup, SMS number validation, and AI subject-line scoring.
 
 ## Base URL
 
@@ -12,7 +12,7 @@ The **Extended API** is a set of low-latency edge utilities that complement the 
 https://apix.spotzee.com/api/ext
 ```
 
-Both the Main API and Extended API now serve from the same hostname. The same `Spotzee-Version`, `X-Request-Id`, and error envelope conventions apply on both surfaces — see [API conventions](/guides/api-versioning) for the full set.
+Both the Main API and Extended API now serve from the same hostname. The Extended API ships the wire-level conventions live today (`Spotzee-Version`, `X-Request-Id`, RFC 7807 error envelope). The Main API is rolling those conventions out in stages. See [API conventions](/guides/api-versioning) for the full set.
 
 ## Authentication
 
@@ -26,12 +26,12 @@ Authorization: Bearer YOUR_API_KEY
 
 | Group | What it does |
 |---|---|
-| Email health | Validate addresses, detect role accounts, check domain reputation |
-| DNS | Look up SPF, DKIM, DMARC, MX records — used by domain-setup wizards |
-| SMS | Dispatch SMS messages and check delivery |
-| AI text tools | Score, classify, and generate content snippets |
-| Customer data | Read-only lookups for enriched customer records |
-| Quota | Inspect remaining credits on metered operations |
+| Email | Address validation, syntax + DNS sanity checks, MX/SPF/DMARC lookup, domain blacklist + IP blacklist checks, SenderScore lookup, malicious URL lookup, SMTP server + send tests, disposable-email detection, mailbox-provider identification, one-shot tester inboxes |
+| DNS | DoH lookups (A, AAAA, MX, TXT, CNAME, NS, SOA, PTR, SRV, CAA + DNSSEC), TCP and URL connectivity probes, end-to-end domain health check |
+| SMS | E.164 phone-number validation and ISO country resolution |
+| AI | Subject-line variant generation and 14-criterion subject-line scoring |
+| Text | Readability scores (Flesch + 6 indices, reading time) and sentiment analysis |
+| Data | Generate synthetic person, contact, name, and date records |
 
 ## When to use Extended over Main
 
@@ -52,9 +52,15 @@ The OpenAPI specification is published at:
 https://apix.spotzee.com/api/ext/openapi.json
 ```
 
-## Rate limits
+## Rate limits and quota
 
-Per-API-key rate limits apply. Quota-metered endpoints (validation, scoring) deduct credits on success — check `Quota` endpoints before high-volume runs.
+Two separate gates apply to Extended API traffic.
+
+**Edge rate limit.** Spotzee's edge network enforces a per-source-IP cap of 1,000 requests per 10 seconds across `apix.spotzee.com/api/*`. Over-limit traffic receives `429 Too Many Requests` with the canonical error envelope. The cap counts every request, authenticated or not.
+
+**Credit-based quota.** Validation, scoring, lookup, and generation endpoints deduct credits on success. The cost varies by route. Inspect remaining balance via the `Quota` endpoints before high-volume runs.
+
+Per-API-key sliding-window rate limits and a doubled budget for MCP traffic are rolling out alongside the Main API hardening rollout. The Extended API does not honour those today.
 
 ## Errors
 
