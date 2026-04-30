@@ -1,0 +1,126 @@
+---
+title: "Install the JavaScript SDK"
+description: "Add @spotzee/js-sdk to a Node app, a browser bundle, or a script tag, and initialise it with a publishable key."
+keywords:
+  - javascript
+  - sdk
+  - install
+  - browserclient
+  - initialise
+  - publishable key
+---
+
+The JavaScript SDK ships three classes for three runtimes. Pick the one that matches where your code runs, install with your usual package manager, and initialise once with a publishable key.
+
+## Install
+
+<CodeGroup>
+
+```bash npm
+npm install @spotzee/js-sdk
+```
+
+```bash yarn
+yarn add @spotzee/js-sdk
+```
+
+```bash pnpm
+pnpm add @spotzee/js-sdk
+```
+
+```html script tag
+<script src="https://unpkg.com/@spotzee/js-sdk/lib/esm/index.js"></script>
+```
+
+</CodeGroup>
+
+The package ships dual CJS + ESM builds. TypeScript types ship with the package.
+
+## Pick a class
+
+| Class | Runtime | Identity handling |
+|---|---|---|
+| `Client` | Node, edge runtimes, server jobs | You pass `anonymousId` and / or `externalId` on every call |
+| `BrowserClient` | Web browsers (modern bundlers) | Mints an anonymous ID on first use, caches `externalId` after `identify` |
+| `Spotzee` | Browser script tag (`window.Spotzee`) | Static singleton wrapper around `BrowserClient` |
+
+## Initialise
+
+The SDK needs a publishable API key. Read [Manage API keys](/guides/manage-api-keys) for how to create one. Use `pk_…` keys for client builds (browsers, mobile, anywhere the key is visible to end users). Server-side jobs that already have a backend can use either a publishable key for SDK flows or a secret key (`sk_…`) for the typed client.
+
+<CodeGroup>
+
+```typescript Node
+import { Client } from '@spotzee/js-sdk'
+
+const spotzee = new Client({ apiKey: process.env.SPOTZEE_API_KEY })
+```
+
+```typescript Browser (bundler)
+import { BrowserClient } from '@spotzee/js-sdk'
+
+const spotzee = new BrowserClient({ apiKey: 'pk_…' })
+```
+
+```javascript Script tag
+<script src="https://unpkg.com/@spotzee/js-sdk/lib/esm/index.js"></script>
+<script>
+  Spotzee.initialize({ apiKey: 'pk_…' })
+</script>
+```
+
+</CodeGroup>
+
+The browser variants persist the anonymous ID for the duration of the page session. To carry an anonymous ID across page loads, pass it explicitly into `track` / `identify` from your own storage.
+
+## What every request carries
+
+Every call the SDK makes adds these headers automatically. You don't need to set them yourself.
+
+| Header | Value | Why |
+|---|---|---|
+| `Authorization` | `Bearer <your apiKey>` | Authenticates the request |
+| `Spotzee-Version` | `2026-04-28` | Pins the API version this SDK release targets |
+| `x-spotzee-client-type` | `sdk-js` | Helps the platform attribute traffic by client type. Read [Identify your API client type](/guides/api-client-type) |
+| `Content-Type` | `application/json` | Set on POST and PUT requests |
+
+The SDK also converts JavaScript camelCase property names to snake_case before sending, so calling `identify({ externalId: 'u_42', timezone: 'Australia/Sydney' })` puts `external_id` and `timezone` on the wire.
+
+## Errors
+
+Failed requests throw an `Error` whose message includes the HTTP status, the API error code (when present), the human-readable message, and the `request_id` for support. The SDK parses the [RFC 7807 envelope](/guides/api-versioning) on `2026-04-28` and falls back to the legacy `{ error: string }` shape across the cutover.
+
+```typescript
+try {
+  await spotzee.track({ event: 'Signed up', properties: { plan: 'starter' } })
+} catch (err) {
+  console.error('Spotzee track failed:', err)
+  // → "API Error HTTP 401 | code=auth_invalid_key | invalid API key | request_id=req_abc123"
+}
+```
+
+Quote the `request_id` when contacting support so the team can find the request in the platform logs.
+
+## Debugging
+
+The SDK doesn't ship a debug toggle. Use your runtime's standard tools.
+
+- **Node.** Set `NODE_DEBUG=http,https` to see outbound requests, or wrap the SDK call in a logging block. The SDK's thrown error already contains everything support needs.
+- **Browser.** Use the network panel of your browser's developer tools to inspect the request and response payloads. Filter by `apix.spotzee.com` to isolate Spotzee traffic.
+
+## Next steps
+
+<Columns cols={2}>
+  <Card title="Identify users" href="/guides/sdks/javascript/identify" icon="user-check">
+    Link anonymous activity to a known user, set traits, and alias on sign-up.
+  </Card>
+  <Card title="Track events" href="/guides/sdks/javascript/track" icon="bolt">
+    Send custom events with properties to trigger journeys and segment users.
+  </Card>
+  <Card title="Devices and notifications" href="/guides/sdks/javascript/devices-and-notifications" icon="bell">
+    Register browser or web push tokens, fetch in-app notifications.
+  </Card>
+  <Card title="Typed API client" href="/guides/sdks/javascript/typed-client" icon="square-code">
+    The full OpenAPI surface for server-side and agentic use.
+  </Card>
+</Columns>

@@ -129,6 +129,23 @@
             ]
           },
           {
+            "group": "SDKs",
+            "icon": "code",
+            "pages": [
+              "guides/sdks/overview",
+              {
+                "group": "JavaScript",
+                "pages": [
+                  "guides/sdks/javascript/install",
+                  "guides/sdks/javascript/identify",
+                  "guides/sdks/javascript/track",
+                  "guides/sdks/javascript/devices-and-notifications",
+                  "guides/sdks/javascript/typed-client"
+                ]
+              }
+            ]
+          },
+          {
             "group": "API conventions",
             "pages": [
               "guides/api-versioning",

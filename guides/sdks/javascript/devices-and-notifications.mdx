@@ -1,0 +1,131 @@
+---
+title: "Devices and in-app notifications"
+description: "Register a browser or web push token, fetch in-app notifications, and mark them read with the JavaScript SDK."
+keywords:
+  - javascript
+  - sdk
+  - device
+  - web push
+  - in-app notifications
+  - registerdevice
+---
+
+The JavaScript SDK covers two related surfaces: device registration (so you can target the user with push) and in-app notifications (so you can render messages inside the page).
+
+## Register a device
+
+`registerDevice` records a device against the current user. The `os` field tells Spotzee what kind of surface this is. For browser tracking you can register without a push token; for [web push](#web-push) you pass the subscription token.
+
+```typescript
+import { Spotzee } from '@spotzee/js-sdk'
+
+Spotzee.initialize({ apiKey: 'pk_…' })
+
+await Spotzee.registerDevice({
+  deviceId: 'browser-uuid-stored-in-localstorage',
+  os: 'web',
+  model: 'Chrome',
+  appBuild: '2026.4.30',
+  appVersion: '2.4.0',
+  // token is optional. Pass it once you have a web push subscription.
+})
+```
+
+Required fields:
+
+| Field | Notes |
+|---|---|
+| `deviceId` | Stable identifier you generate and store yourself. UUID v4 is fine. |
+| `os` | `web`, `ios`, `android`. The mobile SDKs set this for you; in JS you set it. |
+| `model` | Free-form string. Browser name (`Chrome`, `Safari`) is a useful default. |
+| `appBuild` | Free-form. Often a calendar version or commit SHA. |
+| `appVersion` | Free-form. Often a semver string. |
+
+`token` is optional. Without it, the call still records the device against the user (useful for cross-device tracking and per-device journey logic) but won't deliver push to it.
+
+You must have called `identify`, or pass `anonymousId` / `externalId` explicitly, before `registerDevice` succeeds.
+
+## Web push
+
+The SDK does not implement the Web Push API itself. You wire up the standard browser primitives, ask the user for permission, subscribe to a service worker, and pass the resulting subscription endpoint into `registerDevice` as `token`. The full flow:
+
+1. Register a service worker that handles `push` events.
+2. Call `Notification.requestPermission()` from a user gesture.
+3. Subscribe via `serviceWorkerRegistration.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: '<your VAPID public key>' })`.
+4. Send the subscription's endpoint, keys, and `auth` to your backend.
+5. Pass that subscription identifier as `token` into `Spotzee.registerDevice({ os: 'web', token, … })`.
+
+Configure the corresponding push provider under **Settings** → **Integrations** before tokens you register can deliver. Read [Set up push notifications](/guides/configure-push-notifications) for the provider side.
+
+## Fetch in-app notifications
+
+Notifications targeted at the user via campaigns or journeys land in a queue you read with `getNotifications`. The SDK does not render them; you decide when and how.
+
+```typescript
+const { results, cursor } = await Spotzee.getNotifications()
+
+for (const notification of results) {
+  switch (notification.contentType) {
+    case 'banner':
+      renderBanner(notification.content)
+      break
+    case 'alert':
+      renderAlertModal(notification.content)
+      break
+    case 'html':
+      renderHtmlOverlay(notification.content.html)
+      break
+  }
+}
+
+if (cursor) {
+  // More pages available. Pass cursor into the next call.
+  const next = await Spotzee.getNotifications(undefined, cursor)
+}
+```
+
+The three content types share `title`, `body`, and an optional `custom` map. The `alert` and `html` types also carry an `html` field with the rendered markup; `alert` adds an optional `image` URL.
+
+## Mark a notification read
+
+Call `markNotificationRead` once the user dismisses or acknowledges the notification. The platform stops returning it from `getNotifications` after that.
+
+```typescript
+await Spotzee.markNotificationRead(notification.id)
+```
+
+For the `BrowserClient`, the cached `externalId` and `anonymousId` are passed automatically. For the bare `Client`, pass them as the second argument:
+
+```typescript
+await spotzee.markNotificationRead(notification.id, {
+  anonymousId: 'anon_xyz',
+  externalId: 'u_42',
+})
+```
+
+## Worked example: fetch on app load, mark read on dismiss
+
+```typescript
+async function loadSpotzeeNotifications() {
+  const { results } = await Spotzee.getNotifications()
+  for (const n of results) {
+    if (n.readAt) continue
+    showInPageNotification(n, async () => {
+      await Spotzee.markNotificationRead(n.id)
+    })
+  }
+}
+
+document.addEventListener('DOMContentLoaded', loadSpotzeeNotifications)
+```
+
+## Next steps
+
+<Columns cols={2}>
+  <Card title="Set up push providers" href="/guides/configure-push-notifications" icon="bell">
+    Configure APN and FCM credentials before mobile or web push can deliver.
+  </Card>
+  <Card title="Typed API client" href="/guides/sdks/javascript/typed-client" icon="square-code">
+    Server-side surface for higher-volume notification listing.
+  </Card>
+</Columns>

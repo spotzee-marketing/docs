@@ -1,0 +1,124 @@
+---
+title: "Track events"
+description: "Send custom events from a browser or Node app to trigger journeys, feed segments, and update user profiles inline."
+keywords:
+  - javascript
+  - sdk
+  - track
+  - events
+  - properties
+  - journey trigger
+---
+
+`track` sends a single event to Spotzee. Events drive journey entrances, segment membership, campaign triggers, and reporting. Every event carries a name and a `properties` bag, and optionally inline updates to the user's profile.
+
+## Track an event
+
+<CodeGroup>
+
+```typescript Browser / Spotzee global
+import { BrowserClient } from '@spotzee/js-sdk'
+
+const spotzee = new BrowserClient({ apiKey: 'pk_…' })
+
+await spotzee.track({
+  event: 'Order placed',
+  properties: {
+    orderId: 'ord_2026_04_30_001',
+    total: 129.50,
+    currency: 'AUD',
+    items: 3,
+    sku: ['SHIRT-AU-12', 'BAG-AU-01'],
+  },
+})
+```
+
+```typescript Node
+import { Client } from '@spotzee/js-sdk'
+
+const spotzee = new Client({ apiKey: process.env.SPOTZEE_API_KEY })
+
+await spotzee.track({
+  event: 'Order placed',
+  externalId: 'u_42',
+  properties: {
+    orderId: 'ord_2026_04_30_001',
+    total: 129.50,
+    currency: 'AUD',
+  },
+})
+```
+
+</CodeGroup>
+
+The browser variants attach the cached `externalId` and the auto-minted `anonymousId` for you. The Node `Client` requires you to pass at least one of them on every call.
+
+## Naming and structuring events
+
+- **Use a short, descriptive name in the past tense.** `Order placed`, `Account upgraded`, `Subscription cancelled`. Consistent verb tense pays off when you build segments.
+- **Match the name across surfaces.** A `track('Order placed')` from the browser and one from your backend should be the same event so journeys fire once per order, not twice with different names.
+- **Properties are flat key-value pairs.** Strings, numbers, booleans, arrays of strings or numbers, and shallow objects all serialise. Nested objects are accepted but harder to segment on.
+- **Event property names follow the same camelCase-to-snake_case rule** the SDK applies to identify traits.
+
+Read [Send events from your backend](/guides/event-ingestion) for the broader event model.
+
+## Update user traits inline with the event
+
+Set or refresh traits on the user record without a separate `identify` call:
+
+```typescript
+await spotzee.track({
+  event: 'Profile updated',
+  properties: { source: 'self-serve' },
+  user: {
+    timezone: 'Australia/Melbourne',
+    locale: 'en-AU',
+    data: {
+      plan: 'professional',
+      seatsAllocated: 5,
+    },
+  },
+})
+```
+
+The `user` object accepts `email`, `phone`, `timezone`, `locale`, and a nested `data` map for arbitrary traits. Use this when the trait change is the natural side effect of the event (a `Plan upgraded` event upserting the new `plan` value) rather than for routine updates.
+
+## Anonymous events
+
+Track works without an `identify`. Events fire against the SDK-managed anonymous ID and join back to the known user the first time you call `identify`.
+
+```typescript
+const spotzee = new BrowserClient({ apiKey: 'pk_…' })
+
+// Anonymous browse
+await spotzee.track({ event: 'Product viewed', properties: { sku: 'SHIRT-AU-12' } })
+
+// Sign-up. Anonymous events are aliased to u_42.
+await spotzee.identify({ externalId: 'u_42', email: 'sam@example.com' })
+```
+
+## Errors and retries
+
+`track` is awaitable. A failed call throws an `Error` with the HTTP status, error code, and `request_id`. The SDK does not retry on your behalf. For non-blocking client-side use, fire and forget:
+
+```typescript
+spotzee.track({ event: 'Banner clicked', properties: { id: 'launch-2026' } })
+  .catch((err) => console.warn('Spotzee track failed:', err))
+```
+
+For server use, queue events through your existing background job or retry layer. A network blip should not lose an `Order placed`.
+
+## Throughput and batching
+
+Each `track` is one HTTP request. The SDK does not batch. For high-frequency client code (gameplay events, streaming product views), buffer in your app and send in larger chunks via the [typed client](/guides/sdks/javascript/typed-client) or your backend.
+
+## Next steps
+
+<Columns cols={2}>
+  <Card title="Trigger a journey from an event" href="/guides/journey-trigger" icon="route">
+    Wire an event to a journey entrance.
+  </Card>
+  <Card title="Build a segment from events" href="/guides/build-segment-via-api" icon="filter">
+    Use event-frequency rules in segment definitions.
+  </Card>
+</Columns>

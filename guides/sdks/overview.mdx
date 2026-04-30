@@ -1,0 +1,62 @@
+---
+title: "SDKs"
+description: "First-party JavaScript, iOS, and Android SDKs for identifying users, tracking events, and delivering push and in-app notifications."
+keywords:
+  - sdk
+  - javascript
+  - ios
+  - android
+  - mobile
+  - client
+icon: "code"
+---
+
+Spotzee ships three first-party SDKs. They share the same wire shape, the same publishable-key auth, and the same pinned API version, so a customer running a website plus an iOS app plus an Android app sees one user record across all three.
+
+## Pick an SDK
+
+| SDK | Distribution | Min target | Notes |
+|---|---|---|---|
+| JavaScript | npm / yarn / pnpm / `<script>` tag | Modern browsers, Node 18+ | Two ergonomic classes plus a typed client generated from the OpenAPI spec |
+| iOS | Swift Package Manager + CocoaPods | iOS 13+, Mac Catalyst 13+, Xcode 14+ | APNs registration, in-app modals, Universal Links |
+| Android | JitPack | Android SDK 23+ (Android 6.0 Marshmallow) | FCM registration, in-app dialogs, App Links |
+
+<Card title="JavaScript SDK" href="/guides/sdks/javascript/install" icon="square-code">
+  Install, identify users, track events, and register devices from a browser, Node app, or script tag.
+</Card>
+
+## What every SDK does
+
+- **Identifies users.** Anonymous IDs are minted on first use and persisted locally. Calling `identify` with an `external_id` aliases the anonymous record to the known one.
+- **Tracks events.** A single `track` call flows into journeys, segments, and campaign triggers.
+- **Registers devices.** APNs, FCM, or browser push tokens land on the user record so any push channel can target them.
+- **Renders in-app notifications.** Banner, alert, and HTML content types. iOS and Android render natively; the JavaScript SDK fetches and lets you render however you want.
+- **Authenticates with publishable keys** (`pk_…`). These are safe to ship in client builds. Read [Manage API keys](/guides/manage-api-keys) for the key model.
+- **Pins an API version.** Every SDK release sets `Spotzee-Version` to a known release date so a future API change does not break a shipped client.
+
+## Pick the right surface
+
+| Use case | Reach for |
+|---|---|
+| Browser tracking, web push, simple Node integrations | JavaScript ergonomic surface (`Client` / `BrowserClient` / `Spotzee`) |
+| Server-side, agentic, or full-coverage Node integrations | JavaScript [typed client](/guides/sdks/javascript/typed-client) (`@spotzee/js-sdk/generated`) |
+| Native iOS app | iOS SDK |
+| Native Android app | Android SDK |
+| React Native, Flutter, server-side language without an SDK | Call the [Main API](/main-api/introduction) directly with a publishable or secret key |
+
+## Where the SDKs fit
+
+<Columns cols={2}>
+  <Card title="Sync users from your backend" href="/guides/sync-users" icon="users">
+    SDKs cover the client-side flows. For backend-driven user import, use the recipe.
+  </Card>
+  <Card title="Send events from your backend" href="/guides/event-ingestion" icon="bolt">
+    Backend events can mix with SDK events on the same user record.
+  </Card>
+  <Card title="Configure push providers" href="/guides/configure-push-notifications" icon="bell">
+    Set up APN and FCM credentials before mobile SDKs can register tokens.
+  </Card>
+  <Card title="Subscription preferences" href="/guides/subscription-preferences" icon="square-check">
+    The preference centre lives on a web page, not inside the mobile SDKs.
+  </Card>
+</Columns>

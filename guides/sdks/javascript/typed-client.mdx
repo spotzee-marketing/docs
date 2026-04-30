@@ -1,0 +1,144 @@
+---
+title: "Typed API client"
+description: "Use the @spotzee/js-sdk/generated subpath for full OpenAPI coverage with typed inputs, outputs, and the RFC 7807 error envelope."
+keywords:
+  - javascript
+  - sdk
+  - typed
+  - openapi
+  - generated
+  - server-side
+  - agentic
+---
+
+The hand-written `Client` / `BrowserClient` / `Spotzee` classes cover the most common browser-side flows: identify, alias, track, register devices, fetch notifications. For server-side integrations, agentic workloads, or anywhere you want full type coverage of the API, the SDK ships a generated typed client at the `@spotzee/js-sdk/generated` subpath.
+
+## When to reach for it
+
+| You want to… | Use |
+|---|---|
+| Track an event from a browser, mobile JS, or a script tag | `Client` / `BrowserClient` / `Spotzee` |
+| Manage projects, lists, segments, journeys, campaigns from a backend | Typed client |
+| Bulk-import users or events from a backend job | Typed client |
+| Build an agent that needs the full operation catalogue | Typed client |
+| Generate request mocks for tests | Typed client + the exported types |
+
+You can mix both surfaces in the same project. They share no state.
+
+## Set it up
+
+```typescript
+import { Spotzee, client } from '@spotzee/js-sdk/generated'
+
+client.setConfig({
+  baseUrl: 'https://apix.spotzee.com/api/client',
+  headers: {
+    Authorization: `Bearer ${process.env.SPOTZEE_API_KEY}`,
+    'Spotzee-Version': '2026-04-28',
+    'x-spotzee-client-type': 'sdk-js',
+  },
+})
+```
+
+Set this once at process start. Subsequent calls reuse the configured client.
+
+A few notes:
+
+- **`baseUrl`** points at the Main API client surface. Use a publishable key (`pk_…`) for SDK-style flows or a secret key (`sk_…`) for full backend access. Read [Manage API keys](/guides/manage-api-keys) for the distinction.
+- **`Spotzee-Version`** pins your call to a known API release date. Read [API versioning](/guides/api-versioning) for the version model.
+- **`x-spotzee-client-type`** identifies your traffic. The SDK suggests `sdk-js`; for an agent or automation, use `agent` or your own descriptive value. Read [Identify your API client type](/guides/api-client-type).
+
+## Call any operation
+
+Every operation in the OpenAPI spec is exposed as a function on the `Spotzee` namespace. Each returns `{ data, error }` so you can branch on success without try/catch.
+
+```typescript
+const { data, error } = await Spotzee.listUsers({ query: { limit: 50 } })
+
+if (error) {
+  console.error(`[${error.code}]`, error.message, error.request_id)
+  return
+}
+
+data.results.forEach((user) => console.log(user.email))
+```
+
+The error shape matches the [RFC 7807 envelope](/guides/api-versioning) on the `2026-04-28` release: `code`, `message`, `type`, `request_id`. Use `code` for programmatic branching; `message` is for humans; `request_id` goes to support.
+
+## Use the exported types
+
+Every component schema in the OpenAPI spec is exposed as a TypeScript type under the `Spotzee` namespace:
+
+```typescript
+import type { Spotzee } from '@spotzee/js-sdk/generated'
+
+function summarise(user: Spotzee.User): string {
+  return `${user.first_name ?? ''} ${user.last_name ?? ''}`.trim() || user.email
+}
+
+function handleError(err: Spotzee.ErrorResponse): void {
+  console.error(`[${err.code}] ${err.message} (request ${err.request_id})`)
+}
+```
+
+Field names on these types match the OpenAPI spec exactly. The typed client does not transform keys, so use the spec's casing as-shipped.
+
+## Pagination
+
+List operations return cursor-paginated results. Walk the cursor explicitly:
+
+```typescript
+async function* allUsers() {
+  let cursor: string | undefined
+  do {
+    const { data, error } = await Spotzee.listUsers({ query: { limit: 100, cursor } })
+    if (error) throw new Error(`${error.code}: ${error.message}`)
+    yield* data.results
+    cursor = data.nextCursor ?? undefined
+  } while (cursor)
+}
+
+for await (const user of allUsers()) {
+  // ...
+}
+```
+
+Read [API pagination](/guides/api-pagination) for the cursor model and limit ceilings.
+
+## Regenerating the client
+
+The generated source is checked in. To regenerate against the live spec at `https://apix.spotzee.com/api/openapi.json`:
+
+```bash
+npm run generate
+```
+
+This is rarely needed for app code. Regenerate only when you're working from a fork of the SDK or want a snapshot of the spec at a specific point in time. The published package ships a build pinned to the `Spotzee-Version` declared in the SDK's source.
+
+## Mixing surfaces
+
+You can call the typed client from a backend that also uses the ergonomic surface in a frontend bundle. They don't conflict.
+
+```typescript
+// In a Node job
+import { Spotzee as TypedSpotzee, client } from '@spotzee/js-sdk/generated'
+client.setConfig({ baseUrl: 'https://apix.spotzee.com/api/client', headers: { /* … */ } })
+
+const { data } = await TypedSpotzee.createCampaign({ body: { /* … */ } })
+
+// In a browser bundle
+import { BrowserClient } from '@spotzee/js-sdk'
+const sdk = new BrowserClient({ apiKey: 'pk_…' })
+await sdk.track({ event: 'Pricing viewed', properties: {} })
+```
+
+## Next steps
+
+<Columns cols={2}>
+  <Card title="Main API reference" href="/main-api/introduction" icon="book">
+    Browse the full operation catalogue and request shapes.
+  </Card>
+  <Card title="Send events from your backend" href="/guides/event-ingestion" icon="bolt">
+    Recipe for high-volume server-side event ingestion.
+  </Card>
+</Columns>

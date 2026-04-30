@@ -1,0 +1,138 @@
+---
+title: "Identify users"
+description: "Link anonymous activity to a known user with identify and alias from the JavaScript SDK."
+keywords:
+  - javascript
+  - sdk
+  - identify
+  - alias
+  - external_id
+  - traits
+---
+
+`identify` connects your `external_id` (whatever you call users in your own database) to a Spotzee user record and updates that record's traits. Until you call `identify`, the SDK records activity against an anonymous ID that the browser variants mint and persist for you.
+
+## Identify a known user
+
+<CodeGroup>
+
+```typescript Browser / Spotzee global
+import { BrowserClient } from '@spotzee/js-sdk'
+
+const spotzee = new BrowserClient({ apiKey: 'pk_…' })
+
+await spotzee.identify({
+  externalId: 'u_42',
+  email: 'sam@example.com',
+  phone: '+61491570006',
+  timezone: 'Australia/Sydney',
+  locale: 'en-AU',
+  traits: {
+    firstName: 'Sam',
+    lastName: 'Patel',
+    plan: 'starter',
+    lifetimeValue: 199.50,
+  },
+})
+```
+
+```typescript Node
+import { Client } from '@spotzee/js-sdk'
+
+const spotzee = new Client({ apiKey: process.env.SPOTZEE_API_KEY })
+
+await spotzee.identify({
+  anonymousId: 'anon_xyz',  // Required server-side. Pass the ID you stored.
+  externalId: 'u_42',
+  email: 'sam@example.com',
+  traits: {
+    firstName: 'Sam',
+    plan: 'starter',
+  },
+})
+```
+
+</CodeGroup>
+
+The browser variants reuse the anonymous ID they minted on first use, so you don't pass `anonymousId` yourself. The Node `Client` requires you to pass both IDs explicitly because it can't safely persist them between calls.
+
+## How traits flow
+
+Anything you put in `traits` lands as a top-level field on the user record. The set of traits Spotzee accepts is defined by your project's data schema. Read [Define custom user attributes](/guides/data-schema) for how to add, remove, or rename traits.
+
+A few traits map to specific behaviour:
+
+- **`email`** and **`phone`**: top-level fields the email and SMS channels read from. Pass them through `identify` arguments rather than nesting them in `traits` so the SDK puts them in the right place.
+- **`timezone`** and **`locale`**: drive personalisation and send-time logic. Pass them through `identify` arguments. The browser SDK does not infer them; if you want browser locale, read `navigator.language` and pass it in.
+
+## Anonymous to known: automatic alias
+
+The first `identify` call after an anonymous session aliases the anonymous ID to your `external_id`. All prior anonymous activity now belongs to the known user. The browser SDK caches the `external_id` after this call, so subsequent `track` and `identify` calls carry both IDs automatically.
+
+For server contexts where you already know the anonymous ID separately (for example, a user signed up server-side with a session you tracked earlier), call `alias` directly:
+
+```typescript
+await spotzee.alias({
+  anonymousId: 'anon_xyz',
+  externalId: 'u_42',
+})
+```
+
+## When to call identify
+
+- **On sign-up.** First call after the user creates an account.
+- **On sign-in.** So a user switching devices or browsers gets joined back to their record.
+- **When traits change.** Updating profile data, plan, lifetime value, billing state. Identify is upsert: pass only the traits that changed.
+
+Avoid calling `identify` on every page load with the same data. The platform deduplicates server-side, but the network call is wasted.
+
+## Worked example: link anonymous browse to checkout
+
+```typescript
+const spotzee = new BrowserClient({ apiKey: 'pk_…' })
+
+// User browses anonymously. Track fires against the auto-minted anonymous ID.
+await spotzee.track({
+  event: 'Product viewed',
+  properties: { sku: 'SHIRT-AU-12' },
+})
+
+// User signs in. Identify joins the anonymous session to the known account.
+await spotzee.identify({
+  externalId: 'u_42',
+  email: 'sam@example.com',
+  traits: { plan: 'starter' },
+})
+
+// Subsequent track calls automatically include both IDs. The "Product viewed"
+// event from above is now part of u_42's history.
+await spotzee.track({
+  event: 'Checkout started',
+  properties: { cartTotal: 89.95 },
+})
+```
+
+## Reset on sign-out
+
+The SDK caches `externalId` for the lifetime of the page. To clear it (for example, on sign-out), drop the page reference to the client and create a new one:
+
+```typescript
+let spotzee = new BrowserClient({ apiKey: 'pk_…' })
+
+function signOut() {
+  spotzee = new BrowserClient({ apiKey: 'pk_…' })
+}
+```
+
+A fresh `BrowserClient` mints a new anonymous ID. Subsequent activity is anonymous until the next `identify`.
+
+## Next steps
+
+<Columns cols={2}>
+  <Card title="Track events" href="/guides/sdks/javascript/track" icon="bolt">
+    Trigger journeys and feed segments with custom events.
+  </Card>
+  <Card title="Define custom user attributes" href="/guides/data-schema" icon="table-properties">
+    Decide which traits Spotzee accepts.
+  </Card>
+</Columns>
