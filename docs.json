@@ -112,6 +112,19 @@
                   "guides/tools/sendmux/overview",
                   "guides/tools/sendmux/logs"
                 ]
+              },
+              {
+                "group": "Blacklist Monitoring",
+                "pages": [
+                  "guides/tools/blacklist-monitoring/overview",
+                  "guides/tools/blacklist-monitoring/setup",
+                  "guides/tools/blacklist-monitoring/ips",
+                  "guides/tools/blacklist-monitoring/domains",
+                  "guides/tools/blacklist-monitoring/groups",
+                  "guides/tools/blacklist-monitoring/bulk",
+                  "guides/tools/blacklist-monitoring/alerts",
+                  "guides/tools/blacklist-monitoring/troubleshoot"
+                ]
               }
             ]
           },

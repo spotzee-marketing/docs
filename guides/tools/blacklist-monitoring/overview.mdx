@@ -1,0 +1,92 @@
+---
+title: "Blacklist Monitoring overview"
+description: "Monitor sending IPs and domains against 70+ real-time blacklists, get email alerts when listings appear, and protect your email deliverability."
+keywords: ["blacklist-monitoring", "deliverability", "rbl", "ip-monitoring", "domain-monitoring"]
+---
+
+Blacklist Monitoring is a Tool that watches your sending infrastructure for blacklist appearances and alerts you the moment a listing happens. Add IPs and domains, pick how often they're checked, and Spotzee runs scheduled checks against 70+ real-time blacklists (RBLs) plus domain-based blacklists (DBLs) on the domain side.
+
+<Info>
+Blacklist Monitoring lives under **Tools** in the project sidebar and uses credits from your organisation's balance. The tool is read-and-write: you add resources, run checks, and configure groups; Spotzee handles the actual checking and alerting.
+</Info>
+
+## Why monitor blacklists
+
+Email deliverability is reputation-sensitive. A single listing on a major RBL can drop a sender's inbox placement to zero overnight, often without any obvious symptom from the sender's side until campaigns start failing.
+
+The integration:
+
+- **Watches IPs** (IPv4) against major RBLs.
+- **Watches domains** against domain-based blacklists.
+- **Schedules checks** on each resource by group (daily or weekly).
+- **Sends digest alerts** within an hour of a new listing being detected.
+- **Tracks history** over a rolling 30-day window so you can see whether a listing was a one-off or an ongoing issue.
+
+## Open the Tool
+
+<Steps>
+<Step title="Open Tools">
+Inside the project, open **Tools** from the sidebar.
+</Step>
+
+<Step title="Pick Blacklist Monitoring">
+Choose **Blacklist Monitoring**. You'll land on the **Overview** tab if monitoring is already enabled, or a setup screen if it isn't.
+</Step>
+</Steps>
+
+## The Overview tab
+
+The Overview is your at-a-glance health view. Four statistics sit at the top:
+
+| Stat | What it carries |
+|---|---|
+| **Total IPs** | The number of IPs you're monitoring |
+| **Total domains** | The number of domains you're monitoring |
+| **Currently listed** | How many resources are blacklisted right now |
+| **Checks today** | Total checks run in the past 24 hours |
+
+A 30-day history chart sits below the stats showing listing counts over time. Sustained spikes mean a recurring listing problem; isolated bumps usually mean a transient listing that cleared.
+
+## The four tabs
+
+The Tool has four tabs:
+
+| Tab | What's there |
+|---|---|
+| **Overview** | Stats cards plus the 30-day history chart |
+| **IPs** | The list of monitored IPs, their statuses, and per-IP actions |
+| **Domains** | The list of monitored domains, their statuses, and per-domain actions |
+| **Settings** | RBL type selection, default notifications, group management |
+
+For each, see the dedicated guide:
+
+- [Manage monitored IPs](/guides/tools/blacklist-monitoring/ips).
+- [Manage monitored domains](/guides/tools/blacklist-monitoring/domains).
+- [Use groups](/guides/tools/blacklist-monitoring/groups).
+- [Configure settings](/guides/tools/blacklist-monitoring/setup).
+
+## Credit usage
+
+Blacklist checks consume platform credits from your organisation's balance. Each check costs roughly the same regardless of resource type. Keep an eye on your credit balance under **Billing** to avoid alerts pausing because credits ran out.
+
+For more on credits, see [Billing and credits](/guides/billing-and-credits).
+
+## Next steps
+
+<Columns cols={2}>
+<Card title="Enable monitoring" icon="shield-check" href="/guides/tools/blacklist-monitoring/setup">
+Turn on monitoring for the first time and configure RBL types.
+</Card>
+
+<Card title="Manage IPs" icon="server" href="/guides/tools/blacklist-monitoring/ips">
+Add, check, and remove monitored IPs.
+</Card>
+
+<Card title="Manage domains" icon="globe" href="/guides/tools/blacklist-monitoring/domains">
+Add, check, and remove monitored domains.
+</Card>
+
+<Card title="Understand alerts" icon="bell" href="/guides/tools/blacklist-monitoring/alerts">
+How alerts batch, when they fire, and what to do when one arrives.
+</Card>
+</Columns>

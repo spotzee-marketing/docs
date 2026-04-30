@@ -1,0 +1,145 @@
+---
+title: "Bulk actions and CSV"
+description: "Import IPs and domains from CSV, export your monitoring data, and run bulk operations across many resources at once."
+keywords: ["blacklist-monitoring", "csv", "import", "export", "bulk", "batch"]
+---
+
+The IPs and Domains tabs each have an **Actions** dropdown with bulk operations: CSV import, CSV export, bulk check, and bulk delete. Use them when managing more than a handful of resources at a time.
+
+<Info>
+Bulk actions act on every visible resource in the current view. Filter the list before running a bulk action when you don't want to act on everything.
+</Info>
+
+## Import IPs from CSV
+
+<Steps>
+<Step title="Open the IPs tab">
+Inside the project, open **Tools** → **Blacklist Monitoring** → **IPs**.
+</Step>
+
+<Step title="Open Import CSV">
+From the **Actions** dropdown, pick **Import CSV**.
+</Step>
+
+<Step title="Download the template">
+The import drawer has a **Download template** action. The template carries the expected columns and example rows.
+</Step>
+
+<Step title="Prepare your CSV">
+Fill in one row per IP. Required columns: `ip_address`. Optional columns: `group_name` (must match an existing group; rows referencing unknown groups end up ungrouped with a warning).
+</Step>
+
+<Step title="Upload">
+Upload the CSV. Spotzee validates each row, reports the count of accepted and rejected rows, and creates the accepted ones in **Pending** status. Rejected rows show the reason so you can fix and re-upload.
+</Step>
+</Steps>
+
+## Import domains from CSV
+
+The Domains tab has the same flow with a domain-specific template.
+
+<Steps>
+<Step title="Open the Domains tab">
+Open **Domains** then **Actions** → **Import CSV**.
+</Step>
+
+<Step title="Download, fill, upload">
+Same template-download / fill / upload flow. Required column: `domain`. Optional column: `group_name`.
+</Step>
+</Steps>
+
+## Export to CSV
+
+Both tabs support **Export CSV** for taking your monitoring data out of Spotzee.
+
+<Steps>
+<Step title="Open the tab">
+Open **IPs** or **Domains**.
+</Step>
+
+<Step title="Export">
+From the **Actions** dropdown, pick **Export CSV**. Spotzee generates and downloads a CSV containing every resource on the current view.
+</Step>
+</Steps>
+
+The export carries: resource value (IP or domain), group, status, last checked timestamp, and the list of blacklists where the resource is currently listed.
+
+## Bulk check
+
+Run a check across multiple resources at once.
+
+<Steps>
+<Step title="Pick the rows">
+Use the row checkboxes on the IPs or Domains tab to select the resources you want to check.
+</Step>
+
+<Step title="Open Actions → Check selected">
+With at least one row selected, the **Actions** dropdown exposes **Check selected**. Pick it.
+</Step>
+
+<Step title="Wait">
+All selected resources are queued. Status updates within a few minutes per resource as checks complete.
+</Step>
+</Steps>
+
+To check **every** resource in the view (regardless of selection), pick **Check all** instead of **Check selected**.
+
+## Bulk delete
+
+The same row-selection plus dropdown pattern handles deletion.
+
+<Steps>
+<Step title="Pick the rows">
+Use the row checkboxes to select the resources you want to delete.
+</Step>
+
+<Step title="Open Actions → Delete selected">
+Pick **Delete selected**. Confirm the destructive action at the prompt.
+</Step>
+</Steps>
+
+Bulk delete is irreversible. The resources and their 30-day history are removed. Add them back to re-monitor; they start fresh as **Pending** with no history.
+
+## Bulk move (assign group)
+
+Use this to reassign many resources to a different group at once.
+
+<Steps>
+<Step title="Pick the rows">
+Select the resources you want to move.
+</Step>
+
+<Step title="Open Actions → Move to group">
+Pick **Move to group** and choose the destination group.
+</Step>
+
+<Step title="Confirm">
+Confirm. The selected resources land in the new group and inherit its frequency and notifications on the next check.
+</Step>
+</Steps>
+
+## Limits
+
+- **CSV upload size**: up to 10MB per file.
+- **Rows per upload**: up to 10,000.
+- **Bulk action selection**: no upper limit on the number of resources you can act on in a single bulk operation.
+
+## Next steps
+
+<Columns cols={2}>
+<Card title="Manage IPs" icon="server" href="/guides/tools/blacklist-monitoring/ips">
+The single-resource add and edit flow.
+</Card>
+
+<Card title="Manage domains" icon="globe" href="/guides/tools/blacklist-monitoring/domains">
+The single-resource add and edit flow for domains.
+</Card>
+
+<Card title="Use groups" icon="folder" href="/guides/tools/blacklist-monitoring/groups">
+Group management and per-group settings.
+</Card>
+
+<Card title="Troubleshoot" icon="life-buoy" href="/guides/tools/blacklist-monitoring/troubleshoot">
+Diagnose stuck resources and CSV upload errors.
+</Card>
+</Columns>

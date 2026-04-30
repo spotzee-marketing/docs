@@ -1,0 +1,146 @@
+---
+title: "Troubleshoot Blacklist Monitoring"
+description: "Diagnose stuck Pending statuses, missed alerts, repeat false positives, and re-enable monitoring after disabling it."
+keywords: ["blacklist-monitoring", "troubleshooting", "pending", "alerts", "errors"]
+---
+
+Most Blacklist Monitoring issues fall into a handful of patterns: resources stuck on **Pending**, alerts not arriving when expected, repeat listings on the same RBL, or monitoring disabled and you want to turn it back on. This page works through each.
+
+## Resources stuck on Pending
+
+**Symptoms.** An IP or domain stays on **Pending** for longer than expected.
+
+**Possible causes.**
+
+### Monitoring is disabled
+
+The Tool's master switch is off, so no checks are running.
+
+<Steps>
+<Step title="Open Settings">
+Inside the project, open **Tools** → **Blacklist Monitoring** → **Settings**.
+</Step>
+
+<Step title="Verify Enable monitoring">
+Check that **Enable monitoring** is toggled on. If it's off, toggle it on and save.
+</Step>
+</Steps>
+
+### Waiting for the scheduled check
+
+If you just added the resource and it's in a daily group, the first check happens at the next 06:00 UTC. Weekly groups have to wait for next Monday at 06:00 UTC.
+
+**Fix.** Run **Check now** from the row menu to bypass the schedule.
+
+### Credit balance exhausted
+
+Checks consume credits. If your organisation's credit balance is at zero, scheduled checks pause until credits are added.
+
+**Fix.** Top up credits under **Billing**, then run **Check now** to resume.
+
+### Pending after manual Check now
+
+Manual checks queue and run within a few minutes. If a manual check has been pending more than 15 minutes, refresh the page to pull the latest status; some browsers cache the previous state.
+
+If the resource still shows Pending after a refresh, run **Check now** again. Persistent Pending after multiple manual checks usually means the check infrastructure itself is having trouble; check with support if it lasts more than an hour.
+
+## Alerts not arriving
+
+**Symptoms.** A resource is **Blacklisted** in the UI but no alert email arrived.
+
+**Check these in order.**
+
+1. **Notification recipients configured.** Resources in a group with no recipients don't generate alerts. Same for ungrouped resources when the default notification list is empty. Add recipients under Settings or in the group's configuration.
+2. **Email reached the inbox.** Check the recipient's spam folder. The digest comes from a Spotzee sender; deliverability rules occasionally route it to spam, especially on first use.
+3. **Listing happened during the digest window.** Alerts fire hourly. A listing detected just after the previous digest waits for the next dispatch; up to 60 minutes of delay is normal.
+4. **Resource was previously listed and not delisted in between.** Alerts only fire on transitions (clean → listed). A resource that was already listed and is still listed on the same RBLs doesn't generate fresh alerts. New blacklists added to the existing listing set do generate alerts.
+
+## Repeat listings on the same RBL
+
+**Symptoms.** A resource gets de-listed and quickly re-listed on the same RBL, generating multiple alerts in a short period.
+
+**Likely cause.** The underlying issue (compromised account, missing authentication, complaint volume) hasn't been fixed. RBLs re-list quickly when the listing trigger persists.
+
+**Fix.** Don't request delisting until you've identified and fixed the root cause. Common causes:
+
+- **Compromised account sending spam.** Disable the account, rotate credentials, audit recent sends.
+- **Authentication misconfiguration.** Verify SPF, DKIM, and DMARC records resolve correctly. Use a dig-style lookup or an online checker.
+- **Complaint spike.** Look at your recent campaigns for unusual unsubscribe or complaint rates. Pause campaigns that are driving complaints.
+- **Shared IP listing.** If you're on a shared IP pool with another sender's bad behaviour, request a dedicated IP from your sending provider or move to a different pool.
+
+## Errors on a specific resource
+
+**Symptoms.** A resource shows **Error** status after a check.
+
+**Possible causes.**
+
+- **DNS resolution issue.** Some RBLs are sensitive to DNS resolver behaviour or had a transient outage during the check.
+- **RBL endpoint unavailable.** A specific RBL might be temporarily unreachable.
+- **Resource format invalid.** An IP or domain that was accepted at add time but turns out to be invalid for some RBLs (e.g., a domain with no MX records that some DBLs reject).
+
+**Fix.** Run **Check now** to retry. Persistent errors on a single resource (across multiple manual checks) suggest a resource-specific issue. Try removing and re-adding the resource. If errors persist, contact support with the resource details and the timestamp.
+
+## CSV import errors
+
+**Symptoms.** CSV import accepts some rows but rejects others; the rejection reasons aren't obvious.
+
+**Common rejection causes.**
+
+| Reason | Fix |
+|---|---|
+| Invalid IP or domain format | Re-check the format; bare hostname for domains, no scheme/path |
+| Group name unknown | Either create the group first, or leave the column empty to add as ungrouped |
+| Duplicate of an existing resource | Spotzee blocks duplicates within a project |
+| Row above the size limit | Trim very long descriptions or split the upload |
+
+The import drawer reports each rejected row with its reason. Fix the rejected rows and re-upload them in a separate CSV.
+
+## Re-enable monitoring
+
+If you disabled monitoring under Settings and want to turn it back on:
+
+<Steps>
+<Step title="Open Settings">
+Inside the project, open **Tools** → **Blacklist Monitoring** → **Settings**.
+</Step>
+
+<Step title="Toggle Enable monitoring on">
+Turn the master toggle on and save. Existing resources, groups, and settings are preserved.
+</Step>
+
+<Step title="Run a manual check on key resources">
+Some resources may have been listed during the disabled window without alerting. Run **Check now** on your most-important IPs and domains to refresh statuses.
+</Step>
+</Steps>
+
+## Stale check timestamps
+
+**Symptoms.** A resource shows a last-checked timestamp older than its group's check schedule should allow.
+
+**Likely causes.**
+
+- The resource's group changed recently and the new schedule hasn't ticked yet. Wait for the next 06:00 UTC.
+- Monitoring was disabled and re-enabled. Schedules resume but don't backfill the missed window.
+- Credits ran out. Checks pause until credits are added.
+
+**Fix.** Run **Check now** to refresh. Adjust group frequency under Settings if you want more aggressive scheduled coverage.
+
+## Next steps
+
+<Columns cols={2}>
+<Card title="Enable monitoring" icon="shield-check" href="/guides/tools/blacklist-monitoring/setup">
+Master toggle and RBL settings.
+</Card>
+
+<Card title="Manage IPs" icon="server" href="/guides/tools/blacklist-monitoring/ips">
+Run manual checks and edit resources.
+</Card>
+
+<Card title="Use groups" icon="folder" href="/guides/tools/blacklist-monitoring/groups">
+Adjust frequency and notification recipients.
+</Card>
+
+<Card title="Understand alerts" icon="bell" href="/guides/tools/blacklist-monitoring/alerts">
+How alerts batch and how to respond.
+</Card>
+</Columns>

@@ -1,0 +1,95 @@
+---
+title: "Enable Blacklist Monitoring"
+description: "Turn on Blacklist Monitoring for the first time, choose IP and domain RBL types, and configure default notification recipients."
+keywords: ["blacklist-monitoring", "setup", "rbl", "settings", "notifications"]
+---
+
+First time using the Tool? You'll see a setup screen instead of the Overview. Enabling monitoring is a one-click action; the rest of this guide walks through the **Settings** tab where you configure RBL types and default notifications.
+
+<Info>
+Blacklist Monitoring requires the project `editor` role to read and `admin` to configure settings.
+</Info>
+
+## Enable monitoring
+
+<Steps>
+<Step title="Open the Tool">
+Inside the project, open **Tools** → **Blacklist Monitoring**. You'll see the setup screen with an **Enable monitoring** action.
+</Step>
+
+<Step title="Enable">
+Choose **Enable monitoring**. Spotzee creates a system API key automatically (used by the Tool to schedule and run checks). The page refreshes and the Overview tab loads.
+</Step>
+</Steps>
+
+The integration is now ready. You can start adding IPs and domains, or visit the Settings tab to tune RBL types and notifications first.
+
+## RBL settings
+
+The **Settings** tab controls which blacklists are checked. Two settings: IP RBL type and domain RBL type.
+
+### IP RBL type
+
+Pick how thorough the IP checks should be.
+
+| Type | Lists checked | Trade-off |
+|---|---|---|
+| **Standard** | Major RBLs covering the most consequential sender-reputation systems | Fastest checks, lowest credit cost, catches the listings that actually matter for inbox placement |
+| **Comprehensive** | Standard plus secondary RBLs and DNS-based reputation systems | Slower, more credit-expensive, catches edge-case listings on smaller blacklists |
+
+Most senders are well-served by **Standard**. Pick **Comprehensive** when you're investigating a deliverability problem that the standard set isn't surfacing, or when you have a regulatory obligation to track exhaustively.
+
+### Domain RBL type
+
+Same shape, different lists. Domain-based blacklists (DBLs) target the sender domain rather than the IP. Pick:
+
+| Type | Lists checked |
+|---|---|
+| **Standard** | Major DBLs |
+| **Comprehensive** | Standard plus secondary DBLs |
+
+## Default notification emails
+
+The Settings tab has a default notification list that applies to ungrouped resources. When a resource not assigned to a group gets blacklisted, the default list receives the alert.
+
+<Steps>
+<Step title="Open Settings">
+In the Tool, pick the **Settings** tab.
+</Step>
+
+<Step title="Add default recipients">
+Add up to 10 email addresses in the default notifications field. Each address receives every alert for ungrouped resources.
+</Step>
+
+<Step title="Save">
+Save. Changes apply on the next alert dispatch (within an hour).
+</Step>
+</Steps>
+
+For per-group notification recipients, see [Use groups](/guides/tools/blacklist-monitoring/groups).
+
+## Disable monitoring
+
+You can disable monitoring at any time from the Settings tab. Disabling stops scheduled checks for every resource, but doesn't delete your IPs, domains, or groups. Re-enable to resume; the same resources are still configured.
+
+To re-enable later, see [Re-enable monitoring](/guides/tools/blacklist-monitoring/troubleshoot#re-enable-monitoring).
+
+## Next steps
+
+<Columns cols={2}>
+<Card title="Manage IPs" icon="server" href="/guides/tools/blacklist-monitoring/ips">
+Add, check, and remove monitored IPs.
+</Card>
+
+<Card title="Manage domains" icon="globe" href="/guides/tools/blacklist-monitoring/domains">
+Add, check, and remove monitored domains.
+</Card>
+
+<Card title="Use groups" icon="folder" href="/guides/tools/blacklist-monitoring/groups">
+Organise IPs and domains for per-group check frequency and alerts.
+</Card>
+
+<Card title="Understand alerts" icon="bell" href="/guides/tools/blacklist-monitoring/alerts">
+How alerts batch and when they fire.
+</Card>
+</Columns>

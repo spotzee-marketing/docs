@@ -1,0 +1,109 @@
+---
+title: "Understand blacklist alerts"
+description: "How Blacklist Monitoring alerts batch, when they fire, what's in the digest email, and how to respond when one arrives."
+keywords: ["blacklist-monitoring", "alerts", "notifications", "digest", "deliverability"]
+---
+
+When a monitored IP or domain ends up on a blacklist, Spotzee dispatches an email alert. Alerts are batched into hourly digests so a single mass-listing event doesn't flood your inbox with one email per resource. This page covers how alerts work and what to do when one arrives.
+
+## How detection works
+
+Two flows can find a listing:
+
+- **Scheduled checks.** Run automatically on every monitored resource according to its group's frequency. Daily groups check at 06:00 UTC; weekly groups check at 06:00 UTC every Monday; ungrouped resources check daily.
+- **Manual checks.** You triggered them from the IPs, Domains, or bulk actions (`Check now` / `Check selected` / `Check all`). They run immediately and bypass the schedule.
+
+A check that returns one or more blacklist hits flips the resource to **Blacklisted** and queues an alert.
+
+## Alert batching
+
+Alerts don't fire one-per-listing. They batch into hourly digests so you never get 50 emails when 50 IPs go red simultaneously.
+
+The batching rule:
+
+- A blacklisting event marks the resource as having **new alert state** to dispatch.
+- Spotzee runs an alert dispatcher every hour.
+- All resources with new alert state, grouped by their notification recipient list, are bundled into one digest email per recipient list.
+- After dispatch, resources are marked as **alert sent** and won't appear in the next digest unless they're re-listed (or listed on a different blacklist).
+
+In practice: a major listing event affecting your whole sending fleet produces one digest per group, not one email per IP.
+
+## Where alerts go
+
+Alerts go to:
+
+- **Group recipients** for resources in a group with notification emails set.
+- **Default recipients** (set under **Settings** → **Notification emails**) for ungrouped resources.
+
+Resources in a group whose notification list is empty don't generate alerts. The check still runs and the status still updates in the UI; just no email goes out.
+
+## What's in the digest
+
+A digest email includes:
+
+- **Subject**: how many resources are listed and which group they belong to (or `Ungrouped`).
+- **Body**: per-resource breakdown showing the IP or domain, which blacklists it's listed on, and the time the listing was first detected.
+- **Action prompt**: a link back to Spotzee for follow-up.
+
+The format is plain text, optimised for fast triage rather than rich rendering.
+
+## What to do when an alert arrives
+
+A typical response loop:
+
+<Steps>
+<Step title="Open the affected resource in Spotzee">
+Use the link in the email or open the IPs/Domains tab in the Tool. Confirm the listing details.
+</Step>
+
+<Step title="Identify the blacklist and the cause">
+Hover over the **Blacklisted** count to see which RBLs or DBLs flagged the resource. Then check the blacklist's website (each major RBL provides a lookup tool and a delisting process).
+</Step>
+
+<Step title="Address the underlying cause">
+Most listings come from one of: a compromised account sending spam, a misconfigured authentication record (SPF/DKIM/DMARC), a deliverability complaint spike, or a shared-IP listing from a neighbour on the same address pool.
+
+Fix the underlying cause before requesting delisting. Most RBLs auto-relist quickly if the cause persists.
+</Step>
+
+<Step title="Request delisting on the RBL itself">
+Each blacklist has its own delisting process. Some auto-delist after a quiet period; others require a manual request. Follow the specific RBL's instructions.
+</Step>
+
+<Step title="Re-check after delisting">
+Once the RBL confirms removal, run a manual **Check now** on the resource in Spotzee. Status flips to **Clean** when no listings remain.
+</Step>
+</Steps>
+
+## Suppress alerts during maintenance
+
+There's no built-in suppression. To stop alerts temporarily:
+
+- **Disable monitoring entirely** under **Settings**. Stops all checks and alerts. Re-enable when ready.
+- **Move resources to an alerts-empty group**. Keep checks running but stop emails. Useful when you're investigating a known issue and don't want repeat emails.
+
+## Re-listing detection
+
+If a resource clears (status flips from **Blacklisted** to **Clean**) and then later gets listed again, it generates a fresh alert. Spotzee tracks the listing transition; staying listed continuously doesn't generate repeat alerts.
+
+A resource that's listed on a new blacklist (added to the listing set without being de-listed from existing ones) also generates a fresh alert. The digest mentions the new blacklist explicitly so you know what changed.
+
+## Next steps
+
+<Columns cols={2}>
+<Card title="Use groups" icon="folder" href="/guides/tools/blacklist-monitoring/groups">
+Per-group notification recipients.
+</Card>
+
+<Card title="Enable monitoring" icon="shield-check" href="/guides/tools/blacklist-monitoring/setup">
+Configure default notification recipients.
+</Card>
+
+<Card title="Manage IPs" icon="server" href="/guides/tools/blacklist-monitoring/ips">
+The IP tab where listings are surfaced.
+</Card>
+
+<Card title="Troubleshoot" icon="life-buoy" href="/guides/tools/blacklist-monitoring/troubleshoot">
+Diagnose pending statuses, missed alerts, and other issues.
+</Card>
+</Columns>

@@ -1,0 +1,133 @@
+---
+title: "Manage monitored domains"
+description: "Add domains to Blacklist Monitoring, run on-demand DBL checks, assign groups, and remove domains from monitoring."
+keywords: ["blacklist-monitoring", "domains", "dbl", "deliverability"]
+---
+
+The **Domains** tab is where you add, view, check, and remove monitored domains. Each row shows a domain, its current status, the assigned group, and the last-checked timestamp.
+
+<Info>
+Domain checks query domain-based blacklists (DBLs), which target the sending domain rather than the source IP. Common DBLs include Spamhaus DBL, SURBL, and URIBL.
+</Info>
+
+## Add a domain
+
+<Steps>
+<Step title="Open the Domains tab">
+Inside the project, open **Tools** → **Blacklist Monitoring** → **Domains**.
+</Step>
+
+<Step title="Add the domain">
+Choose **Add domain**, then enter:
+- **Domain** (`example.com`, `mail.example.com`). Bare hostnames only; no `http://` or path.
+- **Group** (optional). Assigning a group applies its check frequency and notification settings to this domain.
+</Step>
+
+<Step title="Save">
+Save. The domain enters monitoring with **Pending** status until the first check runs.
+</Step>
+</Steps>
+
+### Domain validation
+
+Spotzee accepts standard hostname formats. Enter just the hostname (no scheme, no path, no port).
+
+| Input | Accepted |
+|---|---|
+| `example.com` | Yes |
+| `mail.example.com` | Yes |
+| `subdomain.example.co.uk` | Yes |
+| `https://example.com` | No (strip the scheme) |
+| `example.com/path` | No (strip the path) |
+| `*.example.com` | No (no wildcards) |
+
+## Edit a domain's group
+
+You can change which group a domain belongs to without removing it.
+
+<Steps>
+<Step title="Find the domain">
+Locate the row in the Domains tab.
+</Step>
+
+<Step title="Open the row menu">
+Use the row's overflow action to pick **Edit**.
+</Step>
+
+<Step title="Change the group">
+Pick a different group from the dropdown, or clear it to make the domain ungrouped. Save.
+</Step>
+</Steps>
+
+## Run a check on demand
+
+Domains are checked automatically on their group's schedule. Force an immediate check when you want to verify a fix or investigate a specific listing.
+
+<Steps>
+<Step title="Open the row menu">
+Use the row's overflow action.
+</Step>
+
+<Step title="Choose Check now">
+Pick **Check now**. The domain is queued for an immediate check.
+</Step>
+
+<Step title="Wait for the result">
+The status updates within a few minutes. Refresh the page to pull the latest state.
+</Step>
+</Steps>
+
+For checking many domains at once, see [Bulk actions](/guides/tools/blacklist-monitoring/bulk).
+
+## Domain statuses
+
+Same four statuses as IPs:
+
+| Status | Colour | Meaning |
+|---|---|---|
+| **Clean** | Green | Not listed on any of the configured DBLs |
+| **Blacklisted** | Red | Listed on one or more DBLs; the count tells you how many |
+| **Pending** | Amber | Queued for first check |
+| **Error** | Grey | Most recent check failed |
+
+Hover the **Blacklisted** count to see the specific DBLs where the domain is listed.
+
+## Remove a domain
+
+<Steps>
+<Step title="Open the row menu">
+Use the row's overflow action.
+</Step>
+
+<Step title="Delete">
+Pick **Delete**. Confirm at the prompt.
+</Step>
+</Steps>
+
+Deletion stops monitoring for that domain and removes the record. The 30-day history removes too.
+
+## What's checked
+
+For each domain, Spotzee queries every DBL included in your configured **Domain RBL type** (Standard or Comprehensive, set under **Settings**). A listing on any one of them flips the domain to **Blacklisted** and triggers an alert.
+
+Like IP checks, domain checks are purely DNS-based and don't touch your sending infrastructure.
+
+## Next steps
+
+<Columns cols={2}>
+<Card title="Manage IPs" icon="server" href="/guides/tools/blacklist-monitoring/ips">
+The same flow for sending IPs.
+</Card>
+
+<Card title="Use groups" icon="folder" href="/guides/tools/blacklist-monitoring/groups">
+Per-group check frequency and notification recipients.
+</Card>
+
+<Card title="Bulk actions" icon="list-checks" href="/guides/tools/blacklist-monitoring/bulk">
+CSV import and bulk operations across many domains.
+</Card>
+
+<Card title="Understand alerts" icon="bell" href="/guides/tools/blacklist-monitoring/alerts">
+How alerts batch and when they fire.
+</Card>
+</Columns>

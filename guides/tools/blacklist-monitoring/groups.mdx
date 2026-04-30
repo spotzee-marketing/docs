@@ -1,0 +1,128 @@
+---
+title: "Use groups"
+description: "Organise monitored IPs and domains into groups with custom check frequencies and per-group notification recipients."
+keywords: ["blacklist-monitoring", "groups", "frequency", "notifications", "organisation"]
+---
+
+Groups let you organise monitored resources into logical buckets, each with its own check frequency and notification recipient list. Use them when different parts of your sending infrastructure need different attention levels.
+
+<Info>
+Groups are configured under **Tools** → **Blacklist Monitoring** → **Settings** → **Groups**. Each group can hold any number of IPs and domains. Resources without a group fall back to default settings.
+</Info>
+
+## What a group carries
+
+Each group has four attributes:
+
+| Attribute | What it does |
+|---|---|
+| **Name** | A descriptive label (`Production servers`, `Marketing IPs`, `Transactional`) |
+| **Description** | Optional notes about the group's purpose |
+| **Check frequency** | How often resources are checked: **Daily** or **Weekly** |
+| **Notification emails** | Up to 10 addresses that receive alerts for resources in this group |
+
+Resources inherit their group's check frequency and notification list. A resource without a group uses the default check frequency (daily) and the default notification list configured under Settings.
+
+## Why groups matter
+
+Two reasons to group resources:
+
+- **Different check frequencies for different priorities.** Production sending IPs might need daily checks; rarely-used backup IPs are fine on weekly. Splitting the cost-versus-coverage decision per resource saves credits without dropping critical coverage.
+- **Different alert recipients for different teams.** Marketing's IPs alert the marketing operations team; transactional IPs alert the engineering on-call.
+
+A common shape:
+
+| Group | Frequency | Recipients |
+|---|---|---|
+| Production senders | Daily | Engineering on-call, deliverability lead |
+| Marketing senders | Daily | Marketing ops, deliverability lead |
+| Backup senders | Weekly | Engineering on-call |
+| Test senders | Weekly | (no recipients; check only) |
+
+## Create a group
+
+<Steps>
+<Step title="Open Settings → Groups">
+Inside the project, open **Tools** → **Blacklist Monitoring** → **Settings**. Scroll to the **Groups** section.
+</Step>
+
+<Step title="Add a group">
+Choose **Add group**, then complete:
+- **Group name** (required).
+- **Description** (optional).
+- **Check frequency** (Daily or Weekly).
+- **Notification emails** (optional, up to 10).
+</Step>
+
+<Step title="Save">
+Save. The group is now available in the group dropdown when adding or editing IPs and domains.
+</Step>
+</Steps>
+
+## Edit a group
+
+<Steps>
+<Step title="Open the group">
+In **Settings** → **Groups**, find the group and use the row's overflow action to pick **Edit**.
+</Step>
+
+<Step title="Change attributes">
+Update name, description, frequency, or notifications.
+</Step>
+
+<Step title="Save">
+Save. Resources already in the group pick up the new settings on the next scheduled check.
+</Step>
+</Steps>
+
+## Delete a group
+
+Deleting a group doesn't delete its resources; it ungroup them.
+
+<Steps>
+<Step title="Open the row menu">
+Use the row's overflow action on the group.
+</Step>
+
+<Step title="Delete">
+Pick **Delete** and confirm. Resources that were in the group revert to default check frequency and the default notification list.
+</Step>
+</Steps>
+
+## Move resources between groups
+
+To move a resource into a different group, edit the resource (not the group). Open the row menu on the IP or domain, pick **Edit**, and choose the new group.
+
+To bulk-move many resources at once, see [Bulk actions](/guides/tools/blacklist-monitoring/bulk).
+
+## Group check schedules
+
+Groups run on fixed UTC schedules. The exact times:
+
+| Frequency | Schedule |
+|---|---|
+| **Daily** | Every day at 06:00 UTC |
+| **Weekly** | Every Monday at 06:00 UTC |
+| **Ungrouped** | Daily by default |
+
+Manual checks via **Check now** ignore the schedule and run immediately. The last-checked timestamp on each resource reflects whichever was most recent: scheduled or manual.
+
+## Next steps
+
+<Columns cols={2}>
+<Card title="Manage IPs" icon="server" href="/guides/tools/blacklist-monitoring/ips">
+Add IPs and assign them to groups.
+</Card>
+
+<Card title="Manage domains" icon="globe" href="/guides/tools/blacklist-monitoring/domains">
+Add domains and assign them to groups.
+</Card>
+
+<Card title="Bulk actions" icon="list-checks" href="/guides/tools/blacklist-monitoring/bulk">
+Move many resources at once via bulk operations.
+</Card>
+
+<Card title="Understand alerts" icon="bell" href="/guides/tools/blacklist-monitoring/alerts">
+How per-group alerts batch and dispatch.
+</Card>
+</Columns>

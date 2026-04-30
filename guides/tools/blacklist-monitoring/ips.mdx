@@ -1,0 +1,122 @@
+---
+title: "Manage monitored IPs"
+description: "Add IPs to Blacklist Monitoring, run on-demand checks, assign groups, and remove IPs from monitoring."
+keywords: ["blacklist-monitoring", "ips", "ipv4", "ipv6", "rbl"]
+---
+
+The **IPs** tab is where you add, view, check, and remove monitored IP addresses. Each row shows an IP, its current status, the assigned group, and the last-checked timestamp.
+
+<Info>
+IPv4 and IPv6 are both accepted at add time. Today, Spotzee only checks IPv4 addresses against blacklists. IPv6 entries are stored but not actively checked.
+</Info>
+
+## Add an IP
+
+<Steps>
+<Step title="Open the IPs tab">
+Inside the project, open **Tools** → **Blacklist Monitoring** → **IPs**.
+</Step>
+
+<Step title="Add the IP">
+Choose **Add IP**, then enter:
+- **IP address** (`192.0.2.10`, `2001:db8::1`).
+- **Group** (optional). Assigning a group applies its check frequency and notification settings to this IP.
+</Step>
+
+<Step title="Save">
+Save. The IP enters monitoring with **Pending** status until the first check runs.
+</Step>
+</Steps>
+
+## Edit an IP's group
+
+You can change which group an IP belongs to without removing it.
+
+<Steps>
+<Step title="Find the IP">
+In the IPs tab, locate the row for the IP.
+</Step>
+
+<Step title="Open the row menu">
+Use the row's overflow action to pick **Edit**.
+</Step>
+
+<Step title="Change the group">
+Pick a different group from the dropdown, or clear it to make the IP ungrouped. Save.
+</Step>
+</Steps>
+
+The new group's frequency and notifications apply on the next scheduled check.
+
+## Run a check on demand
+
+Resources are checked automatically on their group's schedule, but you can trigger an immediate check.
+
+<Steps>
+<Step title="Open the row menu">
+Use the row's overflow action on the IP.
+</Step>
+
+<Step title="Choose Check now">
+Pick **Check now**. The IP is queued for an immediate check.
+</Step>
+
+<Step title="Wait for the result">
+The status updates within a few minutes once the check completes. Refresh the page if you want to see the result without waiting for an automatic refresh.
+</Step>
+</Steps>
+
+For checking many IPs at once, see [Bulk actions](/guides/tools/blacklist-monitoring/bulk).
+
+## IP statuses
+
+Each IP shows one of four statuses:
+
+| Status | Colour | Meaning |
+|---|---|---|
+| **Clean** | Green | Not listed on any of the configured blacklists |
+| **Blacklisted** | Red | Listed on one or more blacklists; the count tells you how many |
+| **Pending** | Amber | Queued for first check, hasn't completed yet |
+| **Error** | Grey | Most recent check failed (DNS error, RBL unreachable, transient infrastructure issue) |
+
+Hover the **Blacklisted** count to see the specific blacklist names where the IP is listed.
+
+## Remove an IP
+
+<Steps>
+<Step title="Open the row menu">
+Use the row's overflow action on the IP.
+</Step>
+
+<Step title="Delete">
+Pick **Delete**. Confirm at the prompt.
+</Step>
+</Steps>
+
+Deletion stops monitoring for that IP and removes the record. The 30-day history for the IP also removes. To re-monitor later, add the IP back; it starts as **Pending** with no history.
+
+## What's checked
+
+For each IP, Spotzee runs a query against every blacklist included in your configured **IP RBL type** (Standard or Comprehensive, set under **Settings**). A listing on any one of them flips the IP to **Blacklisted** and triggers an alert if alerts are configured.
+
+The check is purely DNS-based and doesn't touch your sending infrastructure. Spotzee never sends test mail through your IP to check it; we only query the RBLs themselves.
+
+## Next steps
+
+<Columns cols={2}>
+<Card title="Manage domains" icon="globe" href="/guides/tools/blacklist-monitoring/domains">
+The same flow for domains, with DBL-specific notes.
+</Card>
+
+<Card title="Use groups" icon="folder" href="/guides/tools/blacklist-monitoring/groups">
+Per-group check frequency and notification recipients.
+</Card>
+
+<Card title="Bulk actions" icon="list-checks" href="/guides/tools/blacklist-monitoring/bulk">
+CSV import and bulk operations across many IPs.
+</Card>
+
+<Card title="Understand alerts" icon="bell" href="/guides/tools/blacklist-monitoring/alerts">
+How alerts batch and when they fire.
+</Card>
+</Columns>
