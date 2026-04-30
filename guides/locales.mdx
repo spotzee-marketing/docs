@@ -1,0 +1,104 @@
+---
+title: "Manage locales"
+description: "Add additional locales to a project so you can author per-locale template variants and route users to the closest match."
+keywords: ["locales", "languages", "i18n", "templates", "fallback", "bcp-47"]
+---
+
+A locale is a language plus an optional region tag (`en`, `en-AU`, `es-MX`). Spotzee uses locales to pick which template variant a user receives. Add the locales you'll author content in, and Spotzee handles fallback automatically.
+
+<Info>
+Locale management lives under **Settings** → **Locales** and requires the project `admin` role. The project default locale is set under **Settings** → **General** → **Regional defaults**.
+</Info>
+
+## Three layers of locale
+
+Three different locale settings interact at send time:
+
+- **Project default locale.** The fallback used when nothing else matches. Set under **Settings** → **General** → **Regional defaults**.
+- **Project locale catalogue.** The list of locales you've added in **Settings** → **Locales**. Templates can have variants in any of these.
+- **User locale.** Carried on each user record. Set on creation, updated by syncs or events, or inferred from the user's browser if you set it client-side via the SDK.
+
+## Add a locale
+
+<Steps>
+<Step title="Open Settings → Locales">
+Inside the project, open **Settings** and pick the **Locales** tab.
+</Step>
+
+<Step title="Create a locale">
+Choose **Create locale**, then enter a locale key (`en-AU`, `es-MX`, `zh-CN`, and so on). The form previews the language name from the key as you type. Save.
+</Step>
+
+<Step title="Verify it lands in the list">
+The new locale appears in the table with its key and human-readable label.
+</Step>
+</Steps>
+
+## Locale key format
+
+Spotzee accepts BCP-47 language tags. The format is:
+
+- Two- or three-letter language code, lower-case (`en`, `es`, `zh`, `pt`).
+- Optional dash plus two-letter region code, upper-case (`-AU`, `-MX`, `-CN`, `-BR`).
+
+Examples:
+
+- `en` matches any English speaker.
+- `en-AU` matches Australian English specifically.
+- `es-MX` matches Mexican Spanish specifically.
+- `zh-CN` matches Simplified Chinese (mainland China).
+
+The CD37 validation rule rejects keys that don't match `^[a-z]{2,3}(-[A-Z]{2})?$`. Capitalisation matters: `en-au` is rejected, `en-AU` is accepted.
+
+## How locale fallback works
+
+Send time: Spotzee picks a template variant for the user using this rule:
+
+1. Match the user's locale exactly to a template variant locale.
+2. If no exact match, fall back to the **project default locale's** variant.
+3. If that doesn't exist either, the send fails with a missing-template error.
+
+A few worked examples:
+
+| User locale | Template variants | Project default | Picked variant |
+|---|---|---|---|
+| `en-AU` | `en-AU`, `en-US` | `en-US` | `en-AU` (exact match) |
+| `en-NZ` | `en-AU`, `en-US` | `en-US` | `en-US` (project default) |
+| `es-MX` | `en-AU`, `en-US` | `en-US` | `en-US` (project default) |
+| (none) | `en-AU`, `en-US` | `en-US` | `en-US` (project default) |
+
+To support a wider audience, author at the language level (`en`, `es`) rather than the regional level (`en-AU`, `es-MX`). Regional variants override the language-level variant only when both exist on the same template.
+
+## Set a user's locale
+
+User locales come from three places:
+
+- **Sync time.** When you upsert a user via `POST /users/batch` or `PATCH /users`, include a `locale` field.
+- **Event time.** Pass a `locale` in the user block on `POST /events`. Sets the locale if not already set.
+- **SDK.** The Spotzee JS, iOS, and Android SDKs read the device or browser locale and write it back automatically.
+
+If a user has no locale set and your project has a default locale, that's what gets used.
+
+## Delete a locale
+
+You can delete a locale from **Settings** → **Locales** that no longer has template variants pointing at it. Spotzee blocks deletion when active templates still reference the locale; remove or migrate those template variants first.
+
+## Next steps
+
+<Columns cols={2}>
+<Card title="Build templates" icon="file-text" href="/guides/templates">
+Author per-locale template variants for email, SMS, push, in-app, and webhook channels.
+</Card>
+
+<Card title="Set up a project" icon="folder-plus" href="/guides/setup-project">
+Pick the project default locale that drives template fallback.
+</Card>
+
+<Card title="Sync users" icon="users" href="/guides/sync-users">
+Push a `locale` attribute when you upsert your user base.
+</Card>
+
+<Card title="Concepts" icon="book-open" href="/guides/concepts">
+Brush up on Users, Journeys, Segments, Channels, and Providers.
+</Card>
+</Columns>

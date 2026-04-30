@@ -64,7 +64,8 @@
               "guides/manage-api-keys",
               "guides/configure-email-delivery",
               "guides/configure-sms-delivery",
-              "guides/configure-push-notifications"
+              "guides/configure-push-notifications",
+              "guides/locales"
             ]
           },
           {
