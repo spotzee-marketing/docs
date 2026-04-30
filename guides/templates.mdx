@@ -1,0 +1,161 @@
+---
+title: "Build templates"
+description: "Build per-channel campaign templates with Liquid variables and locale variants for email, SMS, push, in-app, and webhook channels."
+keywords: ["templates", "liquid", "channels", "locales", "email", "html", "mjml"]
+---
+
+Templates are how you author the actual content Spotzee sends. Every template belongs to a campaign and targets a single channel. Each template has a locale, so a campaign can carry multiple variants of the same channel for different audiences.
+
+<Info>
+Templates live inside the campaign that uses them, not as a separate top-level catalogue. Editing a campaign's templates requires the project `editor` role or higher. Liquid renders user attributes and event data into every field that supports variables.
+</Info>
+
+## The template model
+
+Two attributes shape every template: its **channel type** and its **locale**.
+
+- **Channel type** decides which fields the template carries. An email template has `from`, `subject`, and `html`. A push template has `title`, `body`, and `url`. The two types share no fields.
+- **Locale** lets you author variants of the same template for different audiences. A campaign sending in English and German would carry one email template per locale.
+
+When Spotzee dispatches a campaign send, it picks the template whose channel matches the channel the user is enrolled on, then picks the locale variant whose locale matches the user's locale (with fallback to the project default locale).
+
+## Channel field reference
+
+<Tabs>
+<Tab title="Email">
+
+Email templates are the most field-heavy. Compose with HTML, MJML, or plain text.
+
+| Field | Purpose |
+|---|---|
+| `from` | The sender address. Either a plain email or an object with `name` and `address`. |
+| `reply_to` | Optional. Where replies go. Defaults to the from address. |
+| `cc`, `bcc` | Optional carbon-copy recipients. |
+| `subject` | The subject line. Liquid-rendered. |
+| `preheader` | Optional preview text shown next to the subject in most clients. HTML emails only; plain-text emails have no preheader. |
+| `html` | The HTML body. Required for `code` and `visual` editor modes. |
+| `mjml` | Optional MJML source. When present, the visual editor compiles it down to HTML on save. |
+| `text` | Optional plain-text alternative. Required for the `plain` editor mode. |
+| `editor` | One of `code`, `visual`, or `plain`. Decides which fields are required and which the UI shows. |
+
+The `subject`, `preheader`, `from.name`, `from.address`, `reply_to`, `cc`, `bcc`, `text`, and `html` fields all run through Liquid before sending.
+
+</Tab>
+<Tab title="SMS">
+
+SMS templates have one field: the message body.
+
+| Field | Purpose |
+|---|---|
+| `text` | The message body. Liquid-rendered. |
+
+Keep messages under the carrier's segment limit (160 GSM-7 characters or 70 UCS-2 characters) where possible. Multi-segment messages cost more and arrive in pieces on some carriers.
+
+</Tab>
+<Tab title="Push">
+
+Push templates target both APN (iOS) and FCM (Android) through the same fields.
+
+| Field | Purpose |
+|---|---|
+| `title` | The notification title. |
+| `body` | The notification body text. |
+| `url` | Optional. A deep link or web URL to open on tap. Spotzee can wrap this URL through your tracking domain when **Link wrap push** is enabled in project settings. |
+| `custom` | Optional key-value map. Custom payload data your app reads on receipt (route hints, screen identifiers, additional metadata). |
+
+</Tab>
+<Tab title="Webhook">
+
+Webhook templates fire an HTTP request from Spotzee to a destination of your choosing. Use them for journey actions that integrate with internal systems or third-party APIs.
+
+| Field | Purpose |
+|---|---|
+| `method` | HTTP method: `GET`, `POST`, `PUT`, `PATCH`, or `DELETE`. |
+| `endpoint` | The destination URL. Liquid-rendered. |
+| `headers` | Key-value map of request headers. Liquid-rendered. |
+| `body` | Request body for `POST`, `PUT`, `PATCH`. JSON object. Liquid-rendered. Ignored for `GET` and `DELETE`. |
+| `cacheKey` | Optional. When set, identical requests with the same cache key are deduplicated. |
+
+</Tab>
+<Tab title="In-app">
+
+In-app templates render inside your app at runtime. The fields cover both banner and modal styles.
+
+| Field | Purpose |
+|---|---|
+| `type` | `banner` for a slim notification bar, or another type for richer modals. |
+| `title` | The headline shown in the in-app message. |
+| `body` | The body text. |
+| `html` | Optional HTML for richer modal styling. Banner type doesn't render HTML. |
+| `custom` | Optional key-value map for app-side routing or metadata. |
+
+</Tab>
+</Tabs>
+
+## Liquid variables
+
+Spotzee renders fields that support variables through Liquid. The most common variables are exposed under three roots:
+
+- `{{ user }}` for the user's attributes (`{{ user.email }}`, `{{ user.first_name }}`, `{{ user.attributes.tier }}`).
+- `{{ project }}` for project-level configuration.
+- `{{ context }}` for run-time context like `campaign_id`, `reference_id`, and the user's enrolment data.
+
+Liquid's standard filters work too. A few that come up often:
+
+```liquid
+{{ user.first_name | default: "there" }}
+{{ user.signup_at | date: "%b %d, %Y" }}
+{{ "Hello " | append: user.first_name }}
+{{ "USD" | currency: user.lifetime_value }}
+```
+
+Spotzee renders Liquid in subject lines, preheaders, plain-text and HTML email bodies, SMS bodies, push titles, push bodies, push URLs, push custom maps, webhook endpoints, webhook headers, and webhook bodies. Anywhere user-specific values make sense.
+
+## Locale variants
+
+Multi-locale projects rely on per-template locales. The pattern is straightforward:
+
+1. Set a project default locale in **Settings** → **General** → **Regional defaults**.
+2. Create the default-locale template inside your campaign.
+3. Add per-locale variants for each additional audience (`en-US`, `de-DE`, `es-MX`, and so on).
+
+When Spotzee dispatches a send, it picks the variant whose locale matches the user's locale. If no exact match exists, Spotzee falls back to the project default locale's variant. A user with no locale set falls through to the default too.
+
+## Email editor modes
+
+Email templates carry an `editor` field that decides which authoring surface you see:
+
+- **`code`** drops you into raw HTML. You write or paste HTML directly. Good for templates moved over from another platform or built externally.
+- **`visual`** uses a drag-and-drop builder backed by MJML. The `mjml` field stores the source; the `html` field stores the compiled output that Spotzee actually sends.
+- **`plain`** is plain-text only. The `text` field is required and the `html` field is ignored. Use this for transactional notifications, agent-style communications, or audiences where HTML is unwelcome.
+
+Switching between modes is permitted, but switching from `visual` to `code` discards the MJML source (the compiled HTML stays).
+
+## Tracking and link wrapping
+
+Two project-level switches change what Spotzee does to template content at send time:
+
+- **Track opens** (email). When on, Spotzee injects a 1×1 tracking pixel into HTML emails so you can report opens. Plain-text emails (`editor: plain`) never get a tracking pixel.
+- **Wrap links** (email and push). When on, Spotzee rewrites every link through your tracking domain so you can report click-throughs. The link wrapping respects your custom domain configuration if one is set.
+
+Both switches default to on for email. Push link wrapping is off by default. Toggle them under **Settings** → **General** → **Email tracking** and **Push and SMS**.
+
+## Next steps
+
+<Columns cols={2}>
+<Card title="Concepts" icon="book-open" href="/guides/concepts">
+Brush up on Users, Journeys, Segments, Channels, and Providers.
+</Card>
+
+<Card title="Trigger a campaign" icon="send" href="/guides/trigger-campaign">
+Send a one-shot campaign through the API.
+</Card>
+
+<Card title="Set up a project" icon="folder-plus" href="/guides/setup-project">
+Configure your default locale and tracking switches.
+</Card>
+
+<Card title="Provider catalogue" icon="plug" href="/guides/providers">
+See which providers handle each channel type.
+</Card>
+</Columns>
