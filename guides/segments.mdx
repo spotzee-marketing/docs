@@ -4,19 +4,41 @@ description: "Define dynamic audiences that update as customer data and behaviou
 keywords: ["segments", "audiences", "filtering", "behavioural targeting"]
 ---
 
-A **segment** is a query that resolves to a set of users. Membership is recalculated continuously — you do not maintain it by hand.
+A **segment** is a query that resolves to a set of users. Membership is recalculated continuously. You do not maintain it by hand.
 
 ## What you can segment on
 
-- **User attributes** — any standard or custom field on a user
-- **Engagement** — opens, clicks, sends, deliveries, bounces, unsubscribes
-- **Events** — any tracked event (count, recency, properties)
-- **Journey state** — currently in journey X, completed journey Y
-- **List membership** — in/not-in any static list
+Spotzee rules operate over two groups:
 
-## Operators
+- **User attributes**: any standard or custom field on a user, including nested `data.*` fields (`data.plan`, `data.lifetime_value`, etc.).
+- **Events**: any tracked event, optionally combined with a frequency window.
 
-`equals`, `not equals`, `contains`, `starts with`, `ends with`, `greater than`, `less than`, `between`, `in (list)`, `is set`, `is not set`, `within last N days`.
+Anything you want to segment on must be one of the two. Sync external state into `data.*` if you need it as a filter input.
+
+## Operators by field type
+
+Each rule node has a typed comparison. Operators are scoped to the rule type.
+
+| Rule type | Operators |
+|---|---|
+| `string` | `=`, `!=`, `contains`, `not contain`, `starts with`, `not start with`, `ends with`, `is set`, `is not set`, `empty` |
+| `number` | `=`, `!=`, `<`, `<=`, `>`, `>=` |
+| `date` | `=`, `!=`, `<`, `<=`, `>`, `>=`, `is same day` |
+| `boolean` | `=`, `!=`, `is set`, `is not set` |
+| `array` | `any`, `none`, `empty`, `is set`, `is not set` |
+| `wrapper` (combinator) | `and`, `or` |
+| `shopify_purchase` | `has_purchased`, `has_not_purchased`, `any`, `none`, `is set`, `is not set` |
+
+`shopify_purchase` rules are available when the Shopify integration is connected on Professional and Enterprise plans.
+
+## Event frequency
+
+Event rules express "happened how often, when" via an optional `frequency` block:
+
+- `count`: how many times the event occurred, with a comparison operator (`=`, `<`, `<=`, `>`, `>=`).
+- `period`: the window the count applies to. Either a rolling window (`unit: hour | minute | day | week | month | year`, `value: N`) or a fixed range (`start_date`, optional `end_date`).
+
+Use the rolling window for "in the last 30 days"-style rules. Use the fixed range for "between Black Friday and Cyber Monday"-style cohorts.
 
 ## Build a segment
 
@@ -31,26 +53,27 @@ A **segment** is a query that resolves to a set of users. Membership is recalcul
     The segment editor shows live count and a sample of matched users.
   </Step>
   <Step title="Save and use">
-    Reference the segment from any journey trigger, campaign, or send step.
+    Reference the segment from any journey entrance, campaign audience, or send step.
   </Step>
 </Steps>
 
 ## Common patterns
 
-- **Engaged in last 30 days** — opened or clicked any message in the last 30 days
-- **At-risk** — last engagement > 60 days ago, but lifetime value > threshold
-- **High-intent** — viewed pricing page in last 7 days AND not yet a customer
-- **Renewal due** — `policy_renewal_date` within next 30 days *(financial-services attribute)*
+- **Engaged in last 30 days**: `email_opened` or `email_clicked` event with frequency `count >= 1`, rolling 30-day window.
+- **At-risk**: `email_opened` last occurrence > 60 days ago AND `data.lifetime_value > 500`.
+- **High-intent**: `page_viewed` with `data.path = "/pricing"`, frequency `count >= 1` over rolling 7 days, AND `data.is_customer = false`.
+- **Renewal due** (financial-services attribute): `data.policy_renewal_date` within the next 30 days.
 
 ## Reference
 
-Segments are read/write via the API:
+Segments are exposed as **dynamic Lists** in the API:
 
-- Create / list / update / delete / preview-count — see [Main API → Segments](/main-api/introduction)
+- Create / list / update / delete: see [Main API → Lists](/main-api/introduction)
+- Programmatic walkthrough: see [Build a segment via the API](/guides/build-segment-via-api)
 
 ## Next
 
 <Columns cols={2}>
-  <Card title="Build a journey" icon="route" href="/guides/journeys">Use a segment as the trigger.</Card>
-  <Card title="Events" icon="bolt">Send behaviour signals into Spotzee. *Coming soon — check back.*</Card>
+  <Card title="Build a journey" icon="route" href="/guides/journeys">Use a segment as the audience.</Card>
+  <Card title="Send events from your backend" icon="bolt" href="/guides/event-ingestion">Get behavioural data into Spotzee so segments can react to it.</Card>
 </Columns>
