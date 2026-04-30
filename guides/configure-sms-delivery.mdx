@@ -1,0 +1,202 @@
+---
+title: "Set up SMS delivery"
+description: "Connect Twilio, Plivo, Telnyx, Vonage, or httpSMS as your SMS provider, configure inbound webhooks, and verify with a test send."
+keywords: ["sms", "text", "twilio", "plivo", "telnyx", "vonage", "httpsms", "providers"]
+---
+
+Spotzee routes SMS sends through a provider you bring. Five providers are supported: Twilio, Plivo, Telnyx, Vonage, and httpSMS. Pick the one your number is registered with and paste the credentials.
+
+<Info>
+SMS provider configuration lives under **Settings** → **Integrations** and requires the project `admin` role. Vonage appears internally as `nexmo` (its legacy name); the UI labels it Vonage.
+</Info>
+
+## Pick a provider
+
+Each provider takes a different credential shape:
+
+| Provider | Credentials | Notes |
+|---|---|---|
+| **Twilio** | Account SID, Auth Token, Phone number | Pre-built inbound webhook for STOP/HELP and replies |
+| **Plivo** | Auth ID, Auth Token, Phone number | Pre-built inbound webhook |
+| **Telnyx** | API Key, Phone number | Pre-built inbound webhook |
+| **Vonage** | API Key, API Secret, Phone number | Sends through the Vonage SMS API |
+| **httpSMS** | API Key, Phone number | Sends through an Android device acting as the gateway |
+
+Phone numbers should be in E.164 format (for example, `+61400000000`).
+
+## Configure your provider
+
+<Tabs>
+<Tab title="Twilio">
+
+<Steps>
+<Step title="Get Twilio credentials">
+In the Twilio console, copy your **Account SID** and **Auth Token** (or create a sub-account API key for tighter scoping). Note the SMS-capable **phone number** you'll send from.
+</Step>
+
+<Step title="Add the provider">
+In Spotzee **Settings** → **Integrations**, add a new SMS provider and pick **Twilio**.
+</Step>
+
+<Step title="Enter credentials">
+Fill in:
+- **Account SID**.
+- **Auth Token**.
+- **Phone number** in E.164 format.
+</Step>
+
+<Step title="Configure inbound webhook">
+Spotzee shows an **Inbound URL** in the provider's setup metadata. Paste that URL into your Twilio number's **Messaging** webhook so STOP, HELP, and replies flow back into Spotzee.
+</Step>
+
+<Step title="Save and test">
+Save and send a test message (see [Test the connection](#test-the-connection)).
+</Step>
+</Steps>
+
+</Tab>
+<Tab title="Plivo">
+
+<Steps>
+<Step title="Get Plivo credentials">
+In the Plivo console, copy your **Auth ID** and **Auth Token** from the API tab. Note your sending **phone number**.
+</Step>
+
+<Step title="Add the provider">
+In Spotzee **Settings** → **Integrations**, add a new SMS provider and pick **Plivo**.
+</Step>
+
+<Step title="Enter credentials">
+Fill in:
+- **Auth ID**.
+- **Auth Token**.
+- **Phone number** in E.164 format.
+</Step>
+
+<Step title="Save and test">
+Save and run a test send. If you want inbound replies to flow into Spotzee, point your Plivo number's inbound message URL at the Spotzee inbound endpoint shown in the provider's setup metadata.
+</Step>
+</Steps>
+
+</Tab>
+<Tab title="Telnyx">
+
+<Steps>
+<Step title="Get a Telnyx API key">
+In the Telnyx portal, generate an **API key** with messaging permission. Note your sending **phone number**.
+</Step>
+
+<Step title="Add the provider">
+In Spotzee **Settings** → **Integrations**, add a new SMS provider and pick **Telnyx**.
+</Step>
+
+<Step title="Enter credentials">
+Fill in:
+- **API Key**.
+- **Phone number** in E.164 format.
+</Step>
+
+<Step title="Configure inbound webhook">
+Spotzee shows an **Inbound URL** in the provider's setup metadata. Paste that URL into your Telnyx Messaging Profile so inbound messages reach Spotzee.
+</Step>
+</Steps>
+
+</Tab>
+<Tab title="Vonage">
+
+<Steps>
+<Step title="Get Vonage API credentials">
+In the Vonage Dashboard, copy your **API Key** and **API Secret** from the API settings page. Note your sending **phone number**.
+</Step>
+
+<Step title="Add the provider">
+In Spotzee **Settings** → **Integrations**, add a new SMS provider and pick **Vonage**.
+</Step>
+
+<Step title="Enter credentials">
+Fill in:
+- **API Key**.
+- **API Secret**.
+- **Phone number** in E.164 format.
+</Step>
+
+<Step title="Save and test">
+Save and run a test send.
+</Step>
+</Steps>
+
+</Tab>
+<Tab title="httpSMS">
+
+httpSMS turns an Android device into your sending gateway, useful for low-volume work or development.
+
+<Steps>
+<Step title="Set up httpSMS">
+Install the httpSMS app on your Android device, sign in, and copy the **API key** from your account.
+</Step>
+
+<Step title="Add the provider">
+In Spotzee **Settings** → **Integrations**, add a new SMS provider and pick **httpSMS**.
+</Step>
+
+<Step title="Enter credentials">
+Fill in:
+- **API Key** from httpSMS.
+- **Phone number** of the device in E.164 format.
+</Step>
+
+<Step title="Save and test">
+Save. Send a test message. The device receives an instruction over httpSMS and dispatches the SMS through the carrier on its SIM.
+</Step>
+</Steps>
+
+</Tab>
+</Tabs>
+
+## Test the connection
+
+Each provider has a test-send affordance. Run one before you point real campaigns at the provider.
+
+<Steps>
+<Step title="Open the provider you saved">
+In **Settings** → **Integrations**, open the provider's row.
+</Step>
+
+<Step title="Send a test message">
+Use the test-send action. Supply a destination number you can read.
+</Step>
+
+<Step title="Check the result">
+A successful send confirms credentials, network access, and the source number's sending capability. A failure surfaces the underlying error message and the provider's status code.
+</Step>
+</Steps>
+
+## Set the default provider
+
+Spotzee picks the **default** SMS provider for any send that doesn't name one. Mark one provider as default after saving it. Add more providers as fallbacks; the routing layer prefers the default and only falls back when the default fails or is disabled.
+
+## Inbound replies and STOP/HELP handling
+
+Inbound webhooks are how Spotzee receives replies, including STOP and HELP keywords. Spotzee writes the reply onto the user record, marks the user as opted-out for STOP, and sends back the project's configured **SMS opt-out message** or **SMS help message** (set under **Settings** → **General** → **Push and SMS**).
+
+Twilio, Plivo, and Telnyx have explicit Inbound URLs that Spotzee shows in the provider's setup metadata. Vonage and httpSMS use their own inbound message conventions; route them at the same Spotzee endpoint shown in the provider's setup metadata.
+
+## Next steps
+
+<Columns cols={2}>
+<Card title="Provider catalogue" icon="plug" href="/guides/providers">
+Compare providers across email, SMS, push, webhook, and in-app.
+</Card>
+
+<Card title="Set up a project" icon="folder-plus" href="/guides/setup-project">
+Configure SMS opt-out and help messages.
+</Card>
+
+<Card title="Manage API keys" icon="key" href="/guides/manage-api-keys">
+Issue the keys your servers and apps use to talk to Spotzee.
+</Card>
+
+<Card title="Trigger a campaign" icon="send" href="/guides/trigger-campaign">
+Send a one-shot SMS campaign through the API.
+</Card>
+</Columns>

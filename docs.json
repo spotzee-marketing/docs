@@ -61,7 +61,8 @@
             "group": "Configure",
             "pages": [
               "guides/manage-api-keys",
-              "guides/configure-email-delivery"
+              "guides/configure-email-delivery",
+              "guides/configure-sms-delivery"
             ]
           },
           {
