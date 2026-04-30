@@ -1,0 +1,123 @@
+---
+title: "Set up push notifications"
+description: "Configure Apple APN credentials for iOS and Firebase service account credentials for Android in a single push provider record."
+keywords: ["push", "apn", "fcm", "firebase", "ios", "android", "providers"]
+---
+
+Spotzee delivers push notifications through a single provider record that carries credentials for both iOS (Apple Push Notifications) and Android (Firebase Cloud Messaging). You can configure one platform, the other, or both. The same provider record handles both.
+
+<Info>
+Push provider configuration lives under **Settings** → **Integrations** and requires the project `admin` role. Both APN and FCM credentials live on the same provider record, so the provider counts as one row in your Integrations list.
+</Info>
+
+## What you need
+
+Before you start, gather:
+
+**For iOS (APN):**
+
+- An **Apple Developer account** with access to your app's App ID.
+- An **APNs Auth Key** (`.p8` file) generated in the Keys section of the Apple Developer portal. Download it once at creation; Apple won't show it again.
+- The **Key ID** shown next to the key in the Apple Developer portal.
+- Your **Team ID** from the Apple Developer membership page.
+- The **Bundle ID** of your iOS app (for example, `com.example.app`).
+- A decision on **production vs sandbox**. Sandbox targets development builds; production targets App Store and TestFlight builds.
+
+**For Android (FCM):**
+
+- A **Firebase project** linked to your Android app.
+- A **Service account key** (JSON file) from the Firebase project's service accounts page. Download it; the key is shown once.
+- The **App name** as configured in Firebase. Pick something stable; Spotzee uses it as the FCM app identifier.
+
+## Add the push provider
+
+<Steps>
+<Step title="Create the provider">
+In **Settings** → **Integrations**, add a new push provider. Spotzee gives you a single provider with two credential blocks: APN and FCM.
+</Step>
+
+<Step title="Configure the platforms you'll send to">
+Fill in the APN block, the FCM block, or both. See the iOS and Android sections below for field-by-field detail.
+</Step>
+
+<Step title="Save">
+Save the provider. Spotzee validates each block and reports any issues per platform.
+</Step>
+</Steps>
+
+## Configure iOS (APN)
+
+Apple's modern push uses token-based auth. The `.p8` token is your bearer credential.
+
+| Field | Where to find it |
+|---|---|
+| **Key** | The contents of your `.p8` file, including the BEGIN/END lines |
+| **Key ID** | Next to the key in the Apple Developer portal Keys page |
+| **Team ID** | Apple Developer membership page |
+| **Bundle ID** | Your iOS target's bundle identifier in Xcode |
+| **Production** | Toggle. **On** for App Store and TestFlight builds. **Off** for development builds running against the sandbox APN environment |
+
+<Note>
+The bundle ID must match what your iOS app actually uses. If your app reports a different bundle identifier when registering for push, Apple rejects the notification with a topic mismatch.
+</Note>
+
+## Configure Android (FCM)
+
+Firebase Cloud Messaging uses a service account key for auth.
+
+| Field | Where to find it |
+|---|---|
+| **App name** | The app name in Firebase. Match this exactly to what your client SDK uses |
+| **Project ID** | From the service account JSON: `project_id` |
+| **Private key** | From the service account JSON: `private_key`. Includes the BEGIN/END lines and embedded newlines |
+| **Client email** | From the service account JSON: `client_email` |
+
+The easiest path is to copy the three values directly out of the JSON file Firebase gave you when you created the service account.
+
+## Test the connection
+
+Send a test push to verify each platform works end to end.
+
+<Steps>
+<Step title="Open the provider">
+In **Settings** → **Integrations**, open the push provider's row.
+</Step>
+
+<Step title="Pick a test device">
+Pick a Spotzee user whose device is registered, then run the test-send action. You can scope the test to APN, FCM, or both.
+</Step>
+
+<Step title="Verify on the device">
+The test push should land within seconds. A failure surfaces the underlying error (invalid bundle ID, expired key, FCM service-account permission denied, and so on) so you can fix the credential.
+</Step>
+</Steps>
+
+## Bundle IDs, environments, and device tokens
+
+A few rules of thumb to keep push working long-term:
+
+- **One provider per environment**, not per platform. APN and FCM credentials sit together in the same provider so a single provider covers a single iOS-and-Android app pair.
+- **Production toggle matters.** If your app is running an App Store or TestFlight build, the **Production** toggle must be on. Sandbox-only builds need it off. A mismatch silently swallows notifications.
+- **Bundle ID must match.** Apple checks the topic claim in every push request. A mismatch returns `BadDeviceToken` from APN.
+- **Service account scopes.** The Firebase service account needs the **Firebase Messaging Admin** role at minimum. Tighter scopes (custom roles) work as long as `cloudmessaging.messages.create` is allowed.
+- **Rotating credentials.** APN keys can be rotated by uploading a new `.p8` and updating the Key ID. FCM service accounts can be rotated by generating a new JSON key and replacing the three fields.
+
+## Next steps
+
+<Columns cols={2}>
+<Card title="Provider catalogue" icon="plug" href="/guides/providers">
+Compare providers across email, SMS, push, webhook, and in-app.
+</Card>
+
+<Card title="Set up email delivery" icon="mail" href="/guides/configure-email-delivery">
+Connect SMTP, SendGrid, Mailgun, or Amazon SES.
+</Card>
+
+<Card title="Set up SMS delivery" icon="message-circle" href="/guides/configure-sms-delivery">
+Connect Twilio, Plivo, Telnyx, Vonage, or httpSMS.
+</Card>
+
+<Card title="Concepts" icon="book-open" href="/guides/concepts">
+Brush up on Users, Journeys, Segments, Channels, and Providers.
+</Card>
+</Columns>

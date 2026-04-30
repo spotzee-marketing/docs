@@ -62,7 +62,8 @@
             "pages": [
               "guides/manage-api-keys",
               "guides/configure-email-delivery",
-              "guides/configure-sms-delivery"
+              "guides/configure-sms-delivery",
+              "guides/configure-push-notifications"
             ]
           },
           {
