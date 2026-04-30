@@ -1,10 +1,10 @@
 ---
 title: "Trigger a one-off campaign"
-description: "Send a campaign on demand from your backend — the API equivalent of clicking Send in the UI."
+description: "Send a campaign on demand from your backend. The API equivalent of clicking Send in the UI."
 keywords: ["campaigns", "trigger", "send", "blast", "transactional", "broadcast"]
 ---
 
-Use this flow when you've already authored a campaign in the Spotzee UI (audience, template, send-time settings) and want to fire it on demand from your code — for example, the morning of a product launch or in response to a webhook from another system.
+Use this flow when you've already authored a campaign in the Spotzee UI (audience, template, send-time settings) and want to fire it on demand from your code. For example, the morning of a product launch or in response to a webhook from another system.
 
 ## What you'll build
 
@@ -17,7 +17,7 @@ A backend call that:
 ## Prerequisites
 
 <Info>
-  You'll need a `sk_` project key. The campaign must already exist in Spotzee — the API triggers existing campaigns rather than authoring new ones from scratch.
+  You'll need a `sk_` project key. The campaign must already exist in Spotzee. The API triggers existing campaigns rather than authoring new ones from scratch.
 </Info>
 
 ## Walkthrough
@@ -63,23 +63,22 @@ A backend call that:
     On success the response is `{ "success": true }` and the send is enqueued for the standard delivery lifecycle.
   </Step>
   <Step title="Track delivery downstream">
-    Once enqueued, a campaign send progresses through the standard delivery lifecycle. Configure a [webhook endpoint](/guides/api-webhooks) to receive `message.sent`, `message.delivered`, `message.bounced`, and `message.opened` events tied back to the campaign and recipient.
+    Once enqueued, a campaign send progresses through the standard delivery lifecycle. Watch progress on the campaign detail page in the Spotzee app, where send, delivery, and engagement counts update in real time. Outbound webhook delivery for per-message events is on the roadmap; today the in-app reporting view is the system of record.
   </Step>
 </Steps>
 
 ## Pitfalls to avoid
 
 <Warning>
-  Don't reuse a campaign as a transactional template. Campaigns are designed for one-shot sends to a stable audience. For per-event transactional messages (welcome emails, password resets, receipt confirmations), trigger a journey instead — see [Trigger a journey](/guides/journey-trigger).
+  Don't reuse a campaign as a transactional template. Campaigns are designed for one-shot sends to a stable audience. For per-event transactional messages (welcome emails, password resets, receipt confirmations), trigger a journey instead. See [Trigger a journey](/guides/journey-trigger).
 </Warning>
 
-- **Don't trigger the same campaign twice in a row.** Spotzee will happily send twice — that's what the API is for. Use an `Idempotency-Key` so a network retry doesn't double-send. See [Idempotency](/guides/api-idempotency).
+- **Don't trigger the same campaign twice in a row.** Spotzee will happily send twice. That's what the API is for. Use an `Idempotency-Key` so a network retry doesn't double-send. See [Idempotency](/guides/api-idempotency).
 - **Don't expect templates to render with arbitrary data.** Template variables resolve against the user attributes (`{{user.…}}`) and the event payload (`{{event.…}}`). Anything not in either shows up as blank.
 - **Don't trigger in a tight loop without batching.** Each call fires one send for one user; if you're sending to a large audience, queue and pace the calls (or use a `blast`-type campaign against a list instead).
 
 ## Reference
 
-- API surface — see [Main API → Campaigns](/main-api/introduction)
-- Receive delivery events — see [Webhooks](/guides/api-webhooks)
-- Safe retries — see [Idempotency](/guides/api-idempotency)
-- Per-event automation instead — see [Trigger a journey](/guides/journey-trigger)
+- API surface: see [Main API → Campaigns](/main-api/introduction)
+- Safe retries: see [Idempotency](/guides/api-idempotency)
+- Per-event automation instead: see [Trigger a journey](/guides/journey-trigger)
