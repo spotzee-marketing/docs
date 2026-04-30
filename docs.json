@@ -142,6 +142,16 @@
                   "guides/sdks/javascript/devices-and-notifications",
                   "guides/sdks/javascript/typed-client"
                 ]
+              },
+              {
+                "group": "iOS",
+                "pages": [
+                  "guides/sdks/ios/install",
+                  "guides/sdks/ios/identify",
+                  "guides/sdks/ios/track",
+                  "guides/sdks/ios/push-notifications",
+                  "guides/sdks/ios/in-app-and-deeplinks"
+                ]
               }
             ]
           },

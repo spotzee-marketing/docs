@@ -1,0 +1,126 @@
+---
+title: "Push notifications"
+description: "Register an iOS device with APNs, send the token to Spotzee, and route incoming push payloads through the SDK."
+keywords:
+  - ios
+  - sdk
+  - push
+  - apns
+  - register
+  - device token
+---
+
+iOS push runs on Apple Push Notification service (APNs). The pattern: ask the user for permission, register with APNs to get a device token, hand the token to Spotzee, then route every incoming push payload through the SDK so it can run silent in-app refreshes and unwrap deeplinks.
+
+## Prerequisites
+
+- A push provider configured under **Settings → Integrations** with the APNs `.p8` key, key ID, and team ID. Read [Set up push notifications](/guides/configure-push-notifications) for the project-side setup.
+- The `Push Notifications` capability enabled on your app target in Xcode.
+- (For silent in-app refresh) the `Background Modes` capability with `Remote notifications` enabled.
+
+## Request permission and register
+
+`UIApplication.shared.registerForRemoteNotifications()` triggers APNs registration. You ask for user permission via `UNUserNotificationCenter` first.
+
+```swift
+import UIKit
+import UserNotifications
+import Spotzee
+
+extension AppDelegate {
+    func requestPushPermission() {
+        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { granted, _ in
+            DispatchQueue.main.async {
+                UIApplication.shared.registerForRemoteNotifications()
+            }
+        }
+    }
+}
+```
+
+Call `requestPushPermission()` from a sensible moment (after onboarding, after the first useful action). Apple's [Human Interface Guidelines](https://developer.apple.com/design/human-interface-guidelines/notifications) discourage prompting at app launch.
+
+## Hand the device token to Spotzee
+
+Implement `application(_:didRegisterForRemoteNotificationsWithDeviceToken:)` and pass the raw `Data` directly into `Spotzee.shared.register(token:)`. The SDK converts it to the hex-encoded string Spotzee's APNs sender expects.
+
+```swift
+func application(
+    _ application: UIApplication,
+    didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data
+) {
+    Spotzee.shared.register(token: deviceToken)
+}
+```
+
+`register` also reports device characteristics (model, OS version, app version, build) on the same call, which feeds segment rules like "Devices on iOS 18 or later".
+
+If APNs registration fails, you can still register the device's characteristics without a push token. The user becomes addressable for non-push channels and segment rules; pass `nil`:
+
+```swift
+func application(
+    _ application: UIApplication,
+    didFailToRegisterForRemoteNotificationsWithError error: Error
+) {
+    Spotzee.shared.register(token: nil)
+}
+```
+
+You must have called `identify`, or you must let the SDK use its persisted anonymous ID, before `register` succeeds.
+
+## Route incoming payloads through the SDK
+
+Every push payload that opens or wakes the app should pass through `Spotzee.shared.handle(_:userInfo:)`. The SDK does two things with it:
+
+1. **Silent refresh.** A push with `aps.content-available = 1` and no UI triggers an in-app notification fetch via `showLatestNotification`.
+2. **Deeplink unwrap.** A push carrying a `url` field opens the URL through the SDK's deeplink handler so click tracking is registered before the app navigates.
+
+```swift
+func application(
+    _ application: UIApplication,
+    didReceiveRemoteNotification userInfo: [AnyHashable: Any]
+) async -> UIBackgroundFetchResult {
+    Spotzee.shared.handle(application, userInfo: userInfo)
+    return .newData
+}
+```
+
+For pushes that carry visible content (alert / sound / badge), iOS displays the notification through `UNUserNotificationCenter`. Implement the standard delegate methods alongside the SDK call so your app handles taps the way you want:
+
+```swift
+class NotificationCentreDelegate: NSObject, UNUserNotificationCenterDelegate {
+    func userNotificationCenter(
+        _ center: UNUserNotificationCenter,
+        didReceive response: UNNotificationResponse,
+        withCompletionHandler completionHandler: @escaping () -> Void
+    ) {
+        Spotzee.shared.handle(UIApplication.shared, userInfo: response.notification.request.content.userInfo)
+        completionHandler()
+    }
+}
+```
+
+## Test a push
+
+Configure a test user in **Settings → Integrations → Push** under the provider and trigger a test send. Read [Test a push](/guides/configure-push-notifications#test-a-push) for the project-side flow.
+
+## What lives where
+
+| Concern | Where |
+|---|---|
+| Provider credentials (APNs `.p8` key + key ID + team ID) | **Settings → Integrations** in the Spotzee app |
+| Device token registration | `Spotzee.shared.register(token:)` from `didRegisterForRemoteNotificationsWithDeviceToken` |
+| Silent in-app refresh | Wired automatically by `Spotzee.shared.handle(_:userInfo:)` |
+| Deeplink unwrap on tap | `Spotzee.shared.handle(_:userInfo:)` |
+| Universal Links from email taps | `Spotzee.shared.handle(universalLink:)`. Read [In-app notifications and deeplinks](/guides/sdks/ios/in-app-and-deeplinks) |
+
+## Next steps
+
+<Columns cols={2}>
+  <Card title="In-app notifications and deeplinks" href="/guides/sdks/ios/in-app-and-deeplinks" icon="link">
+    Render in-app modals and unwrap Universal Links.
+  </Card>
+  <Card title="Configure push providers" href="/guides/configure-push-notifications" icon="bell">
+    Set up APN credentials before the SDK can deliver push.
+  </Card>
+</Columns>

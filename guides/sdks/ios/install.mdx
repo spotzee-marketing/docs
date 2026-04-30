@@ -1,0 +1,146 @@
+---
+title: "Install the iOS SDK"
+description: "Add Spotzee to your iOS app via Swift Package Manager or CocoaPods, and initialise the singleton with a publishable key."
+keywords:
+  - ios
+  - sdk
+  - install
+  - spm
+  - cocoapods
+  - initialise
+---
+
+The iOS SDK is a single Swift framework distributed through Swift Package Manager and CocoaPods. Add it, import `Spotzee`, and call `initialize` once from your app delegate.
+
+## Requirements
+
+- iOS 13 or later (also runs on Mac Catalyst 13+)
+- Xcode 14 or newer
+- Swift 5.7 or newer
+
+## Install
+
+<Tabs>
+
+<Tab title="Swift Package Manager">
+
+In Xcode, open **File → Add Package Dependencies** and enter:
+
+```text
+https://github.com/spotzee-marketing/ios-sdk
+```
+
+Pick a version range, then add the `Spotzee` library to your app target.
+
+For a `Package.swift` consumer:
+
+```swift
+.package(url: "https://github.com/spotzee-marketing/ios-sdk", from: "0.2.0"),
+```
+
+</Tab>
+
+<Tab title="CocoaPods">
+
+Add to your `Podfile`:
+
+```ruby
+pod 'Spotzee'
+```
+
+Then run:
+
+```bash
+pod install
+```
+
+Open the workspace from now on.
+
+</Tab>
+
+</Tabs>
+
+## Initialise
+
+Call `Spotzee.initialize(apiKey:)` from `application(_:didFinishLaunchingWithOptions:)`. Use a publishable key (`pk_…`); read [Manage API keys](/guides/manage-api-keys) for how to mint one.
+
+```swift
+import UIKit
+import Spotzee
+
+@main
+class AppDelegate: UIResponder, UIApplicationDelegate {
+    func application(
+        _ application: UIApplication,
+        didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
+    ) -> Bool {
+        Spotzee.initialize(
+            apiKey: "pk_…",
+            launchOptions: launchOptions
+        )
+        return true
+    }
+}
+```
+
+The shared instance is `Spotzee.shared`. Every other call uses it: `Spotzee.shared.identify(…)`, `Spotzee.shared.track(…)`, and so on.
+
+To wire in-app notifications and deeplinks too, pass an `inAppDelegate`:
+
+```swift
+Spotzee.initialize(
+    apiKey: "pk_…",
+    inAppDelegate: MyInAppDelegate(),
+    launchOptions: launchOptions
+)
+```
+
+Read [In-app notifications and deeplinks](/guides/sdks/ios/in-app-and-deeplinks) for the delegate contract.
+
+## What every request carries
+
+The SDK adds these headers to every API call. You don't set them yourself.
+
+| Header | Value | Why |
+|---|---|---|
+| `Authorization` | `Bearer <your apiKey>` | Authenticates the request |
+| `Spotzee-Version` | `2026-04-28` | Pins the API version this SDK release targets |
+| `x-spotzee-client-type` | `sdk-ios` | Identifies traffic from this SDK. Read [Identify your API client type](/guides/api-client-type) |
+| `Content-Type` | `application/json` | Set on POST and PUT requests |
+
+The SDK's `JSONEncoder` converts Swift camelCase property names to snake_case before sending, so `Identity(externalId:)` lands as `external_id` on the wire.
+
+## Identity persistence
+
+The SDK persists three values in `UserDefaults(suiteName: "Spotzee")`:
+
+- `anonymousId`: minted on first launch, kept across app launches.
+- `externalId`: cached after `identify` succeeds, cleared by `reset()`.
+- `deviceId`: a per-install UUID used when registering for push.
+
+Call `Spotzee.shared.reset()` on sign-out to mint a new anonymous ID and clear the cached `externalId`.
+
+## Errors
+
+Network failures print a one-line summary to stdout (prefixed `SZ |`) with the HTTP status, the API error code (when present), the message, and the `request_id`. Internally the SDK throws a `URLError(.badServerResponse)` so existing `catch` blocks keep working. The legacy `{ error: string }` shape and the new RFC 7807 envelope are both parsed; quote `request_id` to support.
+
+## Debugging
+
+The SDK does not expose a debug-toggle initialiser. To trace requests in development, attach a Network instrument in Xcode (Debug → Debug Workflow → Capture Network) and filter by host `apix.spotzee.com`.
+
+## Next steps
+
+<Columns cols={2}>
+  <Card title="Identify users" href="/guides/sdks/ios/identify" icon="user-check">
+    Link anonymous activity to a known user.
+  </Card>
+  <Card title="Track events" href="/guides/sdks/ios/track" icon="bolt">
+    Send custom events with properties.
+  </Card>
+  <Card title="Push notifications" href="/guides/sdks/ios/push-notifications" icon="bell">
+    Register for APNs and route incoming pushes through the SDK.
+  </Card>
+  <Card title="In-app notifications and deeplinks" href="/guides/sdks/ios/in-app-and-deeplinks" icon="link">
+    Render in-app modals and unwrap Universal Links.
+  </Card>
+</Columns>

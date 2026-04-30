@@ -1,0 +1,98 @@
+---
+title: "Track events"
+description: "Send custom events from an iOS app to trigger journeys, feed segments, and update user profiles inline."
+keywords:
+  - ios
+  - sdk
+  - track
+  - events
+  - properties
+  - journey trigger
+---
+
+`track` sends a single event to Spotzee. Events drive journey entrances, segment membership, campaign triggers, and reporting. Each event carries a name and a `properties` dictionary, and optionally inline updates to the user's profile.
+
+## Track an event
+
+```swift
+import Spotzee
+
+Spotzee.shared.track(
+    event: "Order placed",
+    properties: [
+        "order_id": "ord_2026_04_30_001",
+        "total": 129.50,
+        "currency": "AUD",
+        "items": 3,
+        "sku": ["SHIRT-AU-12", "BAG-AU-01"],
+    ]
+)
+```
+
+The SDK attaches the persisted anonymous ID and the cached `externalId` (when set) on every call. You don't pass either explicitly.
+
+## Naming and structuring events
+
+- **Use a short, descriptive name in the past tense.** `Order placed`, `Account upgraded`, `Subscription cancelled`. Consistent verb tense pays off when you build segments.
+- **Match the name across surfaces.** A `track("Order placed")` from iOS and one from your backend should be the same event so journeys fire once per order, not twice with different names.
+- **Properties are flat key-value pairs.** Strings, numbers, booleans, arrays of strings or numbers, and shallow dictionaries serialise cleanly. Deep nesting works but is harder to segment on.
+- **Property names use snake_case** in the source dictionary. The SDK does not transform top-level keys inside `[String: Any]` properties.
+
+Read [Send events from your backend](/guides/event-ingestion) for the broader event model.
+
+## Update user traits inline with the event
+
+Set or refresh traits on the user record without a separate `identify` call:
+
+```swift
+Spotzee.shared.track(
+    event: "Profile updated",
+    properties: ["source": "self-serve"],
+    user: TrackUser(
+        timezone: "Australia/Melbourne",
+        locale: "en-AU",
+        data: [
+            "plan": "professional",
+            "seats_allocated": 5,
+        ]
+    )
+)
+```
+
+`TrackUser` accepts `email`, `phone`, `timezone`, `locale`, and a nested `data` dictionary for arbitrary traits. Use this when the trait change is the natural side effect of the event (a `Plan upgraded` event upserting the new `plan` value), not for routine updates.
+
+## Anonymous events
+
+Track works without an `identify`. Events fire against the SDK's persisted anonymous ID and join back to the known user the first time you call `identify`.
+
+```swift
+// Anonymous browse
+Spotzee.shared.track(
+    event: "Product viewed",
+    properties: ["sku": "SHIRT-AU-12"]
+)
+
+// Sign-up. Anonymous events are aliased to u_42.
+Spotzee.shared.identify(id: "u_42", email: "sam@example.com")
+```
+
+## Built-in retry
+
+Each `track` schedules a POST and retries up to three times on failure (any error from `URLSession.shared.data`). The SDK does not block your code on the result; calls return immediately.
+
+For events you cannot afford to lose (`Order placed`, `Payment processed`), still send a backend duplicate via [event ingestion](/guides/event-ingestion). The SDK's retry covers transient blips; a force-quit before the network call lands does not.
+
+## Throughput and batching
+
+Each `track` is one HTTP request. The SDK does not batch. For high-frequency events (animation analytics, gameplay metrics), buffer in your app and send larger windows from your backend rather than one POST per event from the device.
+
+## Next steps
+
+<Columns cols={2}>
+  <Card title="Trigger a journey from an event" href="/guides/journey-trigger" icon="route">
+    Wire an event to a journey entrance.
+  </Card>
+  <Card title="Build a segment from events" href="/guides/build-segment-via-api" icon="filter">
+    Use event-frequency rules in segment definitions.
+  </Card>
+</Columns>

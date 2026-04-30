@@ -1,0 +1,173 @@
+---
+title: "In-app notifications and deeplinks"
+description: "Render in-app banner, alert, and HTML notifications on iOS and unwrap Universal Links and tracking URLs."
+keywords:
+  - ios
+  - sdk
+  - in-app
+  - inappdelegate
+  - universal links
+  - deeplinks
+---
+
+The iOS SDK can render in-app notifications natively (banner, alert, HTML) and unwrap Spotzee click-tracking URLs so taps in emails open the right screen in your app. Both surfaces flow through delegates you implement.
+
+## In-app notifications
+
+In-app notifications are content campaigns or journey steps that target the user's open app session, not the OS push tray. The SDK fetches them, asks your delegate what to do, and renders the chosen ones in a modal.
+
+### Wire up the delegate
+
+Implement `InAppDelegate` and pass an instance into `Spotzee.initialize`:
+
+```swift
+import UIKit
+import Spotzee
+
+class MyInAppDelegate: InAppDelegate {
+    var autoShow: Bool { true }
+    var useDarkMode: Bool { false }
+
+    func onNew(notification: SpotzeeNotification) -> InAppDisplayState {
+        return .show
+    }
+
+    func didDisplay(notification: SpotzeeNotification) {
+        // Telemetry hook
+    }
+
+    func handle(action: InAppAction, context: [String: Any], notification: SpotzeeNotification) {
+        switch action {
+        case .dismiss:
+            // SDK already marked it read. Nothing else to do unless you want analytics.
+            break
+        case .custom:
+            // Custom action triggered from inside the notification HTML.
+            // context carries the payload passed via window.trigger(obj).
+            break
+        }
+    }
+
+    func onError(error: Error) {
+        print("Spotzee in-app error: \(error)")
+    }
+}
+
+@main
+class AppDelegate: UIResponder, UIApplicationDelegate {
+    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+        Spotzee.initialize(
+            apiKey: "pk_…",
+            inAppDelegate: MyInAppDelegate(),
+            launchOptions: launchOptions
+        )
+        return true
+    }
+}
+```
+
+Default implementations cover everything except `handle`. You only need to implement the ones whose default doesn't suit you.
+
+### What each delegate hook does
+
+| Hook | Default | When it fires |
+|---|---|---|
+| `autoShow: Bool` | `true` | Read at app start. When `true`, the SDK fetches and displays the latest notification automatically. |
+| `useDarkMode: Bool` | `false` | Read when rendering. Applies dark-mode styling to alert and HTML notifications. |
+| `onNew(notification:) -> InAppDisplayState` | `.show` | Per fetched notification. Return `.show`, `.skip` (try next), or `.consume` (mark read silently). |
+| `didDisplay(notification:)` | no-op | After the modal appears. Use for telemetry. |
+| `handle(action:context:notification:)` | required | When the user dismisses or triggers a custom action from inside the notification HTML. |
+| `onError(error:)` | no-op | When fetch or render fails. |
+
+### Manual control
+
+Set `autoShow` to `false` and call `showLatestNotification()` from your own UI moment (after sign-in, after the home screen renders) to defer in-app delivery to a calmer surface than launch.
+
+```swift
+Spotzee.shared.showLatestNotification()
+```
+
+To enumerate or render a specific notification yourself:
+
+```swift
+let page = try await Spotzee.shared.getNotifications()
+for notification in page.results {
+    await Spotzee.shared.show(notification: notification)
+}
+```
+
+To mark a notification read without showing it:
+
+```swift
+await Spotzee.shared.consume(notification: notification)
+```
+
+To dismiss a currently shown notification programmatically:
+
+```swift
+await Spotzee.shared.dismiss(notification: notification)
+```
+
+### The three content types
+
+| `contentType` | Renders as | Extra fields |
+|---|---|---|
+| `.banner` | A small overlay with title + body | `custom: [String: String]?` |
+| `.alert` | A modal with title, body, optional image | `image: String?`, `html: String` |
+| `.html` | A full HTML overlay | `html: String` |
+
+For `alert` and `html`, the embedded HTML can call `window.trigger({ … })` from JavaScript to invoke your delegate's `handle(action: .custom, context:, notification:)` with the passed payload. Use this for "Buy now" buttons, "Open settings" actions, or anything that needs to bridge the WebView back to native code.
+
+## Deeplinks and Universal Links
+
+Spotzee click-tracks email links by wrapping them in a `https://<your-tracking-domain>/c?r=<encoded-target-url>` URL. The SDK's `handle(universalLink:)` unwraps the wrapper, registers the click with Spotzee, then opens the unwrapped target so your app navigates to the right screen.
+
+### Configure Associated Domains
+
+In Xcode, open your target's **Signing & Capabilities** tab, add **Associated Domains**, and add an entry for your tracking domain.
+
+| Setup | Associated Domain entry |
+|---|---|
+| Default Spotzee tracking | `applinks:apix.spotzee.com` |
+| Custom tracking domain | `applinks:track.yourcompany.com` |
+
+The SDK detects Spotzee tracking links by their path pattern (`/c` or `/c/`), so custom domains work without further configuration once the Associated Domain is registered.
+
+### Unwrap on Universal Link delivery
+
+Implement `application(_:continue:restorationHandler:)` and pass the URL through `Spotzee.shared.handle(universalLink:)`. The method returns `true` if it recognised and handled the URL, `false` if you should handle it yourself.
+
+```swift
+func application(
+    _ application: UIApplication,
+    continue userActivity: NSUserActivity,
+    restorationHandler: @escaping ([UIUserActivityRestoring]?) -> Void
+) -> Bool {
+    guard let url = userActivity.webpageURL else { return false }
+    return Spotzee.shared.handle(universalLink: url)
+}
+```
+
+For SceneDelegate apps, the equivalent hook is `scene(_:continue:)`.
+
+### `spotzee://` URL scheme
+
+For deeplinks that don't need to round-trip to the web (closing the in-app modal, triggering a custom intent), the SDK accepts a `spotzee://` URL scheme inside notification HTML:
+
+| URL | Effect |
+|---|---|
+| `spotzee://dismiss` | Closes the current in-app notification and marks it read. |
+| `spotzee://*` | Routes to your delegate's `handle(action: .custom, …)` with the URL as context. |
+
+These are interpreted inside the in-app modal's WebView; you don't need to register the scheme as a separate URL Type unless you also accept it from outside the app.
+
+## Next steps
+
+<Columns cols={2}>
+  <Card title="Set up push providers" href="/guides/configure-push-notifications" icon="bell">
+    APN credentials must be configured before pushes deliver.
+  </Card>
+  <Card title="Configure custom domains" href="/guides/custom-domains" icon="globe">
+    Set up a custom tracking domain to use as your `applinks:` host.
+  </Card>
+</Columns>
