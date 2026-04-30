@@ -52,7 +52,7 @@ For convenience, list endpoints also emit:
 async function* listAllContacts(token) {
   let cursor = null
   do {
-    const url = new URL('https://apix.spotzee.com/api/client/contacts')
+    const url = new URL('https://apix.spotzee.com/api/client/users')
     url.searchParams.set('limit', '100')
     if (cursor) url.searchParams.set('cursor', cursor)
 
@@ -70,7 +70,7 @@ async function* listAllContacts(token) {
 Pass `sort` as a single field name. Prefix with `-` for descending order:
 
 ```http
-GET /contacts?sort=-created_at
+GET /users?sort=-created_at
 ```
 
 Endpoints document their valid sort fields. Sorting on a non-indexed field returns `400 parameter_invalid_format`.

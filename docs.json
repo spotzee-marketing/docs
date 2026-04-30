@@ -67,7 +67,7 @@
           {
             "group": "Recipes",
             "pages": [
-              "guides/sync-contacts",
+              "guides/sync-users",
               "guides/event-ingestion",
               "guides/build-segment-via-api",
               "guides/trigger-campaign",
@@ -98,8 +98,8 @@
             "tag": "Projects"
           },
           {
-            "group": "Contacts",
-            "tag": "Contacts"
+            "group": "Users",
+            "tag": "Users"
           },
           {
             "group": "Events",

@@ -51,7 +51,7 @@ The first publicly-versioned release of the Spotzee API.
 
 Public surface for the first time:
 
-- **Contacts** — list, get, upsert (single + batch up to 100), delete. Public name is **Contact**.
+- **Users** — list, get, upsert (single + batch up to 100), delete. Public name is **User**.
 - **Lists** — full CRUD. Static and dynamic flavours; dynamic lists are how you express segments via the API.
 - **Subscriptions** — opt-in management per channel.
 - **Templates** — multi-channel template management with preview and proof endpoints.
@@ -87,7 +87,7 @@ client.setConfig({
     },
 })
 
-const { data, error } = await Spotzee.listContacts({ query: { limit: 50 } })
+const { data, error } = await Spotzee.listUsers({ query: { limit: 50 } })
 ```
 
 Install:

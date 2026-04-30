@@ -1,18 +1,18 @@
 ---
 title: "Trigger a journey"
-description: "Drop a contact into a multi-step automation from your backend so welcomes, onboarding, and lifecycle flows fire on cue."
+description: "Drop a user into a multi-step automation from your backend so welcomes, onboarding, and lifecycle flows fire on cue."
 keywords: ["journey", "trigger", "automation", "lifecycle", "onboarding", "welcome"]
 ---
 
-Journeys are multi-step flows — wait, branch, send, repeat — that Spotzee runs in the background once a contact enters them. Use this flow to enter a contact into a journey from your backend the moment something happens in your product.
+Journeys are multi-step flows — wait, branch, send, repeat — that Spotzee runs in the background once a user enters them. Use this flow to enter a user into a journey from your backend the moment something happens in your product.
 
 ## What you'll build
 
 A backend call that:
 
 1. Picks the right journey for the trigger event.
-2. Enters one or more contacts into it.
-3. Passes per-entrance data the journey's templates can use.
+2. Enters one user into it at a chosen entrance step.
+3. Passes per-entrance event data the journey's conditions and templates can use.
 
 ## Prerequisites
 
@@ -26,10 +26,14 @@ A backend call that:
   <Step title="Author and publish the journey">
     Build the journey in the Spotzee UI: entry condition, branches, sends, waits. Set its status to **Live** when you're ready. Draft and Off journeys reject `POST /journeys/{id}/trigger` calls.
   </Step>
-  <Step title="Find the journey ID">
+  <Step title="Find the journey ID and entrance step">
     `GET /journeys?limit=100` returns every journey in the project. In production, hold a stable mapping in your config (e.g. `WELCOME_JOURNEY_ID`) rather than discovering it at runtime.
+
+    Each journey has one or more **entrance steps** (the `entry` nodes in its graph). The trigger call must specify which one to enter the user at via the `entrance_id` field — this is a numeric step identifier from the journey's published graph.
   </Step>
   <Step title="Trigger an entrance">
+    The endpoint enters **one user at a time**. The body has three fields: `entrance_id` (which entrance step to use), `user` (the user identifier), and an optional `event` payload available to journey conditions and template Handlebars as `{{event}}`.
+
     ```http
     POST /journeys/{journeyId}/trigger HTTP/1.1
     Host: apix.spotzee.com
@@ -39,23 +43,22 @@ A backend call that:
     Content-Type: application/json
 
     {
-      "users": [
-        {
-          "external_id": "cust_001",
-          "first_name": "Ada",
-          "data": {
-            "signup_source": "pricing_page",
-            "trial_ends_at": "2026-05-12"
-          }
-        }
-      ]
+      "entrance_id": 42,
+      "user": {
+        "external_id": "cust_001",
+        "email": "ada@example.com"
+      },
+      "event": {
+        "signup_source": "pricing_page",
+        "trial_ends_at": "2026-05-12"
+      }
     }
     ```
 
-    Each entry in `users` becomes a journey entrance. The shape supports `external_id`, `anonymous_id`, or `email`, and you can attach per-entrance data that journey templates can reference (for example, `{{trial_ends_at}}` in a welcome template).
+    The `user` object requires `external_id` and accepts the standard user fields (`email`, `phone`, `device_token`, `timezone`, `locale`) plus any additional custom attributes. To enter many users, call this endpoint once per user (typically from a worker that fans out from your queue).
   </Step>
   <Step title="Handle the response">
-    The trigger response returns the count of entrances created and a per-user error array for any rejected entries — typically because the contact wasn't found and you didn't pass enough information to upsert one.
+    On success the response confirms the entrance was queued. If the user wasn't found and the supplied `user` block didn't carry enough information to upsert one, the call returns an error from the [error catalogue](/main-api/errors).
   </Step>
   <Step title="Verify in the journey view">
     The journey's runtime view in the Spotzee UI shows fresh entrances within seconds. For automated verification, configure a [webhook endpoint](/guides/api-webhooks) to receive journey-state events.
@@ -65,12 +68,12 @@ A backend call that:
 ## Pitfalls to avoid
 
 <Warning>
-  Don't trigger the same contact into the same journey twice for the same event. Most journeys aren't designed to be entered concurrently. Use a deterministic `Idempotency-Key` (typically `<journey>:<contact>:<event-id>`) so retries are safe — see [Idempotency](/guides/api-idempotency).
+  Don't trigger the same user into the same journey twice for the same event. Most journeys aren't designed to be entered concurrently. Use a deterministic `Idempotency-Key` (typically `<journey>:<user>:<event-id>`) so retries are safe — see [Idempotency](/guides/api-idempotency).
 </Warning>
 
 - **Don't trigger a Draft journey.** Spotzee returns `409` until the journey is set Live. Promote it in the UI first.
-- **Don't pack per-entrance data with stale info.** The journey will reference whatever you pass at trigger time — if a downstream step depends on `trial_ends_at`, set it correctly when you trigger.
-- **Don't fire one trigger per contact in a loop.** The `users` array supports many entrances per call; batch them and rely on the rate-limit and idempotency machinery.
+- **Don't pack the `event` block with stale info.** Conditions and templates downstream will reference whatever you pass at trigger time — if a step depends on `event.trial_ends_at`, set it correctly when you trigger.
+- **Don't fire triggers in a tight loop without pacing.** Each call enters one user; if you're entering thousands at once, fan out through a queue/worker that respects the per-key rate limit. See [Rate limits](/guides/api-rate-limits).
 
 ## Reference
 

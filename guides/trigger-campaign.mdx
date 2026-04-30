@@ -11,7 +11,7 @@ Use this flow when you've already authored a campaign in the Spotzee UI (audienc
 A backend call that:
 
 1. Looks up an existing campaign by ID.
-2. Triggers a send with one or more contacts as the recipient set.
+2. Triggers a send for a single user, with an optional event payload that flows into the template.
 3. Captures the response so you can correlate the send with downstream delivery events.
 
 ## Prerequisites
@@ -28,15 +28,15 @@ A backend call that:
 
     A campaign in `state: "draft"` cannot be triggered. Promote it via the UI, or `PATCH /campaigns/{id}` to set `state: "scheduled"`.
   </Step>
-  <Step title="Decide on the recipient set">
-    Two shapes are supported:
+  <Step title="Identify the user and event payload">
+    The trigger endpoint fires a `trigger`-type campaign for **one user at a time**. The body has two required fields:
 
-    | Shape | Use when |
-    |---|---|
-    | Audience already on the campaign | The campaign is already targeted at a list or segment — just trigger it |
-    | Per-call recipients | You want to fire the same template at a one-off list of contacts (for example, a transactional broadcast keyed on a user action) |
+    | Field | Shape | Notes |
+    |---|---|---|
+    | `user` | object | Identifies the user. `external_id` is required; `email`, `phone`, `device_token`, `timezone`, `locale` are optional, and any additional custom attributes you include flow through to the user record. |
+    | `event` | object | Free-form JSON, exposed to the campaign template as `{{event}}` (so `{{event.order_id}}` etc. resolve in Handlebars). May be `{}` if your template doesn't reference event data. |
 
-    The per-call form passes a `users` array. Each entry can be `{ external_id }`, `{ anonymous_id }`, or `{ email }`. Custom attributes available to the template can ride alongside.
+    To send to multiple users, call the endpoint once per user (typically from your queue/worker layer).
   </Step>
   <Step title="Trigger the send">
     ```http
@@ -48,14 +48,19 @@ A backend call that:
     Content-Type: application/json
 
     {
-      "users": [
-        { "external_id": "cust_001", "first_name": "Ada" },
-        { "external_id": "cust_002", "first_name": "Grace" }
-      ]
+      "user": {
+        "external_id": "cust_001",
+        "email": "ada@example.com",
+        "first_name": "Ada"
+      },
+      "event": {
+        "order_id": "12345",
+        "total": 99.99
+      }
     }
     ```
 
-    The response confirms how many recipients were enqueued and returns a per-user error array for any rejected entries.
+    On success the response is `{ "success": true }` and the send is enqueued for the standard delivery lifecycle.
   </Step>
   <Step title="Track delivery downstream">
     Once enqueued, a campaign send progresses through the standard delivery lifecycle. Configure a [webhook endpoint](/guides/api-webhooks) to receive `message.sent`, `message.delivered`, `message.bounced`, and `message.opened` events tied back to the campaign and recipient.
@@ -69,8 +74,8 @@ A backend call that:
 </Warning>
 
 - **Don't trigger the same campaign twice in a row.** Spotzee will happily send twice — that's what the API is for. Use an `Idempotency-Key` so a network retry doesn't double-send. See [Idempotency](/guides/api-idempotency).
-- **Don't expect templates to render with arbitrary data.** Template variables resolve against the contact + the per-call attributes you passed. Anything not in either shows up as blank.
-- **Don't trigger campaigns in a tight loop.** A single trigger can target thousands of recipients; reach for the per-call audience approach rather than calling trigger N times.
+- **Don't expect templates to render with arbitrary data.** Template variables resolve against the user attributes (`{{user.…}}`) and the event payload (`{{event.…}}`). Anything not in either shows up as blank.
+- **Don't trigger in a tight loop without batching.** Each call fires one send for one user; if you're sending to a large audience, queue and pace the calls (or use a `blast`-type campaign against a list instead).
 
 ## Reference
 

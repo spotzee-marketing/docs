@@ -24,13 +24,15 @@ Network failures, timeouts, and retries are unavoidable. Spotzee supports idempo
 </Steps>
 
 ```http
-POST /contacts HTTP/1.1
+PATCH /users HTTP/1.1
 Host: apix.spotzee.com
 Authorization: Bearer sk_…
 Idempotency-Key: 1f6f4f7c-7a44-4cf6-9b3e-3b8a3a3b3a3a
 Content-Type: application/json
 
-{ "external_id": "user-9876", "email": "ada@example.com" }
+[
+  { "external_id": "user-9876", "email": "ada@example.com" }
+]
 ```
 
 ## Scope and TTL
@@ -90,7 +92,7 @@ uuid.NewString()
 
 ## When not to reuse a key
 
-Reuse a key for the same logical operation — for example, retrying the same "create contact" request after a timeout. Mint a fresh key when:
+Reuse a key for the same logical operation — for example, retrying the same "create user" request after a timeout. Mint a fresh key when:
 
 - The user submits the form a second time after deciding to change a field.
 - You're processing a queue and each message is a distinct operation.

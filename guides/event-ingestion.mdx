@@ -4,14 +4,14 @@ description: "Track behaviour from your servers so segments, journeys, and repor
 keywords: ["events", "ingestion", "tracking", "behaviour", "server-side", "external_id", "anonymous_id"]
 ---
 
-Events are the raw signal Spotzee uses to trigger journeys, build behavioural segments, and drive reporting. Send events from your backend whenever a contact does something worth marketing on — completes a checkout, opens a feature for the first time, abandons a cart, hits a usage milestone.
+Events are the raw signal Spotzee uses to trigger journeys, build behavioural segments, and drive reporting. Send events from your backend whenever a user does something worth marketing on — completes a checkout, opens a feature for the first time, abandons a cart, hits a usage milestone.
 
 ## What you'll build
 
 A backend service that:
 
 1. Captures domain events as they happen.
-2. Forwards each one to Spotzee with the contact's `external_id`.
+2. Forwards each one to Spotzee with the user's `external_id`.
 3. Batches when traffic is bursty and retries on failure.
 
 ## Prerequisites
@@ -23,14 +23,14 @@ A backend service that:
 ## Walkthrough
 
 <Steps>
-  <Step title="Pick stable contact IDs">
-    Identify each event with the same `external_id` you used to sync the contact. If the contact is anonymous (a not-yet-signed-up visitor), use `anonymous_id` instead — Spotzee stitches the two together when the contact later identifies.
+  <Step title="Pick stable user IDs">
+    Identify each event with the same `external_id` you used to sync the user. If the user is anonymous (a not-yet-signed-up visitor), use `anonymous_id` instead — Spotzee stitches the two together when the user later identifies.
   </Step>
   <Step title="Choose an event name">
     Use snake_case verbs: `order_placed`, `subscription_renewed`, `feature_enabled`. Stick to a small catalogue — every event you create is a hook journeys and segments can depend on, so churn in event names breaks downstream automation.
   </Step>
-  <Step title="Send a single event">
-    `POST /events` accepts a single event or an array of up to 100. Single-event form:
+  <Step title="Send events">
+    `POST /events` accepts a JSON array of one to 100 events per call. Even when sending a single event, wrap it in an array.
 
     ```http
     POST /events HTTP/1.1
@@ -39,45 +39,49 @@ A backend service that:
     Spotzee-Version: 2026-04-28
     Content-Type: application/json
 
-    {
-      "external_id": "cust_001",
-      "name": "order_placed",
-      "data": {
-        "order_id": "ord_42",
-        "total": 129.50,
-        "currency": "AUD"
+    [
+      {
+        "external_id": "cust_001",
+        "name": "order_placed",
+        "data": {
+          "order_id": "ord_42",
+          "total": 129.50,
+          "currency": "AUD"
+        }
       }
-    }
-    ```
-  </Step>
-  <Step title="Batch when you can">
-    For high-volume sources (queue consumers, ETL jobs, replay scripts), batch up to 100 events per call. Same endpoint — wrap them in an array.
-
-    ```json
-    {
-      "events": [
-        { "external_id": "cust_001", "name": "page_viewed", "data": { "path": "/pricing" } },
-        { "external_id": "cust_002", "name": "page_viewed", "data": { "path": "/pricing" } }
-      ]
-    }
+    ]
     ```
 
     Per-item errors come back in the response — items that succeeded are committed.
   </Step>
-  <Step title="Add identify alongside the event (optional)">
-    If the event also reveals new contact information — say, a checkout that finally captures the contact's email — include an `identify` block. Spotzee upserts the contact in the same call, so a downstream segment that depends on `email IS NOT NULL` fires correctly.
+  <Step title="Batch when you can">
+    For high-volume sources (queue consumers, ETL jobs, replay scripts), pack up to 100 events into a single call:
 
     ```json
-    {
-      "external_id": "cust_001",
-      "name": "order_placed",
-      "data": { "total": 129.50 },
-      "identify": {
-        "email": "ada@example.com",
-        "first_name": "Ada"
-      }
-    }
+    [
+      { "external_id": "cust_001", "name": "page_viewed", "data": { "path": "/pricing" } },
+      { "external_id": "cust_002", "name": "page_viewed", "data": { "path": "/pricing" } }
+    ]
     ```
+  </Step>
+  <Step title="Add user details alongside the event (optional)">
+    If the event also reveals new user information — say, a checkout that finally captures the user's email — include a `user` block. Spotzee upserts the user in the same call, so a downstream segment that depends on `email IS NOT NULL` fires correctly.
+
+    ```json
+    [
+      {
+        "external_id": "cust_001",
+        "name": "order_placed",
+        "data": { "total": 129.50 },
+        "user": {
+          "email": "ada@example.com",
+          "data": { "first_name": "Ada" }
+        }
+      }
+    ]
+    ```
+
+    The `user` block accepts `email`, `phone`, `timezone`, `locale`, and a `data` object for custom attributes.
   </Step>
   <Step title="Retry safely on failure">
     Network blips happen. Add an `Idempotency-Key` so a retry doesn't double-count an event in reporting. A deterministic key (`order_placed:ord_42`) is easier than a UUID for replay scenarios — see [Idempotency](/guides/api-idempotency).

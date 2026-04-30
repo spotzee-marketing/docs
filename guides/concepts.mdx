@@ -1,22 +1,22 @@
 ---
 title: "Core concepts"
-description: "The building blocks of Spotzee — organisations, projects, contacts, segments, journeys, and channels."
-keywords: ["concepts", "data model", "contacts", "segments", "journeys", "channels"]
+description: "The building blocks of Spotzee — organisations, projects, users, segments, journeys, and channels."
+keywords: ["concepts", "data model", "users", "segments", "journeys", "channels"]
 ---
 
 This page introduces the objects you'll work with throughout the product and the API.
 
 ## Organisation
 
-The top-level container. An organisation owns billing, users, projects, and audit history. Most customers operate one organisation; agencies and groups operate several.
+The top-level container. An organisation owns billing, team members, projects, and audit history. Most customers operate one organisation; agencies and groups operate several.
 
 ## Project
 
-A workspace inside an organisation. A project owns its own contacts, segments, journeys, campaigns, templates, and providers. Use separate projects to isolate brands, regions, or production-vs-staging workloads.
+A workspace inside an organisation. A project owns its own users, segments, journeys, campaigns, templates, and providers. Use separate projects to isolate brands, regions, or production-vs-staging workloads.
 
-## Contact
+## User
 
-A person or account that can be marketed to. Every contact has standard identifiers (email, phone) plus arbitrary custom attributes you define. Contacts can sit in many segments at once.
+A person or account that can be marketed to. Every user has standard identifiers (email, phone) plus arbitrary custom attributes you define. Users can sit in many segments at once.
 
 ## Segment
 
@@ -24,7 +24,7 @@ A dynamic audience defined by a query (attributes + behaviour). Membership recal
 
 ## List
 
-A static, named collection of contacts. Unlike a segment, a list's membership is set explicitly. Use lists for one-off imports and historical exports.
+A static, named collection of users. Unlike a segment, a list's membership is set explicitly. Use lists for one-off imports and historical exports.
 
 ## Journey
 
@@ -40,7 +40,7 @@ The vendor account that actually sends messages. On Starter, you bring your own 
 
 ## Template
 
-A reusable message body — for any channel — with merge tags that resolve from contact attributes and event data at send time.
+A reusable message body — for any channel — with merge tags that resolve from user attributes and event data at send time.
 
 ## Campaign
 

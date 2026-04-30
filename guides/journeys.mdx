@@ -4,11 +4,11 @@ description: "Build multi-step, multi-channel automations with the visual journe
 keywords: ["journeys", "automation", "workflow", "drip campaign", "branching"]
 ---
 
-A **journey** is a visual flow of steps that contacts move through. Use journeys for onboarding sequences, abandonment recovery, renewal reminders, lifecycle re-engagement, and any multi-step automation.
+A **journey** is a visual flow of steps that users move through. Use journeys for onboarding sequences, abandonment recovery, renewal reminders, lifecycle re-engagement, and any multi-step automation.
 
 ## Trigger types
 
-- **Event trigger** — a contact enters when a tracked event occurs (e.g. `purchase_made`, `form_submitted`).
+- **Event trigger** — a user enters when a tracked event occurs (e.g. `purchase_made`, `form_submitted`).
 - **Schedule trigger** — the journey runs on a recurring schedule against a segment.
 
 ## Step types
@@ -17,12 +17,12 @@ A **journey** is a visual flow of steps that contacts move through. Use journeys
 |---|---|
 | `send` | Deliver a message on any channel |
 | `delay` | Wait a fixed period before the next step |
-| `gate` | Conditional split based on contact attributes or behaviour |
+| `gate` | Conditional split based on user attributes or behaviour |
 | `experiment` | A/B test — randomly assign branches |
 | `balancer` | Distribute traffic across N branches by weight |
-| `update` | Modify a contact attribute |
+| `update` | Modify a user attribute |
 | `event` | Emit an internal event for tracking |
-| `exit` | Remove the contact from the journey |
+| `exit` | Remove the user from the journey |
 | `link` | Jump to another step (useful for loops) |
 | `wait-for-event` | Pause until a specific event occurs (or a timeout fires) |
 
@@ -33,13 +33,13 @@ A **journey** is a visual flow of steps that contacts move through. Use journeys
     Choose **Event** for behaviour-driven journeys, **Schedule** for recurring sweeps.
   </Step>
   <Step title="Add a send step">
-    Pick a channel and template. The template can pull contact attributes and event data via merge tags.
+    Pick a channel and template. The template can pull user attributes and event data via merge tags.
   </Step>
   <Step title="Add branching where needed">
     Use `gate` to send different content to different cohorts; use `experiment` to test variants.
   </Step>
   <Step title="Add delays and exits">
-    Pace the journey with `delay` steps and remove ineligible contacts with `exit`.
+    Pace the journey with `delay` steps and remove ineligible users with `exit`.
   </Step>
   <Step title="Activate">
     Toggle to **live**. Spotzee starts evaluating triggers immediately.
