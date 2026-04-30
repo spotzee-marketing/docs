@@ -130,7 +130,6 @@
           },
           {
             "group": "SDKs",
-            "icon": "code",
             "pages": [
               "guides/sdks/overview",
               {
