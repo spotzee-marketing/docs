@@ -60,7 +60,8 @@
           {
             "group": "Configure",
             "pages": [
-              "guides/manage-api-keys"
+              "guides/manage-api-keys",
+              "guides/configure-email-delivery"
             ]
           },
           {

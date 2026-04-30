@@ -1,0 +1,183 @@
+---
+title: "Set up email delivery"
+description: "Connect SMTP, SendGrid, Mailgun, or Amazon SES so Spotzee can send the email your campaigns and journeys produce, and verify with a test send."
+keywords: ["email", "providers", "smtp", "sendgrid", "mailgun", "ses", "delivery"]
+---
+
+Spotzee doesn't ship its own email transport. You bring an email provider, give Spotzee credentials, and we route your sends through it. Four providers are supported: SMTP, SendGrid, Mailgun, and Amazon SES.
+
+<Info>
+Provider configuration lives under **Settings** → **Integrations** and requires the project `admin` role. You can add more than one provider; mark one as the default and use the others as fallbacks.
+</Info>
+
+## Pick a provider
+
+Each provider takes a different credential shape:
+
+| Provider | Best for | Credentials |
+|---|---|---|
+| **SMTP** | Bring-your-own relay or a vendor outside this list | Host, port, protocol, username, password |
+| **SendGrid** | High-volume marketing email with built-in deliverability tooling | API key |
+| **Mailgun** | Transactional and marketing email with strong analytics | API key, domain, optional webhook signing key |
+| **Amazon SES** | Cost-sensitive senders running other infrastructure on AWS | Region, access key ID, secret access key |
+
+If you're unsure, start with SMTP for an existing relay, or SendGrid if you're starting fresh and want the simplest credential.
+
+## Configure your provider
+
+<Tabs>
+<Tab title="SMTP">
+
+Use SMTP when you have a third-party relay or an in-house mail server. Spotzee speaks any standard SMTP server.
+
+<Steps>
+<Step title="Add a new email provider">
+In **Settings** → **Integrations**, add a new email provider and pick **SMTP**.
+</Step>
+
+<Step title="Enter connection details">
+Fill in the credentials your relay gave you:
+- **Host**. The SMTP server hostname.
+- **Port**. Typically `587` for STARTTLS, `465` for SSL, `25` for plain.
+- **Protocol**. Pick `starttls` (recommended), `ssl`, `tls`, or `plain`. STARTTLS is the modern default.
+- **Username** and **Password**.
+- **Auth type** (optional). Defaults to `AUTO`. Switch to `LOGIN` or `PLAIN` only if your server requires it.
+- **Custom headers** (optional). Add tracking headers your downstream analytics needs.
+</Step>
+
+<Step title="Save and test">
+Save the provider, then send a test message (see [Test the connection](#test-the-connection) below).
+</Step>
+</Steps>
+
+</Tab>
+<Tab title="SendGrid">
+
+SendGrid is the simplest setup of the four. One key, one save.
+
+<Steps>
+<Step title="Get your SendGrid API key">
+In your SendGrid account, create an API key with **Mail Send** permission. Copy the value.
+</Step>
+
+<Step title="Add the provider">
+In Spotzee **Settings** → **Integrations**, add a new email provider and pick **SendGrid**.
+</Step>
+
+<Step title="Paste the API key and save">
+Paste the API key into the **API Key** field and save.
+</Step>
+
+<Step title="Configure delivery webhooks (optional)">
+Spotzee gives you a **Webhook URL** in the provider's setup metadata. Paste that URL into SendGrid's Event Webhook configuration so delivery events flow back to Spotzee.
+</Step>
+</Steps>
+
+</Tab>
+<Tab title="Mailgun">
+
+Mailgun uses a per-domain key model.
+
+<Steps>
+<Step title="Get the API key and domain">
+In your Mailgun account, copy the **API key** for your sending domain (typically your verified subdomain). Note the **domain** name itself.
+</Step>
+
+<Step title="Add the provider">
+In Spotzee **Settings** → **Integrations**, add a new email provider and pick **Mailgun**.
+</Step>
+
+<Step title="Enter credentials">
+Fill in:
+- **API key**. Paste the value from Mailgun.
+- **Domain**. The verified sending domain (for example, `mg.example.com`).
+- **Webhook signing key** (optional). Paste Mailgun's webhook signing key here so Spotzee can verify inbound delivery events.
+</Step>
+
+<Step title="Save and configure feedback URL">
+Save the provider. Spotzee shows a **Feedback URL** in the provider's setup metadata. Add that URL to Mailgun's webhook configuration so delivery events flow back.
+</Step>
+</Steps>
+
+</Tab>
+<Tab title="Amazon SES">
+
+Amazon SES uses an AWS access key pair scoped to a region.
+
+<Steps>
+<Step title="Create an IAM user with SES permissions">
+In AWS, create an IAM user with the `AmazonSESFullAccess` policy (or a tighter policy that grants `ses:SendEmail` and `ses:SendRawEmail`). Generate access keys for the user.
+</Step>
+
+<Step title="Add the provider">
+In Spotzee **Settings** → **Integrations**, add a new email provider and pick **Amazon SES**.
+</Step>
+
+<Step title="Enter region and credentials">
+Fill in:
+- **Region**. The AWS region you've verified your sending identity in (for example, `ap-southeast-2`).
+- **Access key ID**.
+- **Secret access key**.
+</Step>
+
+<Step title="Save and add the feedback URL">
+Save. Spotzee shows a **Feedback URL** in the provider's setup metadata. Configure SES to publish bounce, complaint, and delivery notifications to that URL via SNS so Spotzee gets the events.
+</Step>
+</Steps>
+
+</Tab>
+</Tabs>
+
+## Test the connection
+
+Each provider has a test-send affordance. Run one before you point real campaigns at the provider.
+
+<Steps>
+<Step title="Open the provider you just saved">
+In **Settings** → **Integrations**, open the provider's row.
+</Step>
+
+<Step title="Send a test email">
+Use the test-send action and supply a destination address you can read.
+</Step>
+
+<Step title="Check the result">
+A successful send confirms credentials, network access, and DNS auth (SPF/DKIM/DMARC) are healthy. A failure surfaces the underlying error message.
+</Step>
+</Steps>
+
+## Set the default provider
+
+Spotzee picks the **default** email provider for any send that doesn't name one. Mark one provider as default after you save it. Add more providers as fallbacks; the routing layer prefers the default and only falls back when the default fails or is disabled.
+
+For sending domain configuration (DKIM records, link wrapping, deliverability hardening), use **Settings** → **Domains**.
+
+## Webhook callbacks
+
+Spotzee uses provider-specific webhooks to receive delivery events (delivered, bounced, complained, opened, clicked). Each provider exposes its own callback URL in the setup metadata after you save the provider:
+
+- **SendGrid**: a single **Webhook URL** for the Event Webhook.
+- **Mailgun**: a **Feedback URL** for delivery events. Use the optional **webhook signing key** to verify inbound payloads.
+- **Amazon SES**: a **Feedback URL** for SNS-published events (bounces, complaints, deliveries).
+
+SMTP doesn't have webhook callbacks. Open and click tracking still works through Spotzee's tracking domain regardless of provider.
+
+## Next steps
+
+<Columns cols={2}>
+<Card title="Provider catalogue" icon="plug" href="/guides/providers">
+Compare providers across email, SMS, push, webhook, and in-app.
+</Card>
+
+<Card title="Manage API keys" icon="key" href="/guides/manage-api-keys">
+Issue the keys your servers and apps use to talk to Spotzee.
+</Card>
+
+<Card title="Trigger a campaign" icon="send" href="/guides/trigger-campaign">
+Send a one-shot campaign through the API.
+</Card>
+
+<Card title="Sync users" icon="users" href="/guides/sync-users">
+Push your user base into Spotzee with `sk_` keys.
+</Card>
+</Columns>
