@@ -1,72 +1,67 @@
 ---
 title: "Webhooks"
-description: "How outgoing webhooks are signed, replay-protected, and retried."
-keywords: ["webhooks", "signature", "hmac", "spotzee-signature", "replay protection", "retry"]
+description: "Configure webhook endpoints today; outbound delivery of platform events ships next."
+keywords: ["webhooks", "subscriptions", "endpoints", "signing", "rotate-secret"]
 ---
 
-Spotzee delivers events to your endpoints via signed HTTP `POST`. Verify the signature on every incoming webhook before you trust the payload.
+Spotzee's webhook system has two halves: configuring endpoints (live today) and dispatching platform events to those endpoints (rolling out). You can create endpoints, subscribe them to event types, rotate signing secrets, and run a test delivery against your URL right now. Production dispatch of the catalogued event types lands in a future release.
+
+## What's live today
+
+- Create, list, update, and delete webhook endpoints.
+- Subscribe an endpoint to one or more event types from the catalogue.
+- Rotate the signing secret.
+- Send a test payload to your endpoint to verify reachability and signature handling.
+
+## What's rolling out
+
+- Production dispatch of the catalogued events. The event catalogue exists as a subscription model today, but no production loop dispatches them yet.
+- Stripe-style `Spotzee-Signature: t=<unix-ts>,v1=<hex-hmac-sha256>` signing scheme with replay protection. Test deliveries use a simpler `X-Spotzee-Signature: sha256=<hex>` header today; the timestamped scheme ships when production dispatch lights up.
+- Exponential-backoff retry policy with delivery logs and replay.
 
 ## Configure an endpoint
 
-Create or rotate webhook endpoints from **Settings → Webhooks** in the Spotzee app, or via the **Webhooks** tag in the API reference. Each endpoint has:
+Create or rotate webhook endpoints from **Settings → Webhook Endpoints** in the Spotzee app, or via the **Webhooks** tag in the API reference. Each endpoint has:
 
-- A target URL (must be `https://`)
-- A list of subscribed event types
-- A signing secret (issued on creation; rotate via `POST /webhooks/{endpointId}/rotate-secret`)
+- A target URL (must be `https://`).
+- A list of subscribed event types from the catalogue.
+- A signing secret (issued on creation; rotate via `POST /webhooks/{endpointId}/rotate-secret`).
 
-The plaintext signing secret is returned **exactly once** — on the create response and on every rotate. Persist it immediately; it cannot be re-fetched.
+The plaintext signing secret is returned **exactly once** on the create response and on every rotate. Persist it immediately. It cannot be re-fetched.
 
-## The signature header
+## Test a delivery
 
-Every webhook request carries a `Spotzee-Signature` header.
+The webhook detail page in the Spotzee app exposes a **Send test** action that delivers a fixed test payload to your URL with a signed header. Use it to verify your verifier locally before production dispatch lights up.
 
-```http
-POST /your-webhook HTTP/1.1
-Spotzee-Signature: t=1735689600,v1=8a4d3c6f9b…
-Content-Type: application/json
+The test payload looks like this:
+
+```json
+{
+  "event_type": "test.webhook-test",
+  "timestamp": "2026-04-30T12:00:00.000Z",
+  "project_id": 42,
+  "data": {
+    "message": "This is a test webhook from Spotzee",
+    "webhook_id": 7,
+    "webhook_name": "your-endpoint-name"
+  }
+}
 ```
 
-| Component | Meaning |
-|---|---|
-| `t=` | Unix timestamp (seconds) when Spotzee signed the request |
-| `v1=` | Hex-encoded HMAC-SHA256 of `<t>.<raw_body>` using your endpoint's signing secret |
-
-## Verify the signature
-
-<Steps>
-  <Step title="Read the timestamp and signature">
-    Parse the `Spotzee-Signature` header into `t` and `v1` values.
-  </Step>
-  <Step title="Reject stale timestamps">
-    Reject the request if `t` is more than 5 minutes off your current clock — that's the replay-protection window.
-  </Step>
-  <Step title="Compute the expected HMAC">
-    Concatenate `<t>.<raw_body>` (period separator) and HMAC-SHA256 it with your signing secret. Hex-encode the result.
-  </Step>
-  <Step title="Compare with constant-time equality">
-    Use a constant-time comparison (e.g. `crypto.timingSafeEqual` in JavaScript, `hmac.compare_digest` in Python). Reject on mismatch.
-  </Step>
-</Steps>
-
-### Example — JavaScript
+The test path emits an `X-Spotzee-Signature: sha256=<hex>` header. The hex value is the HMAC-SHA256 of the JSON-stringified body using your endpoint's signing secret. Verify by recomputing the HMAC on your side:
 
 ```javascript
 import crypto from 'node:crypto'
 
-export function verifyWebhook(rawBody, header, secret) {
-  const parts = Object.fromEntries(
-    header.split(',').map(p => p.split('=', 2))
-  )
-  const t = Number(parts.t)
-  if (Math.abs(Date.now() / 1000 - t) > 300) return false
-
+export function verifyTestWebhook(rawBody, header, secret) {
+  if (!header?.startsWith('sha256=')) return false
+  const supplied = header.slice('sha256='.length)
   const expected = crypto
     .createHmac('sha256', secret)
-    .update(`${parts.t}.${rawBody}`)
+    .update(rawBody)
     .digest('hex')
-
   const a = Buffer.from(expected, 'hex')
-  const b = Buffer.from(parts.v1, 'hex')
+  const b = Buffer.from(supplied, 'hex')
   return a.length === b.length && crypto.timingSafeEqual(a, b)
 }
 ```
@@ -75,49 +70,18 @@ export function verifyWebhook(rawBody, header, secret) {
   Sign the raw request body, not a parsed-and-re-stringified version. JSON re-encoding can change byte-for-byte content and break the signature.
 </Warning>
 
-## Errors
-
-If signature verification fails on Spotzee's side (for example, you flipped the secret without rotating), Spotzee surfaces `webhook_signature_invalid`:
-
-| HTTP | `code` | When |
-|---|---|---|
-| `400` | `webhook_signature_invalid` | HMAC didn't match the expected value |
+If the test response status is anything but `2xx`, the Spotzee app marks the endpoint as **disabled** so an unreachable URL doesn't accumulate failed deliveries when production dispatch lights up. Re-enable from the same page once you've fixed the receiver.
 
 ## Rotate the signing secret
 
-Call `POST /webhooks/{endpointId}/rotate-secret` — or use **Settings → Webhooks → Rotate** in the Spotzee app — to get a fresh signing secret.
+Call `POST /webhooks/{endpointId}/rotate-secret`, or use **Settings → Webhook Endpoints → Rotate** in the Spotzee app, to get a fresh signing secret. The plaintext value is returned exactly once on the rotate response. Persist it immediately.
 
-<Steps>
-  <Step title="Generate a new secret">
-    The rotate call returns the new plaintext signing secret exactly once. Persist it immediately.
-  </Step>
-  <Step title="Roll forward your verifier">
-    Update your verifier to the new secret. The previous secret stops verifying deliveries the moment the rotate call returns, so plan the rotation for a brief window where missed events are acceptable, or temporarily accept signatures verified against either value during cut-over by reading both from your secret store.
-  </Step>
-  <Step title="Confirm">
-    Watch your delivery logs to confirm the new secret is verifying inbound events.
-  </Step>
-</Steps>
+The previous secret stops verifying deliveries the moment the rotate call returns. Plan the rotation for a brief window where missed test deliveries are acceptable.
 
-## Retry policy
+## Reference
 
-Spotzee retries 5xx responses and connection errors with exponential backoff:
-
-| Attempt | Delay |
-|---|---|
-| 1 | immediate |
-| 2 | 30 seconds |
-| 3 | 5 minutes |
-| 4 | 30 minutes |
-| 5 | 2 hours |
-| 6 | 6 hours |
-| 7 | 24 hours (final) |
-
-After the final attempt, the delivery is marked failed and surfaced in **Settings → Webhooks → Deliveries**. Replies with any `2xx` confirm receipt; `4xx` is a permanent failure and stops retrying.
-
-## Idempotency on the receiving side
-
-Webhooks are at-least-once. Stamp each event with its `event_id` and discard duplicates on your side, or use the same idempotency-key pattern in your own database to make the handler safe to call twice.
+- Webhook endpoint CRUD: see the **Webhooks** tag in the [Main API reference](/main-api/introduction).
+- Event catalogue: subscription names today; production dispatch ships next.
 
 ## Next steps
 
@@ -125,5 +89,3 @@ Webhooks are at-least-once. Stamp each event with its `event_id` and discard dup
   <Card title="Errors" icon="circle-exclamation" href="/main-api/errors">Status codes and the `code` catalogue.</Card>
   <Card title="Authentication" icon="key" href="/guides/authentication">Choose the right key type for outgoing API calls.</Card>
 </Columns>
-
-The full webhook CRUD operations — list, create, get, update, delete, and rotate-secret — appear under the **Webhooks** tag in the [API reference](/main-api/introduction).
