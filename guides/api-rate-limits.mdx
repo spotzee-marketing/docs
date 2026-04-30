@@ -1,49 +1,25 @@
 ---
 title: "Rate limits"
-description: "Per-key rate limits, response headers, and retry strategy for the Spotzee API."
-keywords: ["rate limits", "throttling", "429", "retry-after", "backoff", "mcp"]
+description: "Per-IP rate limits at the edge for the Spotzee API, the 429 envelope, and what's rolling out next."
+keywords: ["rate limits", "throttling", "429", "retry-after", "backoff"]
 ---
 
-Every API key has a per-second budget for read and write operations. Limits are tuned to be generous for parallel agent workloads and bursty fan-out from MCP servers.
+The Spotzee API enforces per-source-IP rate limits at the edge today. Two rules apply across `apix.spotzee.com`.
 
-## Limits per plan
-
-Limits are per second per API key, with a 10-second sliding window that absorbs short bursts.
-
-| Plan | Read req/s | Write req/s | Burst (10s window) |
+| Rule | Surface | Limit | Action |
 |---|---|---|---|
-| Starter | 200 | 100 | 1.5× |
-| Professional | 1,000 | 500 | 1.5× |
-| Enterprise | 5,000 | 2,500 | 2× |
+| Client API limit | `/api/client/*` | 8,000 requests per minute per IP | Block (HTTP 429) |
+| General API limit | `/api/*` (covers `/api/client/*`, `/api/admin/*`, `/api/ext/*`) | 1,000 requests per 10 seconds per IP | Block (HTTP 429) |
 
-Read covers `GET`, `HEAD`, `OPTIONS`. Write covers `POST`, `PATCH`, `PUT`, `DELETE`.
+The general rule's tighter window is the one bursty traffic hits first. The 8,000-per-minute cap on `/api/client/*` is the umbrella ceiling. Both rules count every request, authenticated or not.
 
-### MCP and agent workloads
+## Response on a block
 
-If you're driving the API from an MCP server or agent runtime, send the `x-spotzee-client-type: mcp` header. Spotzee doubles your base limits when this header is present so parallel tool calls don't run out of budget mid-task.
-
-```http
-x-spotzee-client-type: mcp
-```
-
-## Response headers
-
-Every successful response includes the current state of your bucket so you can self-throttle without trial and error.
-
-| Header | Meaning |
-|---|---|
-| `X-RateLimit-Limit` | Maximum requests over the 10-second window for this key + bucket (read or write) |
-| `X-RateLimit-Remaining` | Requests still available in the current window |
-| `X-RateLimit-Reset` | Seconds until the window expires |
-| `X-RateLimit-Tier` | The plan tier applied to your key (`starter`, `professional`, `enterprise`) |
-
-## When you hit the limit
-
-You receive `429 Too Many Requests` with a `Retry-After` header (seconds) and a standard error body:
+Over-limit requests receive `429 Too Many Requests` with a `Retry-After` header and a JSON body matching the canonical Spotzee error envelope:
 
 ```http
 HTTP/1.1 429 Too Many Requests
-Retry-After: 6
+Retry-After: 10
 Content-Type: application/problem+json
 ```
 
@@ -53,8 +29,7 @@ Content-Type: application/problem+json
   "code": "rate_limited",
   "title": "Rate limit exceeded",
   "message": "Rate limit exceeded. Slow down and retry after the period in `Retry-After`.",
-  "type": "https://docs.spotzee.com/main-api/errors#rate_limited",
-  "request_id": "req_01HXY7Z9K8M5J2N4P6Q8R0S1T2"
+  "type": "https://docs.spotzee.com/main-api/errors#rate_limited"
 }
 ```
 
@@ -62,16 +37,16 @@ Content-Type: application/problem+json
 
 <Steps>
   <Step title="Honour Retry-After first">
-    Wait at least the number of seconds in `Retry-After` before retrying. This is the lowest-risk path and almost always succeeds on the next attempt.
+    Wait at least the number of seconds in `Retry-After` before retrying. The block windows are short (10 seconds for the general rule), and the next attempt almost always succeeds.
   </Step>
-  <Step title="Add jitter">
-    If you're driving many keys in parallel, add 0–500 ms of jitter on top of `Retry-After` so retries don't synchronise.
+  <Step title="Add jitter when fanning out">
+    If you're driving many requests in parallel from a single host, add 0–500 ms of jitter on top of `Retry-After` so retries don't synchronise.
   </Step>
   <Step title="Back off on repeats">
-    If you see a second `429` after honouring `Retry-After`, double your delay (exponential backoff) up to a sensible cap — for example, 60 seconds.
+    If you see a second `429` after honouring `Retry-After`, double your delay (exponential backoff) up to a sensible cap, for example 60 seconds.
   </Step>
-  <Step title="Cap concurrency">
-    `X-RateLimit-Remaining` is the most reliable signal. Pause new requests once it falls below your fan-out width.
+  <Step title="Cap concurrency per IP">
+    Both limits count by source IP. Outbound traffic from a single host is the one to pace.
   </Step>
 </Steps>
 
@@ -82,23 +57,22 @@ async function callApi(path, init) {
   const res = await fetch(`https://apix.spotzee.com/api/client${path}`, init)
 
   if (res.status === 429) {
-    const retryAfter = Number(res.headers.get('Retry-After') ?? '5')
+    const retryAfter = Number(res.headers.get('Retry-After') ?? '10')
     await new Promise(r => setTimeout(r, retryAfter * 1000))
     return callApi(path, init)
   }
 
-  // Self-throttle when nearly empty
-  const remaining = Number(res.headers.get('X-RateLimit-Remaining') ?? '0')
-  if (remaining < 50) {
-    await new Promise(r => setTimeout(r, 250))
-  }
   return res
 }
 ```
 
 ## Quota-metered endpoints
 
-A small set of endpoints (validation, scoring, and other quota-billed operations) consumes credits in addition to the per-second budget. Hitting your credit balance returns `402 quota_exceeded` even when your rate-limit headers show capacity remaining.
+The Extended API charges credits on certain operations (validation, scoring, lookups, generation) on top of the per-IP rate limit. Hitting your credit balance returns `402 quota_exceeded` even when the rate-limit window shows capacity remaining. Inspect remaining credits via the `Quota` endpoints before high-volume runs.
+
+## Rolling out
+
+Per-API-key sliding-window rate limits with a read/write split, an `X-RateLimit-*` header set, and a doubled budget for MCP traffic are wired in code and ship behind a feature flag. They are not active in production today. Once enabled, they will sit on top of the per-IP edge limits described above. The self-throttling pattern (honour `Retry-After`, add jitter, exponential backoff) works against either layer.
 
 ## Next steps
 
