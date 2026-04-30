@@ -4,7 +4,7 @@ description: "Drop a user into a multi-step automation from your backend so welc
 keywords: ["journey", "trigger", "automation", "lifecycle", "onboarding", "welcome"]
 ---
 
-Journeys are multi-step flows — wait, branch, send, repeat — that Spotzee runs in the background once a user enters them. Use this flow to enter a user into a journey from your backend the moment something happens in your product.
+Journeys are multi-step flows (wait, branch, send, repeat) that Spotzee runs in the background once a user enters them. Use this flow to enter a user into a journey from your backend the moment something happens in your product.
 
 ## What you'll build
 
@@ -17,7 +17,7 @@ A backend call that:
 ## Prerequisites
 
 <Info>
-  You'll need a `sk_` project key. The journey must already be authored in the Spotzee UI and set to `status: "live"` — only live journeys accept new entrances.
+  You'll need a `sk_` project key. The journey must already be authored in the Spotzee UI and set to `status: "live"`. Only live journeys accept new entrances.
 </Info>
 
 ## Walkthrough
@@ -29,7 +29,7 @@ A backend call that:
   <Step title="Find the journey ID and entrance step">
     `GET /journeys?limit=100` returns every journey in the project. In production, hold a stable mapping in your config (e.g. `WELCOME_JOURNEY_ID`) rather than discovering it at runtime.
 
-    Each journey has one or more **entrance steps** (the `entry` nodes in its graph). The trigger call must specify which one to enter the user at via the `entrance_id` field — this is a numeric step identifier from the journey's published graph.
+    Each journey has one or more **entrance steps** (the `entry` nodes in its graph). The trigger call must specify which one to enter the user at via the `entrance_id` field. This is a numeric step identifier from the journey's published graph.
   </Step>
   <Step title="Trigger an entrance">
     The endpoint enters **one user at a time**. The body has three fields: `entrance_id` (which entrance step to use), `user` (the user identifier), and an optional `event` payload available to journey conditions and template Handlebars as `{{event}}`.
@@ -61,23 +61,22 @@ A backend call that:
     On success the response confirms the entrance was queued. If the user wasn't found and the supplied `user` block didn't carry enough information to upsert one, the call returns an error from the [error catalogue](/main-api/errors).
   </Step>
   <Step title="Verify in the journey view">
-    The journey's runtime view in the Spotzee UI shows fresh entrances within seconds. For automated verification, configure a [webhook endpoint](/guides/api-webhooks) to receive journey-state events.
+    The journey's runtime view in the Spotzee UI shows fresh entrances within seconds. Outbound webhook delivery for journey-state events is on the roadmap; today the runtime view is the system of record.
   </Step>
 </Steps>
 
 ## Pitfalls to avoid
 
 <Warning>
-  Don't trigger the same user into the same journey twice for the same event. Most journeys aren't designed to be entered concurrently. Use a deterministic `Idempotency-Key` (typically `<journey>:<user>:<event-id>`) so retries are safe — see [Idempotency](/guides/api-idempotency).
+  Don't trigger the same user into the same journey twice for the same event. Most journeys aren't designed to be entered concurrently. Use a deterministic `Idempotency-Key` (typically `<journey>:<user>:<event-id>`) so retries are safe. See [Idempotency](/guides/api-idempotency).
 </Warning>
 
 - **Don't trigger a Draft journey.** Spotzee returns `409` until the journey is set Live. Promote it in the UI first.
-- **Don't pack the `event` block with stale info.** Conditions and templates downstream will reference whatever you pass at trigger time — if a step depends on `event.trial_ends_at`, set it correctly when you trigger.
-- **Don't fire triggers in a tight loop without pacing.** Each call enters one user; if you're entering thousands at once, fan out through a queue/worker that respects the per-key rate limit. See [Rate limits](/guides/api-rate-limits).
+- **Don't pack the `event` block with stale info.** Conditions and templates downstream will reference whatever you pass at trigger time. If a step depends on `event.trial_ends_at`, set it correctly when you trigger.
+- **Don't fire triggers in a tight loop without pacing.** Each call enters one user; if you're entering thousands at once, fan out through a queue/worker that respects rate limits. See [Rate limits](/guides/api-rate-limits).
 
 ## Reference
 
-- API surface — see [Main API → Journeys](/main-api/introduction)
-- Receive journey-state events — see [Webhooks](/guides/api-webhooks)
-- Send a one-shot campaign instead — see [Trigger a campaign](/guides/trigger-campaign)
-- Conceptual overview — see [Journeys](/guides/journeys)
+- API surface: see [Main API → Journeys](/main-api/introduction)
+- Send a one-shot campaign instead: see [Trigger a campaign](/guides/trigger-campaign)
+- Conceptual overview: see [Journeys](/guides/journeys)
