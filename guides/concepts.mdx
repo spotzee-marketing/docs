@@ -1,6 +1,6 @@
 ---
 title: "Core concepts"
-description: "The building blocks of Spotzee — organisations, projects, users, segments, journeys, and channels."
+description: "The building blocks of Spotzee: organisations, projects, users, segments, journeys, and channels."
 keywords: ["concepts", "data model", "users", "segments", "journeys", "channels"]
 ---
 
@@ -20,7 +20,7 @@ A person or account that can be marketed to. Every user has standard identifiers
 
 ## Segment
 
-A dynamic audience defined by a query (attributes + behaviour). Membership recalculates as data changes — you do not maintain segment membership manually.
+A dynamic audience defined by a query (attributes + behaviour). Membership recalculates as data changes. You do not maintain segment membership manually.
 
 ## List
 
@@ -28,11 +28,11 @@ A static, named collection of users. Unlike a segment, a list's membership is se
 
 ## Journey
 
-A visual multi-step automation. Spotzee journeys support eleven step types — `send`, `delay`, `gate` (conditional split), `experiment` (A/B), `balancer`, `update`, `event`, `exit`, `link`, `wait-for-event`, and triggers (event-based or scheduled).
+A visual multi-step automation. Users enter at an `entrance` node and progress through eleven step types: `action` (send a message), `delay`, `gate` (conditional split), `experiment` (A/B/n), `balancer`, `throttle` (rate-limit a single path), `update` (patch user attributes), `event` (emit a tracked event), `link` (hand off to another journey), `exit`, and `sticky` (canvas note). See [Journeys](/guides/journeys) for the full breakdown.
 
 ## Channel
 
-A delivery surface. Spotzee supports email, SMS, WhatsApp, push, in-app, and webhooks. Each channel uses a configured **provider** to do the actual delivery.
+A delivery surface. Spotzee supports email, SMS, push, in-app, and webhooks. Each channel uses a configured **provider** to do the actual delivery.
 
 ## Provider
 
@@ -40,7 +40,7 @@ The vendor account that actually sends messages. On Starter, you bring your own 
 
 ## Template
 
-A reusable message body — for any channel — with merge tags that resolve from user attributes and event data at send time.
+A reusable message body for any channel, with merge tags that resolve from user attributes and event data at send time.
 
 ## Campaign
 
@@ -48,20 +48,20 @@ A one-off send to a segment or list. Campaigns are simpler than journeys when yo
 
 ## Event
 
-A behaviour signal sent into Spotzee — a page view, a purchase, a custom action. Events feed segments, trigger journeys, and personalise content.
+A behaviour signal sent into Spotzee: a page view, a purchase, a custom action. Events feed segments, trigger journeys, and personalise content.
 
 ## Tier-gated capabilities
 
 | Capability | Starter | Professional | Enterprise |
 |---|---|---|---|
 | Multi-channel messaging (BYO providers) | ✓ | ✓ | ✓ |
-| Visual journeys (11 step types) | ✓ | ✓ | ✓ |
+| Visual journeys (12 step types incl. entrance) | ✓ | ✓ | ✓ |
 | Smart segments | ✓ | ✓ | ✓ |
 | AI content generation | ✓ | ✓ | ✓ |
-| Managed delivery infrastructure | — | ✓ | ✓ |
-| Compliance workflows + archiving | — | ✓ | ✓ |
-| Financial data triggers | — | ✓ | ✓ |
-| Managed services | — | ✓ | ✓ |
+| Managed delivery infrastructure |  | ✓ | ✓ |
+| Compliance workflows + archiving |  | ✓ | ✓ |
+| Financial data triggers |  | ✓ | ✓ |
+| Managed services |  | ✓ | ✓ |
 
 ## Next
 
