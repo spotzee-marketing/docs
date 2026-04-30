@@ -1,0 +1,124 @@
+---
+title: "Set up a project"
+description: "Create a Spotzee project, set your locale and timezone, and configure tracking defaults before sending your first campaign."
+keywords: ["project", "setup", "locale", "timezone", "onboarding", "settings"]
+---
+
+A project holds your users, journeys, campaigns, providers, and templates. Every send happens inside a project. Set yours up properly the first time and your locale, timezone, and tracking defaults will flow through every send afterwards.
+
+<Info>
+You need an organisation before you can create a project. New sign-ups create one automatically. To join an existing organisation, accept an invitation from an owner or admin.
+</Info>
+
+## Create a project
+
+You can create a project two ways: through the onboarding wizard the first time you sign in, or through the **Projects** page at any point afterwards.
+
+<Tabs>
+<Tab title="First-time onboarding">
+
+The onboarding wizard runs after you create or join an organisation. It walks through three steps and creates the project on the final step.
+
+<Steps>
+<Step title="Name your project and add a website">
+Enter a project name (2 to 100 characters) and your website URL. The URL is optional. If you supply one, it surfaces on transactional links and tracking metadata. Both fields can be edited later.
+</Step>
+
+<Step title="Tell us about your business">
+Pick whether you plan to use Shopify or WooCommerce, choose your industry, and tell us how you heard about Spotzee. None of these answers gate features.
+</Step>
+
+<Step title="Choose your locale and timezone">
+Defaults come from your browser. Change them if you ship from a different region or send to a different audience.
+
+- **Locale.** Drives default formatting in templates (dates, numbers, currency). Use a BCP-47 tag like `en-AU`, `en-GB`, `es-MX`, or `zh-CN`. Per-template variants override the project default.
+- **Timezone.** Drives journey-delay scheduling, time-of-day actions, and time-window throttles. Pick the timezone your sends should anchor to.
+
+You'll also opt in or out of a 30-minute onboarding consultation and Spotzee marketing email on this step.
+</Step>
+
+<Step title="Confirm and create the project">
+Confirm to finish the wizard. You land on the new project's dashboard with sensible defaults applied: link wrapping on for email, off for push, and open tracking on.
+</Step>
+</Steps>
+
+</Tab>
+<Tab title="Add a project later">
+
+Existing organisations can add more projects, one per brand, region, or environment.
+
+<Steps>
+<Step title="Open the Projects page">
+From the organisation menu, open **Projects**.
+</Step>
+
+<Step title="Start a new project">
+Start a new project, then enter a name, an optional website URL, your locale, and your timezone.
+</Step>
+
+<Step title="Switch into the project">
+Confirm and switch into the new project. Each project's settings, providers, users, and journeys are scoped independently.
+</Step>
+</Steps>
+
+</Tab>
+</Tabs>
+
+## Configure project settings
+
+Open **Settings** inside any project to refine the defaults. Settings access requires the project `admin` role; organisation owners and admins receive it automatically. Project members and editors don't see the Settings tab.
+
+The default landing tab (**General**) holds five cards. Each card saves independently.
+
+### Project details
+
+Edit the project name, website URL, and a free-text description. The description shows on the **Projects** index for everyone in your organisation, so use it to distinguish projects from each other.
+
+### Regional defaults
+
+Change the default locale or timezone any time. Existing scheduled sends keep the timezone they were created with. New sends and journey delays inherit the current value.
+
+<Note>
+Locales must be valid BCP-47 tags. Adding additional locales for template variants is a separate flow under **Settings** → **Locales**.
+</Note>
+
+### Email tracking
+
+Two switches govern email tracking:
+
+- **Track opens.** Adds a 1×1 tracking pixel to outbound HTML email so you can report opens.
+- **Wrap links.** Rewrites every link through the Spotzee tracking domain so you can report click-throughs.
+
+Both default to on. Turn either off when sending plain-text-only campaigns or when a region's regulator restricts open and click tracking.
+
+### Push and SMS
+
+Three controls:
+
+- **Wrap push links.** Rewrites links in push payloads through the tracking domain. Off by default. Turn on if your push templates contain trackable URLs.
+- **SMS opt-out message.** The auto-reply sent when a recipient replies with an opt-out keyword. Carrier compliance requires one. Leave the default unless your legal team has approved a custom message.
+- **SMS help message.** The auto-reply sent when a recipient replies with HELP. Carrier compliance requires one. Same default-unless-approved rule.
+
+### Advanced
+
+The **Rebuild attribute schema** action recomputes the auto-detected user-attribute paths used in segment builders. You shouldn't need it during normal operation. Use it after a bulk import that added new attribute keys, or if a key your team uses isn't appearing in segment builders.
+
+## Next steps
+
+<Columns cols={2}>
+<Card title="Concepts" icon="book-open" href="/guides/concepts">
+Brush up on Users, Journeys, Segments, Channels, and Providers.
+</Card>
+
+<Card title="Quickstart" icon="rocket" href="/guides/quickstart">
+Send your first campaign in ten minutes.
+</Card>
+
+<Card title="Providers" icon="plug" href="/guides/providers">
+See the provider catalogue and pick the right one for each channel.
+</Card>
+
+<Card title="Authentication" icon="key" href="/guides/authentication">
+Read the API-key model before issuing your first key.
+</Card>
+</Columns>

@@ -40,7 +40,8 @@
             "pages": [
               "index",
               "guides/quickstart",
-              "guides/concepts"
+              "guides/concepts",
+              "guides/setup-project"
             ]
           },
           {
