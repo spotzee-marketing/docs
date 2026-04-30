@@ -33,9 +33,9 @@ Spotzee issues three API key types, each with a different prefix and scope.
   <Tab title="Browser or mobile app">
     Use a `pk_` publishable key. It works only for endpoints explicitly allowlisted for browser use:
 
-    - `POST /events` — capture behaviour from your front-end
-    - `GET /users/me` — read the current user's preferences (when scoped by a user token)
-    - `PATCH /subscriptions/me` — let the user update their own opt-ins
+    - `POST /events`: capture behaviour from your front-end
+    - `GET /users/me`: read the current user's preferences (requires a user session token)
+    - `PATCH /subscriptions/me`: let the user update their own opt-ins (requires a user session token)
 
     Any other endpoint returns `401 authentication_required` when called with a `pk_` key.
   </Tab>
