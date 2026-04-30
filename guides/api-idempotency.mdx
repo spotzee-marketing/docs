@@ -6,11 +6,15 @@ keywords: ["idempotency", "idempotency-key", "retries", "duplicate prevention", 
 
 Network failures, timeouts, and retries are unavoidable. Spotzee supports idempotency keys so a retried `POST` or `PATCH` returns the original response instead of running the operation twice.
 
+<Note>
+  Idempotency-Key enforcement is live on the Extended API today and rolling out to the Main API. Including the header on Main API requests is forward-compatible: today it has no effect, and once the rollout completes, retries with the same key replay the cached response.
+</Note>
+
 ## How it works
 
 <Steps>
   <Step title="Generate a key">
-    Generate a unique key per logical request — typically a UUID, a hash, or your own primary key.
+    Generate a unique key per logical request, typically a UUID, a hash, or your own primary key.
   </Step>
   <Step title="Send it on the first attempt">
     Add an `Idempotency-Key` header to your `POST` or `PATCH`.
@@ -19,7 +23,7 @@ Network failures, timeouts, and retries are unavoidable. Spotzee supports idempo
     If the request times out or fails partially, retry with the exact same key and exact same body.
   </Step>
   <Step title="Receive the cached response">
-    Spotzee replays the original response — same status, same body, same `request_id`.
+    Spotzee replays the original response. Same status, same body, same `request_id`.
   </Step>
 </Steps>
 
@@ -37,19 +41,19 @@ Content-Type: application/json
 
 ## Scope and TTL
 
-- **Scope** — keys are scoped per API key, so you can reuse the same key string across keys without collision.
-- **Per-surface scope** — the Main API and Extended API maintain independent caches. The same `Idempotency-Key` sent to both surfaces is treated as two distinct requests; pick a fresh key per surface if you want isolation, or reuse it deliberately knowing each surface will replay independently.
-- **TTL** — cached responses live for 24 hours. After that, a request with the same key runs as a brand-new operation.
-- **Eligible methods** — `POST` and `PATCH`. `GET`, `HEAD`, and `DELETE` are idempotent by definition and ignore the header.
+- **Scope**: keys are scoped per API key, so you can reuse the same key string across keys without collision.
+- **Per-surface scope**: the Main API and Extended API maintain independent caches. The same `Idempotency-Key` sent to both surfaces is treated as two distinct requests. Pick a fresh key per surface if you want isolation, or reuse it deliberately knowing each surface will replay independently.
+- **TTL**: cached responses live for 24 hours. After that, a request with the same key runs as a brand-new operation.
+- **Eligible methods**: `POST` and `PATCH`. `GET`, `HEAD`, and `DELETE` are idempotent by definition and ignore the header.
 
 ## What Spotzee does on replay
 
 | Replay scenario | Outcome |
 |---|---|
 | Same key, same body | Original response is returned. The `Idempotent-Replayed: true` response header confirms it's a replay. |
-| Same key, different body | `409 idempotency_key_mismatch` — keys are tied to the exact request body. Use a fresh key for distinct requests. |
+| Same key, different body | `409 idempotency_key_mismatch`. Keys are tied to the exact request body. Use a fresh key for distinct requests. |
 | Same key, in-flight (Main API) | `409 idempotency_in_progress` with `Retry-After`. The original request is still running; retry shortly. |
-| Same key, in-flight (Extended API) | The duplicate runs and is cached on completion — there is no in-flight 409 on this surface. Successive replays after the first response lands return the cached copy. |
+| Same key, in-flight (Extended API) | The duplicate runs and is cached on completion. There is no in-flight 409 on this surface. Successive replays after the first response lands return the cached copy. |
 
 ## Errors
 
@@ -68,7 +72,7 @@ Content-Type: application/json
 |---|---|---|
 | `400` | `idempotency_key_invalid` | Empty or longer than 255 characters |
 | `409` | `idempotency_key_mismatch` | Same key reused with a different body |
-| `409` | `idempotency_in_progress` | Original request still running — retry after `Retry-After`. Main API only. |
+| `409` | `idempotency_in_progress` | Original request still running. Retry after `Retry-After`. Main API only (once enforcement ships). |
 
 ## Generating keys
 
@@ -92,11 +96,11 @@ uuid.NewString()
 
 ## When not to reuse a key
 
-Reuse a key for the same logical operation — for example, retrying the same "create user" request after a timeout. Mint a fresh key when:
+Reuse a key for the same logical operation. For example, retrying the same "create user" request after a timeout. Mint a fresh key when:
 
 - The user submits the form a second time after deciding to change a field.
 - You're processing a queue and each message is a distinct operation.
-- You're running a backfill — each row is its own logical request.
+- You're running a backfill. Each row is its own logical request.
 
 ## Caching rules
 
