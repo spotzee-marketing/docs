@@ -4,45 +4,51 @@ description: "Build multi-step, multi-channel automations with the visual journe
 keywords: ["journeys", "automation", "workflow", "drip campaign", "branching"]
 ---
 
-A **journey** is a visual flow of steps that users move through. Use journeys for onboarding sequences, abandonment recovery, renewal reminders, lifecycle re-engagement, and any multi-step automation.
+A **journey** is a graph of steps that users move through. Use journeys for onboarding sequences, abandonment recovery, renewal reminders, lifecycle re-engagement, and any multi-step automation. Users enter at an `entrance` node and progress until they hit an `exit` or the graph ends.
 
-## Trigger types
+## How users enter
 
-- **Event trigger** — a user enters when a tracked event occurs (e.g. `purchase_made`, `form_submitted`).
-- **Schedule trigger** — the journey runs on a recurring schedule against a segment.
+An `entrance` node has one of three modes:
+
+- **`event`**: a user enters when a tracked event occurs (e.g. `purchase_made`, `form_submitted`).
+- **`schedule`**: the journey runs on a recurring schedule against a segment.
+- **`none`**: entries come from the API or another journey, not from a trigger condition.
+
+A journey can have multiple entrance nodes for the same flow (e.g. one entrance per signup source).
 
 ## Step types
 
 | Step | Purpose |
 |---|---|
-| `send` | Deliver a message on any channel |
-| `delay` | Wait a fixed period before the next step |
+| `action` | Deliver a message via a configured channel |
+| `delay` | Wait a fixed duration, until a specific time, or for a templated date |
 | `gate` | Conditional split based on user attributes or behaviour |
-| `experiment` | A/B test — randomly assign branches |
-| `balancer` | Distribute traffic across N branches by weight |
-| `update` | Modify a user attribute |
-| `event` | Emit an internal event for tracking |
-| `exit` | Remove the user from the journey |
-| `link` | Jump to another step (useful for loops) |
-| `wait-for-event` | Pause until a specific event occurs (or a timeout fires) |
+| `experiment` | Weighted random A/B/n split |
+| `balancer` | Random distribution across children with per-child rate limits |
+| `throttle` | Hold users in a single-path queue until the next rate-limit window opens |
+| `link` | Hand the user off to another journey |
+| `update` | Patch user attributes from a Liquid template |
+| `event` | Emit a tracked event for the user |
+| `exit` | Force-remove the user from another entrance |
+| `sticky` | Operator-facing canvas note. No runtime effect. |
 
 ## Build a journey
 
 <Steps>
-  <Step title="Pick a trigger">
-    Choose **Event** for behaviour-driven journeys, **Schedule** for recurring sweeps.
+  <Step title="Pick an entrance">
+    Choose **event** for behaviour-driven journeys, **schedule** for recurring sweeps, or **none** for journeys triggered from the API or another journey.
   </Step>
-  <Step title="Add a send step">
+  <Step title="Add an action step">
     Pick a channel and template. The template can pull user attributes and event data via merge tags.
   </Step>
   <Step title="Add branching where needed">
-    Use `gate` to send different content to different cohorts; use `experiment` to test variants.
+    Use `gate` to send different content to different cohorts. Use `experiment` to test variants.
   </Step>
   <Step title="Add delays and exits">
     Pace the journey with `delay` steps and remove ineligible users with `exit`.
   </Step>
   <Step title="Activate">
-    Toggle to **live**. Spotzee starts evaluating triggers immediately.
+    Toggle to **live**. Spotzee starts evaluating entrances immediately.
   </Step>
 </Steps>
 
@@ -50,11 +56,12 @@ A **journey** is a visual flow of steps that users move through. Use journeys fo
 
 The journey object contract is documented in the API:
 
-- Create / update / list / activate — see [Main API → Journeys](/main-api/introduction)
+- Create / update / list / activate: see [Main API → Journeys](/main-api/introduction)
+- Trigger an entrance from your code: see [Trigger a journey](/guides/journey-trigger)
 
 ## Next
 
 <Columns cols={2}>
   <Card title="Smart segments" icon="filter" href="/guides/segments">Audiences journeys can target.</Card>
-  <Card title="AI content generation" icon="sparkles">Generate copy for any send step. *Coming soon — check back.*</Card>
+  <Card title="Trigger a journey" icon="bolt" href="/guides/journey-trigger">Drop a user in from your backend.</Card>
 </Columns>
