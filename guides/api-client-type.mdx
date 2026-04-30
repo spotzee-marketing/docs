@@ -1,64 +1,54 @@
 ---
 title: "Client type header"
-description: "Identify your traffic with x-spotzee-client-type so you get the right rate limits and Spotzee can tune for your workload."
+description: "Reserve x-spotzee-client-type for future per-key rate-limit policy and traffic telemetry."
 keywords: ["x-spotzee-client-type", "client type", "mcp", "mobile", "sdk", "cli", "rate limits", "telemetry"]
 ---
 
-Every request can carry an `x-spotzee-client-type` header that tells Spotzee what kind of client made the call. The header is optional, opaque, and used for two things:
+The `x-spotzee-client-type` header tells Spotzee what kind of client made a request. The header is optional, opaque, and reserved for two things.
 
-1. **Rate-limit tuning** — `mcp` clients get double the base read and write budget so parallel tool calls don't run out of headroom mid-task.
-2. **Telemetry** — Spotzee uses the value to break down traffic by client type internally, which informs SDK roadmaps and capacity planning.
+1. **Rate-limit policy.** Once the per-key sliding-window rate limits ship (see [Rate limits](/guides/api-rate-limits)), MCP and agent traffic gets a doubled budget so parallel tool calls don't run out of headroom mid-task.
+2. **Telemetry.** Spotzee uses the value to break traffic down by client type internally, which informs SDK roadmaps and capacity planning.
 
 ```http
 x-spotzee-client-type: mcp
 ```
 
+<Note>
+  `x-spotzee-client-type` is accepted on every request today (no error if absent or unknown), but the rate-limit policy that would honour it is rolling out behind a feature flag. Including the header now is forward-compatible. Once enforcement ships, the documented values take effect automatically.
+</Note>
+
 ## Recognised values
 
-Send one of these. Anything else is ignored at the rate-limit layer and bucketed as `unknown` in telemetry.
+Send one of these. Anything else is bucketed as `unknown`.
 
 | Value | Use for |
 |---|---|
 | `mcp` | MCP servers and agent runtimes that fan out parallel tool calls |
 | `mobile` | Native iOS or Android apps using the official mobile SDKs |
-| `sdk-js` | The official JavaScript SDK — set automatically; you don't need to set it yourself |
-| `sdk-android` | The official Android SDK — set automatically |
-| `sdk-ios` | The official iOS SDK — set automatically |
+| `sdk-js` | The official JavaScript SDK (set automatically) |
+| `sdk-android` | The official Android SDK (set automatically) |
+| `sdk-ios` | The official iOS SDK (set automatically) |
 | `cli` | Command-line tools (deploy scripts, one-off backfills, your own CLI) |
-| `unknown` | Default when omitted — no rate-limit boost |
+| `unknown` | Default when omitted. No future rate-limit boost. |
 
 ## When to set it
 
 <Tabs>
   <Tab title="MCP server">
-    Always set `x-spotzee-client-type: mcp`. The rate-limit boost is the only way an agent driving many parallel calls keeps up with its own fan-out. See [Rate limits](/guides/api-rate-limits) for the exact multipliers.
+    Always set `x-spotzee-client-type: mcp`. Once the per-key rate limits ship, this is the only way an agent driving many parallel calls keeps up with its own fan-out.
   </Tab>
   <Tab title="CLI tool">
-    Set `x-spotzee-client-type: cli` so Spotzee can distinguish ad-hoc CLI traffic from production application traffic in telemetry. No rate-limit change.
+    Set `x-spotzee-client-type: cli` so Spotzee can distinguish ad-hoc CLI traffic from production application traffic in telemetry.
   </Tab>
   <Tab title="Custom integration (your own backend)">
-    Leave the header off. Your traffic is treated as `unknown` and gets the standard limit for your plan. Setting `mcp` from a non-MCP backend just to grab the boost is unsupported — Spotzee may rate-limit it back to standard if traffic patterns don't match.
+    Leave the header off. Your traffic is treated as `unknown` and gets the standard rate-limit policy for your account. Setting `mcp` from a non-MCP backend just to grab the future boost is unsupported.
   </Tab>
   <Tab title="Official SDK">
-    Don't set it manually — the SDK does this for you. Overriding the value in your own wrapper interferes with Spotzee's ability to attribute traffic correctly.
+    Don't set it manually. The SDK does this for you. Overriding the value in your own wrapper interferes with Spotzee's ability to attribute traffic correctly.
   </Tab>
 </Tabs>
 
-## Verifying it's applied
-
-Check the response headers. The applied rate-limit tier is echoed in `X-RateLimit-Tier`, and the resulting limit is in `X-RateLimit-Limit`:
-
-```http
-HTTP/1.1 200 OK
-X-RateLimit-Limit: 8000
-X-RateLimit-Remaining: 7999
-X-RateLimit-Reset: 10
-X-RateLimit-Tier: starter
-```
-
-An MCP client on the Starter plan should see `X-RateLimit-Limit` higher than the unboosted Starter ceiling — that's how you confirm the header took effect.
-
 ## Reference
 
-- Rate limits and the MCP boost — see [Rate limits](/guides/api-rate-limits)
-- Authentication — see [Authentication](/guides/authentication)
+- Rate-limit policy and the MCP boost: see [Rate limits](/guides/api-rate-limits)
+- Authentication: see [Authentication](/guides/authentication)
