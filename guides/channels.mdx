@@ -1,10 +1,10 @@
 ---
 title: "Channels"
-description: "Send via email, SMS, WhatsApp, push, in-app, and webhooks — from one platform."
-keywords: ["channels", "email", "sms", "whatsapp", "push", "in-app", "webhooks"]
+description: "Send via email, SMS, push, in-app, and webhooks from one platform."
+keywords: ["channels", "email", "sms", "push", "in-app", "webhooks"]
 ---
 
-Spotzee sends across six channels. Each channel uses a configured **provider** to do the actual delivery.
+Spotzee sends across five channels. Each channel uses a configured **provider** to do the actual delivery.
 
 ## Email
 
@@ -13,10 +13,6 @@ Transactional and marketing email. On Starter, bring your own delivery provider.
 ## SMS
 
 Text messaging via your configured SMS provider. Per-message pricing applies on top of platform pricing.
-
-## WhatsApp
-
-WhatsApp Business messaging. Templates must be approved by WhatsApp before use.
 
 ## Push
 
@@ -32,7 +28,7 @@ Outbound HTTP callbacks. Use webhooks to forward events to your own systems, tri
 
 ## Provider configuration
 
-Providers are configured per project. A project can hold multiple providers per channel — Spotzee routes a send to the configured default unless you specify otherwise.
+Providers are configured per project. A project can hold multiple providers per channel. Spotzee routes a send to the configured default unless you specify otherwise.
 
 <Info>
   See [Bring your own provider](/guides/providers) for the supported vendor list and credential requirements.
@@ -40,5 +36,5 @@ Providers are configured per project. A project can hold multiple providers per 
 
 ## Reference
 
-- Send a message — see [Main API → Campaigns / Journeys](/main-api/introduction)
-- Test message deliverability — see [Extended API → Email health](/extended-api/introduction)
+- Send a message: see [Main API → Campaigns / Journeys](/main-api/introduction)
+- Test message deliverability: see [Extended API → Email health](/extended-api/introduction)
