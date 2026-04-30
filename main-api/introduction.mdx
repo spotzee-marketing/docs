@@ -29,16 +29,16 @@ Authorization: Bearer YOUR_API_KEY
 
 ## Conventions
 
-Common request and response conventions live in the Guides tab:
+The Main API is rolling out a set of wire-level conventions in stages. Per-IP edge rate limits, cursor pagination, and the `X-Request-Id` correlation header are live today. Per-key rate limits with read/write split, the MCP boost, `Idempotency-Key` enforcement, full `Spotzee-Version` validation, and the RFC 7807 error envelope ship in a future release. Each guide flags the live-vs-rolling-out state for its concern.
 
 | Concern | Read |
 |---|---|
-| Versioning | [API versioning](/guides/api-versioning) — `Spotzee-Version` header |
-| Rate limits | [Rate limits](/guides/api-rate-limits) — `X-RateLimit-*` headers, MCP doubling |
-| Idempotency | [Idempotency](/guides/api-idempotency) — `Idempotency-Key` on `POST` and `PATCH` |
-| Pagination | [Pagination](/guides/api-pagination) — cursor-based with `nextCursor` / `prevCursor` |
-| Webhooks | [Webhooks](/guides/api-webhooks) — outgoing signing and retries |
-| Correlation | Every response includes `X-Request-Id` — quote it when reporting issues |
+| Versioning | [API versioning](/guides/api-versioning): `Spotzee-Version` header |
+| Rate limits | [Rate limits](/guides/api-rate-limits): per-IP edge limits today, per-key budgets rolling out |
+| Idempotency | [Idempotency](/guides/api-idempotency): `Idempotency-Key` rolling out on Main API |
+| Pagination | [Pagination](/guides/api-pagination): cursor-based with `nextCursor` / `prevCursor` |
+| Webhooks | [Webhooks](/guides/api-webhooks): subscriptions configurable today; outbound delivery on the roadmap |
+| Correlation | Every response includes `X-Request-Id`. Quote it when reporting issues. |
 
 ## Endpoints
 
