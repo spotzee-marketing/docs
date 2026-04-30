@@ -4,7 +4,7 @@ description: "Track behaviour from your servers so segments, journeys, and repor
 keywords: ["events", "ingestion", "tracking", "behaviour", "server-side", "external_id", "anonymous_id"]
 ---
 
-Events are the raw signal Spotzee uses to trigger journeys, build behavioural segments, and drive reporting. Send events from your backend whenever a user does something worth marketing on — completes a checkout, opens a feature for the first time, abandons a cart, hits a usage milestone.
+Events are the raw signal Spotzee uses to trigger journeys, build behavioural segments, and drive reporting. Send events from your backend whenever a user does something worth marketing on: completes a checkout, opens a feature for the first time, abandons a cart, or hits a usage milestone.
 
 ## What you'll build
 
@@ -17,17 +17,17 @@ A backend service that:
 ## Prerequisites
 
 <Info>
-  You'll need a `sk_` project key with write access. The browser-side equivalent uses a `pk_` publishable key — see [Authentication](/guides/authentication).
+  You'll need a `sk_` project key with write access. The browser-side equivalent uses a `pk_` publishable key. See [Authentication](/guides/authentication).
 </Info>
 
 ## Walkthrough
 
 <Steps>
   <Step title="Pick stable user IDs">
-    Identify each event with the same `external_id` you used to sync the user. If the user is anonymous (a not-yet-signed-up visitor), use `anonymous_id` instead — Spotzee stitches the two together when the user later identifies.
+    Identify each event with the same `external_id` you used to sync the user. If the user is anonymous (a not-yet-signed-up visitor), use `anonymous_id` instead. Spotzee stitches the two together when the user later identifies.
   </Step>
   <Step title="Choose an event name">
-    Use snake_case verbs: `order_placed`, `subscription_renewed`, `feature_enabled`. Stick to a small catalogue — every event you create is a hook journeys and segments can depend on, so churn in event names breaks downstream automation.
+    Use snake_case verbs: `order_placed`, `subscription_renewed`, `feature_enabled`. Stick to a small catalogue. Every event you create is a hook journeys and segments can depend on, so churn in event names breaks downstream automation.
   </Step>
   <Step title="Send events">
     `POST /events` accepts a JSON array of one to 100 events per call. Even when sending a single event, wrap it in an array.
@@ -52,7 +52,7 @@ A backend service that:
     ]
     ```
 
-    Per-item errors come back in the response — items that succeeded are committed.
+    Per-item errors come back in the response. Items that succeeded are committed.
   </Step>
   <Step title="Batch when you can">
     For high-volume sources (queue consumers, ETL jobs, replay scripts), pack up to 100 events into a single call:
@@ -65,7 +65,7 @@ A backend service that:
     ```
   </Step>
   <Step title="Add user details alongside the event (optional)">
-    If the event also reveals new user information — say, a checkout that finally captures the user's email — include a `user` block. Spotzee upserts the user in the same call, so a downstream segment that depends on `email IS NOT NULL` fires correctly.
+    If the event also reveals new user information (say, a checkout that finally captures the user's email), include a `user` block. Spotzee upserts the user in the same call, so a downstream segment that depends on `email IS NOT NULL` fires correctly.
 
     ```json
     [
@@ -84,7 +84,7 @@ A backend service that:
     The `user` block accepts `email`, `phone`, `timezone`, `locale`, and a `data` object for custom attributes.
   </Step>
   <Step title="Retry safely on failure">
-    Network blips happen. Add an `Idempotency-Key` so a retry doesn't double-count an event in reporting. A deterministic key (`order_placed:ord_42`) is easier than a UUID for replay scenarios — see [Idempotency](/guides/api-idempotency).
+    Network blips happen. Add an `Idempotency-Key` so a retry doesn't double-count an event in reporting. A deterministic key (`order_placed:ord_42`) is easier than a UUID for replay scenarios. See [Idempotency](/guides/api-idempotency).
   </Step>
 </Steps>
 
@@ -96,11 +96,11 @@ A backend service that:
 
 - **Don't send "view" events from your backend** unless you have a real reason to. Page views belong in browser-side tracking with a `pk_` key. Backend events should reflect domain transitions: orders, subscriptions, status changes.
 - **Don't churn the schema.** If you add a field to `data`, keep it. Removing it breaks segments and journeys that already depend on it.
-- **Don't forget `Spotzee-Version`.** It's optional — but pinning a version makes your event payload's behaviour predictable across releases. See [API versioning](/guides/api-versioning).
+- **Don't forget `Spotzee-Version`.** It's optional, but pinning a version makes your event payload's behaviour predictable across releases. See [API versioning](/guides/api-versioning).
 
 ## Reference
 
-- API surface — see [Main API → Events](/main-api/introduction)
-- Browser-side tracking — see [Authentication → publishable keys](/guides/authentication)
-- Safe retries — see [Idempotency](/guides/api-idempotency)
-- Rate limits — see [Rate limits](/guides/api-rate-limits)
+- API surface: see [Main API → Events](/main-api/introduction)
+- Browser-side tracking: see [Authentication → publishable keys](/guides/authentication)
+- Safe retries: see [Idempotency](/guides/api-idempotency)
+- Rate limits: see [Rate limits](/guides/api-rate-limits)
