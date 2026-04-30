@@ -66,7 +66,8 @@
               "guides/configure-sms-delivery",
               "guides/configure-push-notifications",
               "guides/custom-domains",
-              "guides/locales"
+              "guides/locales",
+              "guides/data-schema"
             ]
           },
           {
