@@ -1,0 +1,131 @@
+---
+title: "Configure subscription preferences"
+description: "Define opt-in subscription types per channel, then let users manage their own preferences via a publishable preference centre or via the API."
+keywords: ["subscriptions", "opt-in", "opt-out", "preferences", "unsubscribe", "channels"]
+---
+
+A subscription is a named opt-in channel a user can subscribe to or unsubscribe from. Most projects need at least one per delivery channel (Marketing email, Transactional SMS, Product push) and many add topic-level subscriptions on top. Spotzee separates **subscription types** (configured by admins) from **subscription states** (per-user values).
+
+<Info>
+Subscription types live under **Settings** → **Subscriptions** and require the project `admin` role. Per-user state changes can come from the in-product preference centre, the public `PATCH /subscriptions/me` endpoint, or the server-side bulk toggle endpoint.
+</Info>
+
+## What a subscription type is
+
+Each subscription type carries three attributes:
+
+- **Name.** What users see in unsubscribe links and preference centres (for example, `Marketing email`, `Promotional SMS`, `Product updates`).
+- **Channel.** One of `email`, `text` (SMS), `push`, `webhook`, or `in_app`. A subscription is bound to exactly one channel.
+- **Public visibility.** When on, the subscription appears in the customer-facing preference centre. When off, the subscription is internal-only (you control state from the server).
+
+You can create as many subscription types as your channel mix needs. Common patterns:
+
+- One per channel: `Marketing email`, `Marketing SMS`, `Marketing push`.
+- Topic-level: `Newsletter`, `Product updates`, `Onboarding tips`, `Account alerts`.
+- Tier-aware: `Free-tier email`, `Premium-tier email` (when content differs by plan).
+
+## The three states
+
+Per-user, each subscription has one of three states:
+
+| State | Meaning | Spotzee will send |
+|---|---|---|
+| `subscribed` | User has opted in | Yes |
+| `unsubscribed` | User has opted out | No |
+| `opted_in` | User actively confirmed (double opt-in) | Yes (some flows treat this stricter than plain `subscribed`) |
+
+Default state for a new user is unset, which Spotzee treats as `subscribed` for non-public subscription types (so internal flows reach everyone) and as no-state for public types until the user actively opts in.
+
+## Create a subscription type
+
+<Steps>
+<Step title="Open Settings → Subscriptions">
+Inside the project, open **Settings** and pick the **Subscriptions** tab.
+</Step>
+
+<Step title="Create a new subscription">
+Choose **Create subscription**, then complete:
+- **Name** (for example, `Marketing email`).
+- **Channel** (`email`, `text`, `push`, `webhook`, or `in_app`).
+- **Public**. Toggle on if users should see this subscription in their preference centre. Off for internal-only types.
+</Step>
+
+<Step title="Save">
+Save. The new type appears in the table with the channel badge and visibility flag. Existing users have no state for the new type until you set one or they interact with it.
+</Step>
+</Steps>
+
+## Let users manage their own preferences
+
+The `PATCH /subscriptions/me` endpoint is purpose-built for browser-side preference centres. It accepts a publishable key and a user session token, so the call is safe to make from a customer's browser without exposing a secret key.
+
+<Steps>
+<Step title="Mint a user session token">
+From your server, call `POST /users/{userId}/sessions` with a secret key (`sk_…`) to mint a short-lived user session token bound to the user.
+</Step>
+
+<Step title="Hand the token to your front-end">
+Pass the token to your preference-centre page along with your publishable key (`pk_…`).
+</Step>
+
+<Step title="Toggle subscriptions from the browser">
+Call `PATCH /subscriptions/me` with `Authorization: Bearer pk_...`, `X-Spotzee-User-Token: <session token>`, and a body of toggle items:
+
+```json
+[
+  { "subscription_id": 12, "state": 1 },
+  { "subscription_id": 13, "state": 0 }
+]
+```
+
+State values follow the encoding above: `0` for unsubscribed, `1` for subscribed, `2` for opted-in. Up to 100 toggles per request. Toggling to the current state is a no-op.
+</Step>
+
+<Step title="Re-render the centre with the response">
+The endpoint returns the user's full set of subscription states, refreshed. Use it to re-render your preference centre without an extra round trip.
+</Step>
+</Steps>
+
+## Bulk-toggle from your server
+
+When you need to flip subscription state across many users, use `POST /subscriptions/batch` with a secret key. Each item identifies its target by `external_id` or `anonymous_id`. Per-item errors are returned so a single failed lookup doesn't hold up the rest of the batch.
+
+```json
+[
+  { "external_id": "user_001", "subscription_id": 12, "state": 0 },
+  { "external_id": "user_002", "subscription_id": 12, "state": 1 },
+  { "anonymous_id": "abc-123", "subscription_id": 13, "state": 1 }
+]
+```
+
+Up to 100 toggles per request. Spotzee returns a per-item outcome list so you can retry only the failures.
+
+## Unsubscribe links and SMS opt-out
+
+Some opt-out flows happen automatically:
+
+- **Email unsubscribe links.** Spotzee inserts a one-click unsubscribe link into outbound HTML emails when the recipient is subscribed to a `Public` email subscription. Clicking the link records `unsubscribed` for that subscription.
+- **SMS keywords.** Replies of `STOP`, `UNSUBSCRIBE`, `CANCEL`, `END`, or `QUIT` mark the user as `unsubscribed` for the project's primary SMS subscription. Spotzee then sends back the configured **SMS opt-out message** (set under **Settings** → **General** → **Push and SMS**).
+- **Help keywords.** Replies of `HELP` send back the configured **SMS help message**. Help responses don't change subscription state.
+
+These flows mean you don't need to wire up unsubscribe handling yourself for the common cases. Reach for the API only when you're building a richer preference centre or processing opt-outs from another source.
+
+## Next steps
+
+<Columns cols={2}>
+<Card title="Set up a project" icon="folder-plus" href="/guides/setup-project">
+Configure SMS opt-out and help messages for keyword replies.
+</Card>
+
+<Card title="Sync users" icon="users" href="/guides/sync-users">
+Push user data into a project.
+</Card>
+
+<Card title="Manage API keys" icon="key" href="/guides/manage-api-keys">
+Issue publishable and secret keys for preference-centre flows.
+</Card>
+
+<Card title="Authentication" icon="lock" href="/guides/authentication">
+The conceptual model for `pk_` plus user session token combinations.
+</Card>
+</Columns>
