@@ -1,16 +1,16 @@
 ---
 title: "Bring your own provider"
-description: "Connect your existing email, SMS, WhatsApp, and push delivery vendors so Spotzee sends on your behalf."
-keywords: ["providers", "byo", "smtp", "email provider", "sms provider", "whatsapp provider", "push provider", "credentials"]
+description: "Connect your existing email, SMS, and push delivery vendors so Spotzee sends on your behalf."
+keywords: ["providers", "byo", "smtp", "email provider", "sms provider", "push provider", "credentials"]
 ---
 
-A **provider** is the underlying delivery vendor that puts a message in front of a user. Spotzee builds, segments, schedules, and tracks the send; the provider executes the actual delivery. You can bring your own provider on every plan — Professional and Enterprise additionally include managed delivery infrastructure.
+A **provider** is the underlying delivery vendor that puts a message in front of a user. Spotzee builds, segments, schedules, and tracks the send; the provider executes the actual delivery. You can bring your own provider on every plan. Professional and Enterprise additionally include managed delivery infrastructure.
 
 ## Why bring your own provider
 
 - Keep your existing sending reputation, IP warm-up, and vendor relationships.
 - Pay for delivery directly to the vendor rather than through a re-sale layer.
-- Stay portable — switching marketing platforms doesn't mean re-warming a fresh sender.
+- Stay portable. Switching marketing platforms doesn't mean re-warming a fresh sender.
 
 <Info>
   Providers are configured per project. A project can hold multiple providers per channel, and Spotzee routes a send to the configured default unless a campaign or journey step picks a specific one.
@@ -28,44 +28,38 @@ The list grows. Pick the row that matches the channel you're sending on.
 | SendGrid | API key | Marketing + transactional |
 | Mailgun | API key + domain | Region-aware (US / EU) |
 | Amazon SES | Access key + secret key + region | IAM user with `ses:SendRawEmail` |
-| Postmark | Server token | Transactional-first; separate streams for marketing |
-| SparkPost | API key | |
 
 ### SMS
 
 | Provider | Auth |
 |---|---|
 | Twilio | Account SID + auth token |
-| MessageBird | API key |
 | Plivo | Auth ID + auth token |
+| Telnyx | API key + sending phone number |
 | Vonage | API key + secret |
-
-### WhatsApp
-
-| Provider | Auth | Notes |
-|---|---|---|
-| WhatsApp Business via Meta | Phone-number ID + system-user access token | Templates require approval before first use |
-| Twilio WhatsApp | Account SID + auth token | Same Twilio credentials as SMS |
+| httpsms (device gateway) | API key + sending phone number |
 
 ### Push
 
+A single push provider record holds both Apple and Google credentials. Configure either or both depending on which mobile platforms you target.
+
 | Platform | Auth | Notes |
 |---|---|---|
-| Apple (APNs) | `.p8` auth key + key ID + team ID | Token-based auth; certificates not supported |
-| Google (FCM) | Service-account JSON | Use a dedicated service account scoped to FCM |
+| Apple (APNs) | `.p8` auth key + key ID + team ID | Token-based auth. Certificates not supported. |
+| Google (FCM) | Service-account JSON | Use a dedicated service account scoped to FCM. |
 
 ### Webhooks
 
-Outbound HTTP callbacks don't need a third-party provider — Spotzee delivers them directly. See [Webhooks](/guides/api-webhooks) for signing, retries, and replay protection.
+Outbound HTTP callbacks don't need a third-party provider. Spotzee delivers them directly. See [Webhooks](/guides/api-webhooks) for signing, retries, and replay protection.
 
 ## Connect a provider
 
 <Steps>
   <Step title="Mint vendor credentials">
-    In your provider's dashboard, create a dedicated API key, service account, or SMTP user for Spotzee. Scope it to the smallest permission set that still covers the channel — for example, `ses:SendRawEmail` for Amazon SES, or "Mail Send" for SendGrid.
+    In your provider's dashboard, create a dedicated API key, service account, or SMTP user for Spotzee. Scope it to the smallest permission set that still covers the channel. For example, `ses:SendRawEmail` for Amazon SES, or "Mail Send" for SendGrid.
   </Step>
   <Step title="Add the provider in Spotzee">
-    Open **Settings → Providers**, choose the channel, then choose the vendor. Paste the credentials. Add a label so future you can tell two SES accounts apart.
+    Open **Settings → Integrations**, choose the channel, then choose the vendor. Paste the credentials. Add a label so future you can tell two SES accounts apart.
   </Step>
   <Step title="Send a test">
     Trigger a test message from the provider settings page. A successful test confirms the credentials and that Spotzee can reach the vendor.
@@ -79,10 +73,10 @@ Outbound HTTP callbacks don't need a third-party provider — Spotzee delivers t
 
 <Steps>
   <Step title="Mint a replacement">
-    Create a new credential at the vendor — same scope, fresh secret.
+    Create a new credential at the vendor. Same scope, fresh secret.
   </Step>
   <Step title="Update Spotzee">
-    Edit the provider entry under **Settings → Providers** and paste the new credential. Send a test.
+    Edit the provider entry under **Settings → Integrations** and paste the new credential. Send a test.
   </Step>
   <Step title="Revoke the old credential">
     Once traffic is on the new credential, revoke the old one at the vendor. Spotzee shows the date a credential was last used so you can confirm it's safe to retire.
@@ -90,20 +84,20 @@ Outbound HTTP callbacks don't need a third-party provider — Spotzee delivers t
 </Steps>
 
 <Warning>
-  Treat provider credentials as secrets. Never commit them to source control or share them in tickets — paste them only into the Spotzee provider settings page or rotate them via the API.
+  Treat provider credentials as secrets. Never commit them to source control or share them in tickets. Paste them only into the Spotzee provider settings page or rotate them via the API.
 </Warning>
 
 ## Choosing a provider
 
 The right provider depends on volume, geography, regulatory posture, and the kind of messages you're sending. A few rules of thumb:
 
-- **Transactional only** — single-stream vendors with strong inbox placement work well (Postmark, SparkPost, SES on the right warm-up curve).
-- **Marketing at volume** — SendGrid, Mailgun, and SES handle scale and have mature warm-up tooling.
-- **EU data residency** — pick a vendor with an EU sending region (Mailgun EU, SES EU regions).
-- **Regulated industries** — see the [Concepts](/guides/concepts) page for the financial-services features that affect provider choice.
+- **Transactional and marketing at volume**: SendGrid, Mailgun, and SES handle scale and have mature warm-up tooling.
+- **EU data residency**: pick a vendor with an EU sending region (Mailgun EU, SES EU regions).
+- **Roll-your-own SMTP**: any RFC-compliant relay works via the SMTP provider.
+- **Regulated industries**: see the [Concepts](/guides/concepts) page for the financial-services features that affect provider choice.
 
 ## Reference
 
-- API surface — see [Main API](/main-api/introduction)
-- Channel overview — see [Channels](/guides/channels)
-- Authentication for the management API — see [Authentication](/guides/authentication)
+- API surface: see [Main API](/main-api/introduction)
+- Channel overview: see [Channels](/guides/channels)
+- Authentication for the management API: see [Authentication](/guides/authentication)
