@@ -58,6 +58,12 @@
             ]
           },
           {
+            "group": "Configure",
+            "pages": [
+              "guides/manage-api-keys"
+            ]
+          },
+          {
             "group": "API conventions",
             "pages": [
               "guides/api-versioning",

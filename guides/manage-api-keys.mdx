@@ -1,0 +1,120 @@
+---
+title: "Manage API keys"
+description: "Create publishable and secret keys for project access, organisation keys for admin access, then rotate or revoke them safely."
+keywords: ["api-keys", "publishable", "secret", "rotation", "authentication", "scopes"]
+---
+
+API keys are how anything outside the app talks to Spotzee. The model has three key types: two scoped to a single project, and one scoped to your organisation. Each carries a role that decides what endpoints it can hit.
+
+<Info>
+Project key management requires the project `admin` role. Organisation key management requires organisation `admin` or `owner`. Spotzee shows the full key value **exactly once** at creation time. Save it immediately; later reads only show the prefix and last four characters.
+</Info>
+
+## The three key types
+
+| Prefix | Scope | Where it works | When to use |
+|---|---|---|---|
+| `pk_` | Project, publishable | `apix.spotzee.com/api/client/*` (allowlisted endpoints only) | Browsers, mobile SDKs, any client where the key is visible to end users |
+| `sk_` | Project, secret | `apix.spotzee.com/api/client/*` and project subroutes | Server-side integrations, backend code, anywhere the key is kept secret |
+| `ok_` | Organisation, admin | `apix.spotzee.com/api/admin/*` | Organisation-level operations across multiple projects |
+
+Each project key also carries a **role** chosen from `support`, `smtpproxy`, `editor`, `publisher`, or `admin`. The role gates what the key can do, the same way a teammate's project role gates what they can do. See [Invite teammates and assign roles](/guides/invite-teammates) for the role hierarchy.
+
+For the conceptual model behind the prefixes (allowlists, masking, surface mapping), see [Authentication](/guides/authentication).
+
+## Create a project API key
+
+Project keys live in your project's Settings page.
+
+<Steps>
+<Step title="Open API Keys settings">
+Inside the project, open **Settings** and pick the **API Keys** tab.
+</Step>
+
+<Step title="Start a new key">
+Choose to create a new key, then complete the form:
+- **Name**. Short, recognisable. Helps you identify the key in audits.
+- **Description** (optional). Explain what the key is for so future-you knows when it's safe to revoke.
+- **Scope**. **Publishable (`pk_`)** for keys exposed in browsers or apps, **Secret (`sk_`)** for keys kept server-side.
+- **Role**. Lowest project role that can do the key's job. Default to `editor` for general API work; pick `admin` only when the key needs to manage settings.
+</Step>
+
+<Step title="Save the key value immediately">
+Spotzee returns the full key value (e.g. `sk_a1b2c3d4...`) exactly once. Copy it into your secrets manager or environment configuration before you leave the page. The key is never displayed in full again.
+</Step>
+</Steps>
+
+## Create an organisation API key
+
+Organisation keys (CD44) target the admin surface and inherit admin scope from the creator's organisation role.
+
+<Steps>
+<Step title="Open the organisation API page">
+From the organisation menu, open **API**.
+</Step>
+
+<Step title="Start a new key">
+Create a new organisation API key, then complete the form:
+- **Name**. Recognisable label.
+- **Description** (optional).
+- **Role**. Pick from the organisation roles available to you. Owners can issue any organisation role; admins can issue `member` or `admin`.
+</Step>
+
+<Step title="Save the value">
+Same one-shot rule. The full `ok_…` value appears once. Save it now.
+</Step>
+</Steps>
+
+## Rotate a key
+
+Spotzee has no in-place rotate operation. Rotation is a two-step swap: issue the new key first, then revoke the old one once everything is moved across.
+
+<Steps>
+<Step title="Issue a replacement key">
+Create a new key with the same scope and role as the one you're replacing. Save the value.
+</Step>
+
+<Step title="Move integrations across">
+Update every consumer (servers, SDK installations, scheduled jobs) to use the new key. Roll the change carefully if you have many consumers.
+</Step>
+
+<Step title="Revoke the old key">
+Once you've confirmed every consumer is on the new key, revoke the old one. Subsequent requests using the old key receive `401 Unauthorized`.
+</Step>
+</Steps>
+
+## Revoke a key
+
+Open the same management page (project **Settings** → **API Keys** for project keys; organisation **API** for organisation keys), pick the key, and revoke it. Revocation is immediate and final. The key cannot be restored. Issue a new key if you need to replace it.
+
+System keys created by Spotzee for internal flows (the SMTP-proxy key, for example) are flagged as system keys and can't be revoked from the UI. Revoke them only when removing the feature itself.
+
+## Best practices
+
+A few habits that prevent the typical key-leak incidents:
+
+- **Never embed `sk_` keys in client code.** Use `pk_` keys in any code that ships to browsers or mobile devices. Secret keys live server-side only.
+- **Pick the smallest role that works.** A read-only integration takes `support`. An ingestion worker takes `editor`. Don't reach for `admin` unless the key actually configures settings.
+- **One key per integration.** Easier to rotate one consumer without disturbing others. Easier to spot a compromised key from its usage shape.
+- **Rotate on schedule and on incident.** Quarterly is a reasonable default. Rotate immediately if a key is committed to source control or shared in a chat.
+- **Treat `ok_` keys with extra care.** They cross every project. Limit who issues them and where they're used.
+
+## Next steps
+
+<Columns cols={2}>
+<Card title="Authentication" icon="key" href="/guides/authentication">
+The conceptual model: prefixes, allowlists, and surface mapping.
+</Card>
+
+<Card title="Quickstart" icon="rocket" href="/guides/quickstart">
+Use your first key to send a test campaign.
+</Card>
+
+<Card title="Sync users via API" icon="users" href="/guides/sync-users">
+Push user data into a project with `sk_` keys.
+</Card>
+
+<Card title="Ingest events" icon="activity" href="/guides/event-ingestion">
+Send events from your backend or SDK.
+</Card>
+</Columns>
