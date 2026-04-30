@@ -1,0 +1,126 @@
+---
+title: "Disconnect, delete, reconnect"
+description: "The three actions you can take on a connected Shopify store, what each does to your data, and when to use each."
+keywords: ["shopify", "disconnect", "delete", "reconnect", "data-retention"]
+---
+
+Three different actions, three different outcomes. Pick the right one for what you're trying to do.
+
+| Action | What happens to data | Status after | Reversible |
+|---|---|---|---|
+| **Disconnect** | Imported data preserved. Sync paused. | Disconnected (grey) | Yes, by reconnecting |
+| **Delete** | Imported data wiped. Integration removed. | Removed | No |
+| **Reconnect** | Same data preserved. OAuth refreshed. | Connected (green) | n/a |
+
+## Disconnect
+
+**What it does.** Pauses the integration. Webhooks stop firing into Spotzee, scheduled syncs stop running. Your already-imported customer records, orders, and product data stay in Spotzee.
+
+**Use it when:**
+
+- You're temporarily pausing syncs (during a store migration, a Shopify plan change, or a long debug session).
+- You're troubleshooting and want to stop new data flowing while you investigate.
+- You're not sure whether you want to fully remove the integration but want to stop new activity.
+
+**How:**
+
+<Steps>
+<Step title="Open the store card menu">
+Inside the project, open **Integrations** and find the store card.
+</Step>
+
+<Step title="Choose Disconnect">
+Use the card menu and pick **Disconnect**. Confirm at the prompt: "Are you sure you want to disconnect? You can reconnect later."
+</Step>
+</Steps>
+
+After disconnect, the status badge flips to **Disconnected** (grey). The store remains in your integration list. Reconnect later from the same menu when you're ready.
+
+## Delete
+
+**What it does.** Removes the integration entirely. Imported customer records that came from this Shopify store are removed from Spotzee. The integration card disappears from your **Integrations** page. The OAuth grant in Shopify is revoked.
+
+**Use it when:**
+
+- You're permanently moving away from a store (closing the store, switching platforms).
+- You imported data into the wrong project and want to wipe and start over.
+- The store has been replaced by a different Shopify store at the same domain (rare, but happens with rebrands).
+
+**Be careful.** Delete is destructive and irreversible. If you might want this data back, disconnect instead and decide later.
+
+**How:**
+
+<Steps>
+<Step title="Open the store card menu">
+Use the card menu on the store you want to remove.
+</Step>
+
+<Step title="Choose Delete">
+Pick **Delete**. Confirm the destructive action prompt explicitly. Spotzee describes what gets removed before you confirm.
+</Step>
+
+<Step title="Wait for cleanup">
+Deletion of the customer records can take a few minutes for stores with large imports. The card disappears once cleanup completes.
+</Step>
+</Steps>
+
+After delete, the only way to bring the data back is to connect the store fresh and run an initial sync. Customer external IDs in Spotzee for that store are reset, so even a fresh connect treats every customer as new.
+
+## Reconnect
+
+**What it does.** Refreshes the OAuth grant. Used when status shows **Reconnect required** (amber badge) or when you've added new sync-back permissions and need updated scopes.
+
+**Sync settings, customer list assignment, history, and existing data are all preserved.** Only the OAuth credentials change.
+
+**Use it when:**
+
+- Status is **Reconnect required**.
+- You uninstalled and reinstalled the Spotzee app in Shopify.
+- You enabled a sync-back toggle that needs a scope you didn't grant on the original install.
+- The connecting Shopify user's permissions changed.
+
+**How:**
+
+<Steps>
+<Step title="Open the store card menu">
+Use the card menu and pick **Reconnect**.
+</Step>
+
+<Step title="Re-approve on Shopify">
+You're sent through the same OAuth flow as the initial connect. Re-approve permissions on Shopify.
+</Step>
+
+<Step title="Land back in Spotzee">
+On approval, the store flips back to **Connected** (green) and syncs resume.
+</Step>
+</Steps>
+
+## Picking the right action
+
+A simple decision tree:
+
+- **Want to stop syncing temporarily?** Disconnect. Reversible.
+- **Want to fix an OAuth or scope issue?** Reconnect. No data loss.
+- **Want to permanently remove the store and its data?** Delete. Irreversible. Confirm twice.
+
+When in doubt, disconnect. You can always come back.
+
+## Next steps
+
+<Columns cols={2}>
+<Card title="Sync operations" icon="activity" href="/guides/shopify/sync-operations">
+Status badges, retries, and re-syncs.
+</Card>
+
+<Card title="Store details" icon="store" href="/guides/shopify/store-details">
+The five-item readiness checklist.
+</Card>
+
+<Card title="Connect a store" icon="link" href="/guides/shopify/connect">
+The OAuth flow used by both initial connect and reconnect.
+</Card>
+
+<Card title="Troubleshoot" icon="life-buoy" href="/guides/shopify/troubleshoot">
+Diagnose connection problems before deciding to delete.
+</Card>
+</Columns>

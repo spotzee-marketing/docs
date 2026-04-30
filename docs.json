@@ -85,6 +85,21 @@
                   "guides/salesforce/operations",
                   "guides/salesforce/troubleshoot"
                 ]
+              },
+              {
+                "group": "Shopify",
+                "pages": [
+                  "guides/shopify/overview",
+                  "guides/shopify/connect",
+                  "guides/shopify/data-from-shopify",
+                  "guides/shopify/data-to-shopify",
+                  "guides/shopify/sync-settings",
+                  "guides/shopify/store-details",
+                  "guides/shopify/sync-operations",
+                  "guides/shopify/disconnect",
+                  "guides/shopify/journeys-and-segments",
+                  "guides/shopify/troubleshoot"
+                ]
               }
             ]
           },

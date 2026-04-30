@@ -1,0 +1,92 @@
+---
+title: "Store details and readiness"
+description: "View Shopify store metadata, granted scopes, and the five-item readiness checklist that confirms the integration is healthy."
+keywords: ["shopify", "store-details", "readiness", "health", "scopes"]
+---
+
+The Store Details drawer is the at-a-glance health view for a connected Shopify store. Open it from the store card menu. Three sections: store information, granted permissions, and the readiness checklist.
+
+## Open store details
+
+<Steps>
+<Step title="Open Integrations">
+Inside the project, open **Integrations**.
+</Step>
+
+<Step title="Open the store details">
+Find the store card and use the card menu to pick **View details**.
+</Step>
+</Steps>
+
+## Store information
+
+| Field | What it shows |
+|---|---|
+| **Store domain** | The `<store>.myshopify.com` domain |
+| **Email** | The store's contact email from Shopify |
+| **Custom domain** | Your store's primary custom domain if configured |
+| **Plan** | The Shopify plan tier the store is on |
+| **Currency** | Default currency for the store |
+| **Country** | Where the store is registered |
+| **Created** | When the Spotzee integration was first connected |
+
+This information mirrors what Spotzee learned from the OAuth handshake plus the initial Shopify API call. It refreshes on every health check.
+
+## Granted scopes
+
+The drawer lists every OAuth scope Spotzee currently holds for the store. Each scope is one permission Shopify granted at install. Common scopes:
+
+- `read_customers`, `write_customers`
+- `read_orders`, `write_orders`
+- `read_products`
+- `read_inventory` (for inventory-aware personalisation, when used)
+
+If you don't see a scope you expected, the install on Shopify didn't grant it. Reconnect to re-approve and pick up the missing scope.
+
+## Store readiness checklist
+
+The **Store Readiness** section is the integration's health checklist. Five items, each pass or fail:
+
+| Check | Verifies |
+|---|---|
+| **OAuth connected** | The OAuth grant is live and Shopify recognises the app |
+| **Token valid** | The access token hasn't expired |
+| **All scopes granted** | Every scope the integration needs is approved |
+| **API responding** | A test API call to Shopify returns a successful response |
+| **Initial sync complete** | At least one full sync has finished successfully |
+
+A healthy integration has all five items checked. Any failure flips the integration's status badge to **Error** and points you at what to fix.
+
+### Last checked timestamp
+
+The drawer shows when the readiness checklist last refreshed. Run a manual health check (see [Sync operations](/guides/shopify/sync-operations)) to refresh it on demand.
+
+### What each failure means
+
+| Failed check | Likely cause | Fix |
+|---|---|---|
+| OAuth connected | App was uninstalled in Shopify, or the merchant revoked access | Reconnect from the store card |
+| Token valid | Access token expired (rare on long-lived integrations) | Reconnect |
+| All scopes granted | Scopes changed or were trimmed during a re-install | Reconnect to re-approve full scope set |
+| API responding | Shopify API outage or rate-limit hit | Wait a few minutes, then run a fresh health check |
+| Initial sync complete | Initial sync failed or was never run | Open sync settings and run the initial sync |
+
+## Next steps
+
+<Columns cols={2}>
+<Card title="Sync operations" icon="activity" href="/guides/shopify/sync-operations">
+Run health checks and read sync statuses.
+</Card>
+
+<Card title="Disconnect, delete, reconnect" icon="unplug" href="/guides/shopify/disconnect">
+What each action does and when to use which.
+</Card>
+
+<Card title="Troubleshoot" icon="life-buoy" href="/guides/shopify/troubleshoot">
+Diagnose connection and sync failures.
+</Card>
+
+<Card title="Sync settings" icon="settings" href="/guides/shopify/sync-settings">
+Configure toggles and the customer list.
+</Card>
+</Columns>

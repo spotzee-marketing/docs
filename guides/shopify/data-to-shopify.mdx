@@ -1,0 +1,92 @@
+---
+title: "What syncs back to Shopify"
+description: "Push profile completions, email and SMS subscription changes, and engagement metrics from Spotzee back to Shopify customer records."
+keywords: ["shopify", "sync", "two-way", "metafields", "consent", "profile"]
+---
+
+Sync isn't only one-way. The **Sync data to Shopify** section of your sync settings has four toggles that push data from Spotzee back into Shopify. Off by default. Opt in to each one.
+
+<Info>
+Reverse sync writes to Shopify customer records and metafields. The connecting OAuth token needs write permission for the data you're pushing back; reconnect after granting if you turn on a toggle that fails for permission reasons.
+</Info>
+
+## The four toggles
+
+### Sync profile data to Shopify
+
+Fills in missing customer fields in Shopify with values you have in Spotzee.
+
+- Phone number missing on a Shopify customer but present in Spotzee? It gets written.
+- First name missing? Same.
+- Default address blank? Same.
+
+The rule that matters most: **this only fills in missing fields**. Spotzee never overwrites data that already exists in Shopify. If a phone number is set in Shopify, Spotzee leaves it alone, even if a different number is on the Spotzee user.
+
+### Sync email subscription to Shopify
+
+Pushes email consent changes from Spotzee back to Shopify. When a customer unsubscribes through a Spotzee email link or preference centre, the unsubscribe state propagates to Shopify so your store reflects the same state.
+
+Use this when Shopify is your customer-record system of record and you want to keep both stores aligned without manual reconciliation.
+
+### Sync SMS subscription to Shopify
+
+Same for SMS. Opt-out keywords (`STOP`, `UNSUBSCRIBE`, etc.) handled by Spotzee on inbound SMS reply propagate back to Shopify.
+
+### Sync engagement to metafields
+
+Writes Spotzee engagement metrics onto Shopify customer metafields so your Shopify staff and other tooling can see them.
+
+Metafields written:
+
+- Last email open timestamp.
+- Last email click timestamp.
+- Last SMS click timestamp.
+- Spotzee RFM segment.
+- Spotzee total messages sent.
+
+Useful for in-store staff who pull up customer records, or for downstream Shopify apps that act on engagement state.
+
+## When to enable each
+
+A few suggested patterns:
+
+- **Shopify-first orgs** (Shopify is the source of truth for customer records): turn on all four. Keep both systems aligned.
+- **Spotzee-first orgs** (Spotzee owns the customer record, Shopify just owns commerce): leave the profile-sync toggle off, turn the consent toggles on for compliance.
+- **Compliance-conscious orgs**: at minimum turn on **Sync email subscription to Shopify** and **Sync SMS subscription to Shopify** so unsubscribes propagate back. Profile and engagement sync are optional.
+- **Shopify metafield consumers**: turn on engagement sync if any Shopify app or storefront feature reads from those metafields.
+
+## How updates flow back
+
+Reverse sync runs in real time off Spotzee state changes:
+
+- Profile updates push when the relevant Spotzee user attribute changes.
+- Subscription updates push when subscription state changes in Spotzee.
+- Engagement metafield writes happen periodically as engagement state evolves.
+
+You don't need to schedule reverse syncs. Toggle on, and writes flow.
+
+## When permissions matter
+
+If a reverse sync toggle fails after enabling, the most common reason is OAuth scope. The integration was originally connected without write permission for the resource you're now pushing back to. Reconnecting with the latest scopes resolves it.
+
+The store card shows a **Reconnect required** badge when scopes need updating; it's the same flow as the initial connection.
+
+## Next steps
+
+<Columns cols={2}>
+<Card title="What syncs from Shopify" icon="arrow-down" href="/guides/shopify/data-from-shopify">
+The five categories pulling data into Spotzee.
+</Card>
+
+<Card title="Sync settings" icon="settings" href="/guides/shopify/sync-settings">
+Configure all toggles and start the initial sync.
+</Card>
+
+<Card title="Subscription preferences" icon="bell-off" href="/guides/subscription-preferences">
+How Spotzee tracks the consent state you're syncing back.
+</Card>
+
+<Card title="Shopify overview" icon="info" href="/guides/shopify/overview">
+What the integration does, end to end.
+</Card>
+</Columns>

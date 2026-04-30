@@ -1,0 +1,118 @@
+---
+title: "Configure sync settings"
+description: "Pick which Shopify data flows into Spotzee, what (if anything) flows back, and which customer list new customers land on. Then start the initial sync."
+keywords: ["shopify", "sync", "settings", "customer-list", "initial-sync"]
+---
+
+Sync settings is the control panel for one connected store. Open it from the store card menu. The drawer has three sections: data from Shopify, data to Shopify, and the customer list assignment. The initial sync button sits at the bottom.
+
+<Info>
+The drawer pops open automatically right after you connect a store. You can re-open it any time from the store card.
+</Info>
+
+## Open sync settings
+
+<Steps>
+<Step title="Open Integrations">
+Inside the project, open **Integrations**.
+</Step>
+
+<Step title="Find the store card">
+Each connected Shopify store has its own card. Pick the one you're configuring.
+</Step>
+
+<Step title="Open the drawer">
+Use the card menu to choose **Sync settings**. The drawer slides in.
+</Step>
+</Steps>
+
+## Data from Shopify (5 toggles, on by default)
+
+Each toggle controls one category of data flowing from your store into Spotzee.
+
+| Toggle | Pulls in | Detailed in |
+|---|---|---|
+| **Customer profiles** | Names, emails, phones, addresses, tags | [What syncs from Shopify](/guides/shopify/data-from-shopify) |
+| **Email marketing consent** | Email subscription state per customer | [What syncs from Shopify](/guides/shopify/data-from-shopify) |
+| **SMS marketing consent** | SMS subscription state per customer | [What syncs from Shopify](/guides/shopify/data-from-shopify) |
+| **Orders, checkouts, and carts** | Order history, in-progress checkouts, abandoned carts | [What syncs from Shopify](/guides/shopify/data-from-shopify) |
+| **Product catalogue** | Products and their collections | [What syncs from Shopify](/guides/shopify/data-from-shopify) |
+
+Turn off categories you don't need. For example, if you don't run product-personalisation campaigns, turn off the catalogue toggle to skip syncing product data.
+
+## Data to Shopify (4 toggles, off by default)
+
+Each toggle pushes data from Spotzee back to Shopify. Off by default; opt in to each one.
+
+| Toggle | Pushes back | Detailed in |
+|---|---|---|
+| **Sync profile data to Shopify** | Fills in missing fields on Shopify customer records | [What syncs back to Shopify](/guides/shopify/data-to-shopify) |
+| **Sync email subscription to Shopify** | Email opt-out propagation | [What syncs back to Shopify](/guides/shopify/data-to-shopify) |
+| **Sync SMS subscription to Shopify** | SMS opt-out propagation | [What syncs back to Shopify](/guides/shopify/data-to-shopify) |
+| **Sync engagement to metafields** | Writes Spotzee engagement metrics onto Shopify customer metafields | [What syncs back to Shopify](/guides/shopify/data-to-shopify) |
+
+## Customer list
+
+Every store needs a Spotzee customer list to receive its imported customers. The customer list picker shows up in the drawer when **Customer profiles** is on.
+
+Two options:
+
+- **Pick an existing list** from the dropdown.
+- **Create a new list** named after the store from the same picker.
+
+### One list per store
+
+Each Shopify store gets its own dedicated list. Lists already assigned to another store are greyed out in the dropdown so you can't accidentally mix customers from different stores.
+
+### Switching the list
+
+You can change which list is assigned any time. Customers already imported don't move; the change applies to future imports only. To move existing customers, either re-sync (which re-creates them on the new list) or migrate manually.
+
+## Run the initial sync
+
+Once toggles and customer list are configured, run the initial sync.
+
+<Steps>
+<Step title="Confirm toggles">
+Double-check the sync-from toggles, sync-to toggles, and customer list assignment in the drawer.
+</Step>
+
+<Step title="Start the initial sync">
+Choose **Start initial sync** at the bottom of the drawer.
+</Step>
+
+<Step title="Wait for completion">
+The button changes to a progress indicator. Each enabled entity processes in turn (Customers → Orders → Products → Collections). Time depends on how much data your store carries; small stores finish in seconds, large stores take a few minutes.
+</Step>
+</Steps>
+
+After the initial sync completes, real-time webhooks keep your data current. You don't need to re-run the initial sync unless you change settings dramatically or suspect divergence.
+
+## When to re-run sync settings
+
+Open sync settings whenever you need to:
+
+- Toggle a category on or off.
+- Change which customer list new customers land on.
+- Verify the current toggle state.
+- Run a manual re-sync from the **Sync status** section (see [Sync operations](/guides/shopify/sync-operations)).
+
+## Next steps
+
+<Columns cols={2}>
+<Card title="Sync operations" icon="activity" href="/guides/shopify/sync-operations">
+Statuses, retries, and full re-syncs.
+</Card>
+
+<Card title="Store details" icon="store" href="/guides/shopify/store-details">
+View the store record, scopes, and the readiness checklist.
+</Card>
+
+<Card title="Journeys and segments" icon="route" href="/guides/shopify/journeys-and-segments">
+Build automations on Shopify events.
+</Card>
+
+<Card title="Troubleshoot" icon="life-buoy" href="/guides/shopify/troubleshoot">
+What to do when sync stalls or data doesn't appear.
+</Card>
+</Columns>

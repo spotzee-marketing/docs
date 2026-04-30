@@ -1,0 +1,259 @@
+---
+title: "Journeys and segments"
+description: "Use 19 Shopify event types as journey triggers, segment by RFM and purchase behaviour, and personalise messages with Shopify customer and order data."
+keywords: ["shopify", "journeys", "segments", "events", "rfm", "abandoned-cart", "personalisation"]
+---
+
+Shopify data starts paying off the moment you build segments and journeys against it. The integration exposes 19 event types you can trigger journeys from, automatically calculates RFM segments and lifetime-value metrics on every customer, and makes Shopify properties available as Liquid variables in your templates.
+
+## The 19 Shopify events
+
+Every Shopify event Spotzee fires can be the entry trigger on a journey. Six categories.
+
+### Customer events
+
+| Event | Fires when |
+|---|---|
+| `shopify_customer_created` | A new customer is created in Shopify |
+| `shopify_customer_updated` | An existing customer's details change |
+| `shopify_customer_deleted` | A customer is deleted from Shopify |
+
+### Order events
+
+| Event | Fires when |
+|---|---|
+| `shopify_order_placed` | A new order is created |
+| `shopify_order_updated` | An order's details change |
+| `shopify_order_paid` | Payment is received for an order |
+| `shopify_order_fulfilled` | All items in an order are fulfilled |
+| `shopify_order_partially_fulfilled` | Some (not all) items are fulfilled |
+| `shopify_order_cancelled` | An order is cancelled |
+| `shopify_order_refunded` | An order is refunded |
+| `shopify_ordered_product` | Fires once **per line item** in a new order. Useful for product-specific automations |
+
+### Checkout events
+
+| Event | Fires when |
+|---|---|
+| `shopify_checkout_started` | A customer begins the checkout process |
+| `shopify_checkout_abandoned` | A checkout is left incomplete after 60 minutes of inactivity |
+
+### Consent events
+
+| Event | Fires when |
+|---|---|
+| `shopify_email_consent_updated` | A customer's email marketing consent changes |
+| `shopify_sms_consent_updated` | A customer's SMS marketing consent changes |
+
+### Fulfilment and shipping events
+
+| Event | Fires when |
+|---|---|
+| `shopify_fulfillment_created` | A new fulfilment record is created for an order |
+| `shopify_fulfillment_updated` | An existing fulfilment's details change (tracking added, for example) |
+| `shopify_shipment_status` | Shipping status updates (in transit, delivered, etc.) |
+
+### Product events
+
+| Event | Fires when |
+|---|---|
+| `shopify_product_updated` | A product's details change in your catalogue |
+
+## Build an abandoned cart recovery journey
+
+The `shopify_checkout_abandoned` event is the foundation for cart recovery. Spotzee fires it 60 minutes after a checkout was started but not completed.
+
+<Steps>
+<Step title="Create a journey">
+Open **Journeys** and create a new journey.
+</Step>
+
+<Step title="Set the entry trigger">
+Pick **Event** as the entrance mode and select `shopify_checkout_abandoned` as the event.
+</Step>
+
+<Step title="Add a wait step">
+Don't email immediately. Add a `delay` step of 1-4 hours. Give the customer time to come back on their own.
+</Step>
+
+<Step title="Send the recovery email">
+Add an `action` step pointing at an email template. Include a reminder, a link back to their cart, and product details from the checkout payload.
+</Step>
+
+<Step title="Add a follow-up if you want one">
+Add another wait (24 hours) and a second action with a discount or free-shipping offer.
+</Step>
+</Steps>
+
+A common shape:
+
+```
+Entry: shopify_checkout_abandoned
+  -> delay 2 hours
+  -> action: "You left something behind"
+  -> delay 24 hours
+  -> action: "Still thinking? Here's 10% off"
+```
+
+Track conversion by watching for a `shopify_order_placed` event after the recovery emails fire.
+
+## Build post-purchase journeys
+
+Order events power the full post-purchase lifecycle.
+
+### Order confirmation + cross-sell
+
+```
+Entry: shopify_order_placed
+  -> action: "Thanks for your order #{{order_number}}"
+  -> delay 3 days
+  -> action: "You might also like..."
+```
+
+The `shopify_order_placed` event payload includes line items, totals, currency, and shipping address. All of it is available as Liquid variables in the email template.
+
+### Fulfilment notification
+
+```
+Entry: shopify_order_fulfilled
+  -> action: "Your order has been shipped!"
+```
+
+For multi-shipment orders, `shopify_order_partially_fulfilled` fires when some items ship before the rest.
+
+### Delivery follow-up
+
+```
+Entry: shopify_shipment_status (filtered to delivered)
+  -> delay 5 days
+  -> action: "How's your purchase? Leave a review"
+```
+
+The `shopify_shipment_status` event fires whenever shipping status changes. Branch on the status field to send different messages for `in_transit` vs `delivered`.
+
+### Refund retention
+
+```
+Entry: shopify_order_refunded
+  -> delay 1 day
+  -> action: "We're sorry it didn't work out. Here's 15% off your next order"
+```
+
+## Segment by purchase behaviour
+
+Spotzee calculates and exposes three Shopify properties on every customer record:
+
+| Property | What it carries |
+|---|---|
+| `shopify_order_count` | Total number of orders this customer has placed |
+| `shopify_total_spent` | Total amount spent across all orders |
+| `shopify_rfm_segment` | The customer's RFM bucket (see below) |
+
+You build segments using these properties just like any other user attribute.
+
+### RFM segments
+
+RFM scoring looks at three dimensions:
+
+- **Recency**: how recently did they buy?
+- **Frequency**: how often do they buy?
+- **Monetary**: how much do they spend?
+
+Each gets a score 1-5 (5 best). Combined scores land each customer in one of 11 segments:
+
+| Segment | Meaning |
+|---|---|
+| **Champion** | High recency, high frequency, high spend. Your best customers. |
+| **Loyal** | Consistently high purchase frequency. |
+| **Potential loyalist** | Recent buyers with moderate frequency. Worth nurturing. |
+| **New customer** | Very recent first-time buyers. |
+| **Promising** | Recent purchases, good spend, low frequency so far. |
+| **Need attention** | Average across the board, starting to fade. |
+| **About to sleep** | Below-average recency, but previously active. |
+| **Can't lose** | Were champions but haven't bought recently. High value drifting away. |
+| **At risk** | Previously good customers with declining recency. |
+| **Hibernating** | Low recency and low frequency. Gone quiet. |
+| **Lost** | Lowest recency and frequency. |
+
+Segment with rules like:
+
+- **High spenders**: `shopify_total_spent` greater than 500.
+- **Repeat buyers**: `shopify_order_count` greater than 3.
+- **Champions**: `shopify_rfm_segment` equals `champion`.
+- **Win-back targets**: `shopify_rfm_segment` equals `at_risk` OR `shopify_rfm_segment` equals `cant_lose`.
+
+## Personalise with Shopify data
+
+Shopify customer and order data lands directly in Liquid variables you can drop into any template field that supports Liquid (subject lines, bodies, push titles, webhook payloads, and so on).
+
+### User-property personalisation
+
+```liquid
+Hi {{ user.first_name | default: "there" }}!
+
+You've placed {{ user.shopify_order_count }} orders with us.
+Total spend: {{ user.shopify_total_spent }}.
+```
+
+### Event-data personalisation
+
+When a journey fires off an event, the event's payload is available too. For `shopify_order_placed`:
+
+```liquid
+Order #{{ event.order_number }}
+Total: {{ event.total_price }} {{ event.currency }}
+
+Items:
+{% for line_item in event.line_items %}
+  - {{ line_item.title }} x {{ line_item.quantity }}
+{% endfor %}
+```
+
+For `shopify_shipment_status`:
+
+```liquid
+Your order #{{ event.order_number }} is now {{ event.status }}.
+{% if event.tracking_number %}
+Track it: {{ event.tracking_url }}
+{% endif %}
+```
+
+### RFM-based win-back
+
+```liquid
+{% if user.shopify_rfm_segment == "at_risk" %}
+We miss you, {{ user.first_name }}. Here's 20% off your next order.
+{% elsif user.shopify_rfm_segment == "lost" %}
+It's been a while. Come back and save 30%.
+{% endif %}
+```
+
+## Customer lists
+
+When customers sync from Shopify, they land in a Spotzee customer list assigned in your sync settings. One list per store. The list:
+
+- Receives every customer pulled in during the initial sync.
+- Adds new customers as they appear via webhooks.
+- Works as a targeting option in campaigns and journeys ("send to everyone on the Store A list").
+
+See [Sync settings](/guides/shopify/sync-settings#customer-list) for how to assign the list.
+
+## Next steps
+
+<Columns cols={2}>
+<Card title="What syncs from Shopify" icon="arrow-down" href="/guides/shopify/data-from-shopify">
+The five categories that power events and properties.
+</Card>
+
+<Card title="Build templates" icon="file-text" href="/guides/templates">
+Liquid variables, locale variants, and per-channel template fields.
+</Card>
+
+<Card title="Build segments" icon="filter" href="/guides/segments">
+The general segment-building reference for any user attribute.
+</Card>
+
+<Card title="Journeys" icon="route" href="/guides/journeys">
+The journey step types and how they combine.
+</Card>
+</Columns>

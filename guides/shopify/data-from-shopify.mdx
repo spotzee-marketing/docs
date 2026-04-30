@@ -1,0 +1,91 @@
+---
+title: "What syncs from Shopify"
+description: "Five categories of data flow from Shopify into Spotzee: customer profiles, email and SMS consent, orders, products, and collections."
+keywords: ["shopify", "sync", "data", "customers", "orders", "products", "consent"]
+---
+
+Five categories of data flow from your Shopify store into Spotzee. Each has its own toggle in the **Sync data from Shopify** section of your sync settings. All five default to on; turn off the ones you don't need.
+
+## The five categories
+
+### Customer profiles
+
+The foundation. Without it you have no audience.
+
+Fields imported per customer:
+
+- First name, last name, email, phone.
+- Default address (street, city, province, country, postcode).
+- Customer tags from Shopify.
+- Shopify customer ID (used as the external identifier in Spotzee).
+
+Customer profiles land in the customer list you assign to the store in sync settings.
+
+### Email marketing consent
+
+Email subscription state from Shopify. When a customer opts in or out of email marketing in your Shopify store, that change flows into Spotzee on the next sync (or in real time via webhooks for incremental updates).
+
+This category is what keeps Spotzee from sending marketing email to anyone who unsubscribed in Shopify, regardless of what your Spotzee subscription state says.
+
+### SMS marketing consent
+
+Same idea for SMS. Spotzee respects the SMS marketing consent state from Shopify so your texting stays compliant with what customers agreed to in your store.
+
+### Orders, checkouts, and carts
+
+Order history, in-progress checkouts, and abandoned carts. This unlocks:
+
+- Per-order events (`shopify_order_placed`, `shopify_order_paid`, `shopify_order_fulfilled`, and so on).
+- Abandoned cart detection and the `shopify_checkout_abandoned` event after 60 minutes of inactivity.
+- Total spend and order count properties on each customer.
+- RFM scoring, which depends on order recency, frequency, and monetary value.
+
+Without this category enabled, you can't run abandoned cart recovery or post-purchase journeys.
+
+### Product catalogue
+
+Products and the collections they belong to. Used for:
+
+- Personalising emails and SMS with product names, images, prices.
+- Cross-sell journeys that reference what a customer bought (or browsed).
+- Filtering segments by product or collection.
+
+Catalogue sync is read-only: Spotzee never modifies your product data.
+
+## How updates flow in
+
+Two mechanisms keep data current:
+
+- **Initial sync** runs once after you finish setup. Bulk import of every existing record.
+- **Real-time webhooks** fire from Shopify whenever something changes (customer updated, order placed, consent toggled). Spotzee receives the webhook and updates the corresponding record within seconds.
+
+You don't need to schedule re-syncs. The webhook stream keeps everything current. Run a manual re-sync only when you suspect divergence (after a connection issue, after changing sync settings).
+
+## What doesn't sync
+
+A few things Spotzee deliberately doesn't pull:
+
+- **Order line items as separate Spotzee records.** They're carried inside the `shopify_order_placed` event payload and the `shopify_ordered_product` per-line-item event, but they don't become standalone records.
+- **Inventory levels.** Catalogue sync is for personalisation, not inventory management.
+- **Pricing rules and promotions.** Discount codes appear on order events but the rules behind them aren't synced.
+- **Storefront customer activity** beyond checkouts. Page views and product views don't flow in.
+
+## Next steps
+
+<Columns cols={2}>
+<Card title="What syncs back to Shopify" icon="arrow-up" href="/guides/shopify/data-to-shopify">
+The four optional toggles that push data from Spotzee back to your store.
+</Card>
+
+<Card title="Sync settings" icon="settings" href="/guides/shopify/sync-settings">
+Configure toggles and start the initial sync.
+</Card>
+
+<Card title="Journeys and segments" icon="route" href="/guides/shopify/journeys-and-segments">
+Build automations on Shopify events and segment by purchase behaviour.
+</Card>
+
+<Card title="Personalise with Shopify data" icon="sparkles" href="/guides/shopify/journeys-and-segments#personalise-with-shopify-data">
+Drop Shopify properties and event data into your templates.
+</Card>
+</Columns>

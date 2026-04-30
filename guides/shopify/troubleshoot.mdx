@@ -1,0 +1,165 @@
+---
+title: "Troubleshoot Shopify sync"
+description: "Diagnose Shopify connection failures, domain validation errors, stuck syncs, missing data, and reconnect-required statuses."
+keywords: ["shopify", "troubleshooting", "errors", "oauth", "sync", "connection"]
+---
+
+Shopify integration issues mostly fall into two buckets: connection problems (OAuth, domain validation, scopes) and sync problems (stuck entities, missing data, failed retries). This page works through both.
+
+## Connection issues
+
+### OAuth fails during install
+
+**Symptoms.** Connection fails after redirecting to Shopify, or you land back in Spotzee without a success message.
+
+| Cause | Fix |
+|---|---|
+| No admin access to the Shopify store | Ask the store owner to connect, or get admin permissions |
+| Browser blocking popups or redirects | Allow popups from Spotzee and try incognito mode |
+| Permissions denied on the Shopify install page | Retry the connection and choose **Install app** when prompted |
+| Network timeout during OAuth | Check your internet connection and try again |
+
+### Domain validation errors
+
+These show up in the **Connect Shopify store** drawer before you reach Shopify.
+
+| Error | Cause | Fix |
+|---|---|---|
+| "Store domain is required" | Field empty | Enter your store name |
+| "Invalid store domain format" | Doesn't match a valid `myshopify.com` domain | Use just the store name (`mystore`) or full domain (`mystore.myshopify.com`) |
+| "Store name must be at least 4 characters" | Too short | Shopify store names are 4 or more characters |
+| "Store name cannot exceed 60 characters" | Too long | Re-check the entered value |
+| "Store name cannot start or end with a hyphen" | Invalid hyphen placement | Remove leading or trailing hyphens |
+
+### "Already connected to another project"
+
+A single Shopify store can only connect to one Spotzee project at a time. If you see this:
+
+1. Find which project currently has the store connected.
+2. Disconnect the store from that project first.
+3. Then connect it to the new project.
+
+### Reconnect required (amber badge)
+
+The integration's status is **Reconnect required**.
+
+Common causes:
+
+- The Spotzee app was uninstalled and reinstalled in Shopify.
+- Shopify revoked the app's access tokens.
+- Required scopes changed (you turned on a sync-back toggle that needs a scope you didn't grant initially) and need re-approval.
+
+**Fix.** Open the store card menu and choose **Reconnect**. Re-approve permissions on Shopify. Sync settings, customer list, and history are preserved.
+
+## Sync issues
+
+### Sync stuck or taking too long
+
+**Symptoms.** An entity shows **Syncing** for longer than expected.
+
+**Possible causes.**
+
+- Large dataset (thousands of products, tens of thousands of orders).
+- Shopify API responding slowly or hitting rate limits.
+- Network issues between Spotzee and Shopify.
+
+**What to do.**
+
+1. Close and re-open the sync settings drawer to refresh the displayed status.
+2. Wait 15 minutes. Large initial imports take time.
+3. If still stuck, run a **Re-sync** from the same drawer. It restarts the bulk import.
+
+### Individual entity shows Failed
+
+**Symptoms.** One entity (say, Orders) shows **Failed** while the others are **Synced**.
+
+<Steps>
+<Step title="Run Retry">
+Pick **Retry** next to the failed entity in sync settings.
+</Step>
+
+<Step title="If it fails again, run a health check">
+Use **Check health** from the store card menu. A health-check failure points at the underlying cause (OAuth, scopes, API).
+</Step>
+
+<Step title="If health checks pass, run a full Re-sync">
+A persistent per-entity failure with passing health checks usually clears with a full re-sync.
+</Step>
+</Steps>
+
+### Missing data after sync
+
+**Symptoms.** Sync completed successfully but expected data isn't in Spotzee.
+
+**Check these.**
+
+1. **Sync toggles**: open sync settings and confirm the right category is enabled. Orders missing? Verify **Orders, checkouts, and carts** is on.
+2. **Customer list**: a customer list must be assigned for customer profiles to land somewhere.
+3. **Data exists in Shopify**: confirm the records are actually in your Shopify admin. Spotzee can only sync what's there.
+4. **Recent changes**: data added after the initial sync should arrive via webhooks within seconds. If something specific isn't there, run a **Re-sync** to catch up.
+
+### Customers not appearing in the list
+
+**Symptoms.** Sync status is **Synced** for Customers but the assigned list is empty or missing people.
+
+**Check.**
+
+1. Is **Customer profiles** toggle on in sync settings?
+2. Is a customer list assigned in the dropdown?
+3. Did the initial Customer sync actually complete? Check the per-entity status.
+4. Are customers actually in your Shopify admin? Confirm in Shopify.
+
+### Health check failed
+
+The store card shows **Error** status and the readiness checklist has one or more failed items.
+
+| Failed item | Fix |
+|---|---|
+| OAuth not connected | App was uninstalled or token was revoked. Reconnect from the card menu. |
+| Token expired | Reconnect to refresh credentials. |
+| Missing scopes | Reconnect to re-approve the full scope set. |
+| API credentials invalid | Reconnect. |
+| Initial sync incomplete | Open sync settings and run the initial sync. |
+
+After fixing, run **Check health** again to confirm.
+
+### Webhooks aren't firing
+
+**Symptoms.** Initial sync was fine, but new orders or customers aren't appearing in Spotzee.
+
+**Check.**
+
+- The integration's status badge. **Disconnected** or **Reconnect required** stops webhook delivery. Reconnect.
+- The OAuth scopes still grant the webhook subscriptions Spotzee installed. Reconnect if scopes changed.
+- The webhook delivery logs in Shopify (Settings → Notifications → Webhooks). Failed deliveries show retry status there.
+
+If Shopify shows successful webhook delivery but Spotzee doesn't reflect the data, run a manual re-sync to reconcile.
+
+## Still stuck
+
+If you've worked through the patterns above and the integration still won't behave:
+
+- Read the most recent failure detail in the **Store details** drawer.
+- Try **Reconnect** to refresh OAuth credentials.
+- Pause the integration via **Disconnect** to stop retry storms while you investigate, then reconnect once the underlying cause is fixed.
+- For data-corruption-style issues, **Delete** and start fresh. Note that delete is irreversible; see [Disconnect, delete, reconnect](/guides/shopify/disconnect).
+
+## Next steps
+
+<Columns cols={2}>
+<Card title="Sync operations" icon="activity" href="/guides/shopify/sync-operations">
+Statuses, retries, and the re-sync flow.
+</Card>
+
+<Card title="Store details" icon="store" href="/guides/shopify/store-details">
+The five-item readiness checklist.
+</Card>
+
+<Card title="Disconnect, delete, reconnect" icon="unplug" href="/guides/shopify/disconnect">
+The three actions and what each does to your data.
+</Card>
+
+<Card title="Connect a store" icon="link" href="/guides/shopify/connect">
+The OAuth flow used by reconnect.
+</Card>
+</Columns>

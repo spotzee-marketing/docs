@@ -1,0 +1,59 @@
+---
+title: "Shopify overview"
+description: "Sync customers, orders, products, and consent from Shopify into Spotzee, optionally push profile and engagement data back, and personalise journeys with purchase data."
+keywords: ["shopify", "integration", "ecommerce", "sync", "overview"]
+---
+
+The Shopify integration moves data both ways between your Shopify store and Spotzee. It pulls customers, consent, orders, products, and collections in. It can push profile completions, subscription state, and engagement back. Most flows are real-time via webhooks; bulk imports cover the initial pull and any on-demand re-syncs.
+
+<Info>
+The Shopify integration runs at the project level. Setup requires the project `admin` role. Connecting needs admin access on the Shopify store side.
+</Info>
+
+## What the integration does
+
+Two halves work together:
+
+- **Sync from Shopify into Spotzee** moves your customer base and commerce activity into Spotzee so you can segment, personalise, and trigger journeys against it. Five categories sync, all on by default.
+- **Sync back into Shopify** keeps your store's customer fields, subscription consent, and engagement metafields aligned with what's happening in Spotzee. Four toggles, all off by default. Opt in to each one.
+
+Beyond raw data sync, the integration:
+
+- Fires 19 event types into Spotzee whenever something changes in Shopify (customer created, order placed, checkout abandoned, fulfilment shipped, and so on). These are journey triggers.
+- Calculates RFM segments and lifetime-value metrics for every Shopify customer automatically. These land as user properties you can segment and personalise on.
+- Detects abandoned checkouts after 60 minutes of inactivity and fires a `shopify_checkout_abandoned` event ready for recovery journeys.
+
+## Multi-store
+
+You can connect more than one Shopify store per project. Each store gets its own integration card, sync settings, customer list, and statuses. One restriction: a single Shopify store can only connect to one Spotzee project at a time.
+
+## Setup at a glance
+
+Bringing the integration live takes four steps:
+
+1. **Connect** your store via OAuth.
+2. **Configure sync settings** to pick what flows in, what (if anything) flows back, and which Spotzee customer list new customers land on.
+3. **Run the initial sync** to pull existing data.
+4. **Operate** through the store card: trigger health checks, run re-syncs, or pause via disconnect.
+
+Once the initial sync completes, real-time webhooks keep your data current automatically. No polling, no manual refreshes.
+
+## Next steps
+
+<Columns cols={2}>
+<Card title="Connect a store" icon="link" href="/guides/shopify/connect">
+OAuth flow, single and multi-store setup.
+</Card>
+
+<Card title="What gets synced" icon="arrow-down" href="/guides/shopify/data-from-shopify">
+The five categories of data flowing from Shopify into Spotzee.
+</Card>
+
+<Card title="Sync settings" icon="settings" href="/guides/shopify/sync-settings">
+Configure toggles, customer list, and start the initial sync.
+</Card>
+
+<Card title="Journeys and segments" icon="route" href="/guides/shopify/journeys-and-segments">
+Build automations on Shopify events and segment by purchase behaviour.
+</Card>
+</Columns>

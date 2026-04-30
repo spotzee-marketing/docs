@@ -1,0 +1,132 @@
+---
+title: "Sync operations"
+description: "Read sync statuses, run health checks, retry a failed entity, run a full re-sync, and understand the four integration states."
+keywords: ["shopify", "sync", "operations", "status", "retry", "resync", "health"]
+---
+
+After the initial sync completes and webhooks start flowing, day-to-day operations come down to four actions: reading per-entity status, running health checks, retrying a failed entity, and running a full re-sync. Plus the four integration statuses you'll see on the store card.
+
+## The four integration statuses
+
+Every connected Shopify store carries one of four statuses, shown as a coloured badge on the store card:
+
+| Status | Colour | Meaning | Typical action |
+|---|---|---|---|
+| **Connected** | Green | OAuth valid, syncs running on schedule | None. Healthy. |
+| **Disconnected** | Grey | Manually paused. Data preserved, sync stopped. | Reconnect when ready. |
+| **Error** | Red | Health check failed or sync errored | Drill into details, fix, re-test. |
+| **Reconnect required** | Amber | OAuth needs re-authorisation (uninstall, scope change) | Reconnect from the card menu. |
+
+Statuses update as syncs run and health checks complete. Resolving the underlying cause and seeing one successful sync flips status back to **Connected** automatically.
+
+## Per-entity sync status
+
+Open **Sync settings** from the store card menu and look at the **Sync status** section. Each entity (Customers, Orders, Products, Collections) shows one of four states:
+
+| State | Meaning |
+|---|---|
+| **Pending** | Queued for sync but not started yet |
+| **Syncing** | Currently importing |
+| **Synced** | Latest sync completed successfully |
+| **Failed** | Sync ran into an error |
+
+Entities that have completed at least one sync show a **Last synced** timestamp.
+
+Once the initial sync is done, real-time webhooks keep data current. The **Last synced** timestamp reflects the most recent bulk sync, not the latest webhook.
+
+## Run a health check
+
+Health checks are on-demand. Use them when you suspect an issue or want a fresh readiness reading.
+
+<Steps>
+<Step title="Open the store card menu">
+Inside the project, open **Integrations** and find the store card. Use the card menu to pick **Check health**.
+</Step>
+
+<Step title="Wait for the result">
+The menu item changes to **Checking...** while the check runs. It typically completes within seconds.
+</Step>
+
+<Step title="Read the result">
+The check returns either **Health check completed** (all five readiness items pass) or **Health check failed** (one or more failed). Open **View details** for the specific item that failed.
+</Step>
+</Steps>
+
+The four checks the system runs:
+
+- **OAuth connected**: the OAuth grant is still valid.
+- **Token not expired**: access token hasn't passed its expiry.
+- **All scopes granted**: every required scope is in place.
+- **API credentials valid**: a test call to Shopify succeeds.
+
+See [Store details and readiness](/guides/shopify/store-details) for what each failure means and how to fix it.
+
+## Retry a failed entity
+
+When one entity (say, Orders) shows **Failed** but the rest are **Synced**, the cleanest fix is a per-entity retry.
+
+<Steps>
+<Step title="Open Sync settings">
+Use the store card menu to pick **Sync settings**.
+</Step>
+
+<Step title="Find the failed entity">
+The entity row in the **Sync status** section shows the **Failed** state and a **Retry** action.
+</Step>
+
+<Step title="Retry">
+Choose **Retry**. Spotzee re-attempts the sync for just that entity. Other entities keep their existing state.
+</Step>
+</Steps>
+
+Retry as many times as you need. Spotzee deduplicates by Shopify IDs, so repeated retries don't create duplicate customers, orders, or products.
+
+## Run a full re-sync
+
+A full re-sync re-runs the bulk import for every enabled entity. Use it when:
+
+- Multiple entities failed.
+- You suspect the data has drifted (after a connection issue, after toggling settings dramatically).
+- You changed sync settings and want them fully applied to historical records.
+
+<Steps>
+<Step title="Open Sync settings">
+Use the store card menu to pick **Sync settings**.
+</Step>
+
+<Step title="Choose Re-sync">
+Pick **Re-sync**. You'll see a "Sync rerun started" confirmation.
+</Step>
+
+<Step title="Wait for completion">
+The bulk import processes each enabled entity in turn. Time depends on store size. Watch the per-entity statuses to track progress.
+</Step>
+</Steps>
+
+Re-sync is safe to run repeatedly. Records match by Shopify ID, so existing customers, orders, and products are updated rather than duplicated.
+
+## Pause and resume
+
+To pause syncing without losing configuration, disconnect the store from the card menu. Status flips to **Disconnected**. To resume, reconnect.
+
+If you need to remove the integration entirely (with data deletion), use **Delete** instead of **Disconnect**. See [Disconnect, delete, reconnect](/guides/shopify/disconnect) for the differences.
+
+## Next steps
+
+<Columns cols={2}>
+<Card title="Store details" icon="store" href="/guides/shopify/store-details">
+The five-item readiness checklist and what each failure means.
+</Card>
+
+<Card title="Disconnect, delete, reconnect" icon="unplug" href="/guides/shopify/disconnect">
+The three actions, their outcomes, and when to use each.
+</Card>
+
+<Card title="Troubleshoot" icon="life-buoy" href="/guides/shopify/troubleshoot">
+Diagnose stuck syncs, missing data, and failed entities.
+</Card>
+
+<Card title="Sync settings" icon="settings" href="/guides/shopify/sync-settings">
+Toggle data categories on or off.
+</Card>
+</Columns>

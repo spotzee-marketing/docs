@@ -1,0 +1,92 @@
+---
+title: "Connect a Shopify store"
+description: "OAuth your Shopify store into Spotzee, connect more than one store, and understand what each store carries on its own."
+keywords: ["shopify", "connect", "oauth", "multi-store", "setup"]
+---
+
+Connecting takes about two minutes. Spotzee uses OAuth, so you don't share API keys or passwords with us. The Shopify side runs the standard install flow you already know.
+
+<Info>
+You'll need admin access to the Shopify store you're connecting. Have your `<store>.myshopify.com` domain handy.
+</Info>
+
+## Connect your first store
+
+<Steps>
+<Step title="Open the integration page">
+Inside the project, open **Integrations** and pick **Connect platform**.
+</Step>
+
+<Step title="Pick Shopify">
+Choose Shopify from the platform options. The **Connect Shopify store** drawer opens.
+</Step>
+
+<Step title="Enter your store domain">
+Type your store name into the **Store domain** field. Just the store name works (`mystore`); the `.myshopify.com` suffix is added automatically. The full domain (`mystore.myshopify.com`) works too.
+</Step>
+
+<Step title="Approve permissions on Shopify">
+Choose **Connect**. You're redirected to Shopify to review the permissions Spotzee is requesting. Review them, then choose **Install app** in Shopify.
+</Step>
+
+<Step title="Land back in Spotzee">
+On install, Shopify redirects you to Spotzee. The store appears as a connected integration. The **Sync settings** drawer pops open automatically so you can configure what flows in before any data moves.
+</Step>
+</Steps>
+
+## Connect another store
+
+The same flow connects each additional store. Run it once per Shopify store:
+
+<Steps>
+<Step title="Open the integration page again">
+Inside the project, open **Integrations** and pick **Connect platform** again.
+</Step>
+
+<Step title="Enter the new store's domain">
+Type the new store's domain. Different store; different OAuth.
+</Step>
+
+<Step title="Approve and configure">
+Approve on Shopify, then configure sync settings for the new store independently. Each store carries its own customer list, sync toggles, and status.
+</Step>
+</Steps>
+
+The **Integrations** page lists every connected store as a separate card.
+
+## How multi-store works
+
+Each connected Shopify store is independent. That means:
+
+- **Sync settings differ per store.** Store A can sync orders only; Store B can sync everything.
+- **Customer lists differ per store.** Each store gets its own dedicated Spotzee list, so customers from different stores stay separate.
+- **Statuses differ per store.** Store A might be Active while Store B is in Reconnect Required.
+- **Events differ per store.** A `shopify_order_placed` event carries the originating store identifier so journeys can branch on which store fired the event.
+
+## One project per store
+
+A Shopify store can only connect to one Spotzee project at a time. If you try to connect a store that's already linked to a different project, Spotzee blocks the new connection. Disconnect from the other project first, or pick a different store.
+
+## Reconnecting
+
+When the integration shows **Reconnect required** (amber badge), the OAuth grant has been revoked or the app's required scopes have changed. Open the store card menu and choose **Reconnect**. You're sent through the same install flow on Shopify; the existing sync settings, customer list, and history are preserved.
+
+## Next steps
+
+<Columns cols={2}>
+<Card title="Sync settings" icon="settings" href="/guides/shopify/sync-settings">
+Configure what flows in, what flows back, and which list new customers land on.
+</Card>
+
+<Card title="What gets synced" icon="arrow-down" href="/guides/shopify/data-from-shopify">
+The five categories of data flowing from Shopify into Spotzee.
+</Card>
+
+<Card title="Troubleshoot" icon="life-buoy" href="/guides/shopify/troubleshoot">
+OAuth and domain-validation errors during connection.
+</Card>
+
+<Card title="Shopify overview" icon="info" href="/guides/shopify/overview">
+What the integration does, end to end.
+</Card>
+</Columns>
