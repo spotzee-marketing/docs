@@ -40,7 +40,6 @@ The Extended API and Main API share one error envelope, served as `application/p
 | `401 Unauthorized` | Missing or invalid token | No `Authorization` header, expired key |
 | `403 Forbidden` | Authenticated but not allowed | Key scope insufficient |
 | `404 Not Found` | Resource or record not present | Domain has no DNS record of the requested type |
-| `408 Request Timeout` | Upstream lookup exceeded timeout | DNS or upstream provider slow — retry once |
 | `429 Too Many Requests` | Rate limited or quota exhausted | Honour `Retry-After`; check your remaining quota |
 | `500 Internal Server Error` | Unexpected platform error | Retry with backoff |
 | `503 Service Unavailable` | Temporary capacity issue | Retry with backoff |
@@ -58,7 +57,7 @@ The full code catalogue is shared with the Main API:
 | `quota_exceeded` | Credit-metered operation; insufficient balance. |
 | `rate_limited` | Token bucket exhausted; check `Retry-After`. |
 | `version_unsupported` / `version_required` | `Spotzee-Version` header value not a known release. |
-| `internal_error` | Unhandled — quote `request_id` in support tickets. |
+| `internal_error` | Unhandled. Quote `request_id` in support tickets. |
 
 ## Quota errors
 
@@ -66,5 +65,5 @@ Validation and AI-scoring endpoints are credit-metered. A `quota_exceeded` respo
 
 ## Retry guidance
 
-- **Lookups** (`GET`): retry on `5xx`, `408`, and `429` with exponential backoff.
+- **Lookups** (`GET`): retry on `5xx` and `429` with exponential backoff.
 - **SMS dispatch** (`POST`): include an `Idempotency-Key` to make retries safe. Do not retry `4xx`.
