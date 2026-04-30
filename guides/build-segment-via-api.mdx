@@ -4,10 +4,10 @@ description: "Define a dynamic membership rule programmatically so segments stay
 keywords: ["segments", "lists", "dynamic", "rules", "api", "membership", "filter"]
 ---
 
-Most segments are best authored in the Spotzee UI — operators iterate quickly, preview membership, and version their work. Use the API when the rules themselves are derived from your code or config: a generated cohort per pricing plan, a per-region segment driven by a feature-flag rollout, or a backfill that needs to recreate dozens of segments at once.
+Most segments are best authored in the Spotzee UI. Operators iterate quickly, preview membership, and version their work. Use the API when the rules themselves are derived from your code or config: a generated cohort per pricing plan, a per-region segment driven by a feature-flag rollout, or a backfill that needs to recreate dozens of segments at once.
 
 <Info>
-  Today the API exposes segments as **dynamic lists**. There is no separate `/segments` endpoint — a segment is a list with `type: "dynamic"` and a rule tree. Static lists (explicit member add/remove) use the same endpoints with `type: "static"`.
+  Today the API exposes segments as **dynamic lists**. There is no separate `/segments` endpoint. A segment is a list with `type: "dynamic"` and a rule tree. Static lists (explicit member add/remove) use the same endpoints with `type: "static"`.
 </Info>
 
 ## What you'll build
@@ -24,9 +24,9 @@ You'll need a `sk_` project key with write access. See [Authentication](/guides/
   <Step title="Decide what membership means">
     A segment is a boolean rule that yields true or false for any user. Common shapes:
 
-    - **Attribute filter** — `data.plan = "professional"`
-    - **Behavioural filter** — users who triggered `order_placed` in the last 30 days
-    - **Combined** — `plan = "professional"` AND triggered `order_placed` in the last 30 days
+    - **Attribute filter**: `data.plan = "professional"`
+    - **Behavioural filter**: users who triggered `order_placed` in the last 30 days
+    - **Combined**: `plan = "professional"` AND triggered `order_placed` in the last 30 days
 
     Sketch the rule as plain language first; the JSON shape follows from there.
   </Step>
@@ -37,14 +37,14 @@ You'll need a `sk_` project key with write access. See [Authentication](/guides/
 
     | Field | Notes |
     |---|---|
-    | `uuid` | Stable client-supplied UUID — preserved across edits. Generate one per node. |
+    | `uuid` | Stable client-supplied UUID, preserved across edits. Generate one per node. |
     | `type` | `wrapper` for groups; `string` / `number` / `boolean` / `date` / `array` for leaves. |
     | `group` | `user` (compare against the user) or `event` (compare against an event). Use `parent` to inherit. |
     | `path` | Dotted path on the user or event payload (e.g. `data.plan`, `name`). Empty on wrappers. |
     | `operator` | `=`, `!=`, `<`, `<=`, `>`, `>=`, `and`, `or`, etc. |
     | `value` | Leaf comparison value. Omitted on wrappers. |
     | `frequency` | Optional event-frequency window: `{ period, operator, count }`. |
-    | `children` | Array of child nodes — present on wrappers. |
+    | `children` | Array of child nodes (present on wrappers). |
 
     Example: users on the Pro plan who triggered `order_placed` at least once in the last 30 days.
 
@@ -97,13 +97,13 @@ You'll need a `sk_` project key with write access. See [Authentication](/guides/
     }
     ```
 
-    The response includes the list `id`. Save it — that's how you'll reference the segment from journeys, campaigns, and member-listing endpoints.
+    The response includes the list `id`. Save it. That's how you'll reference the segment from journeys, campaigns, and member-listing endpoints.
   </Step>
   <Step title="Verify membership">
-    Members are computed asynchronously — give Spotzee a moment after creation. The current public API does not expose a "members of a list" endpoint; verify the list resolved as expected by inspecting it in the Spotzee UI, or by issuing a representative `GET /users?q=…` query that exercises the same attributes the rule depends on.
+    Members are computed asynchronously, so give Spotzee a moment after creation. The current public API does not expose a "members of a list" endpoint. Verify the list resolved as expected by inspecting it in the Spotzee UI, or by issuing a representative `GET /users?q=…` query that exercises the same attributes the rule depends on.
   </Step>
   <Step title="Update the rule">
-    `PATCH /lists/{listId}` with a new `rule` block. Spotzee re-computes membership in the background. Existing members are reconciled — those who still match stay, those who don't drop out.
+    `PATCH /lists/{listId}` with a new `rule` block. Spotzee re-computes membership in the background. Existing members are reconciled: those who still match stay, those who don't drop out.
   </Step>
 </Steps>
 
@@ -118,8 +118,8 @@ You'll need a `sk_` project key with write access. See [Authentication](/guides/
 
 ## Reference
 
-- API surface — see [Main API → Lists](/main-api/introduction)
-- Rule node schema — see **RuleNode** in the [API reference](/main-api/introduction)
-- Sync users first — see [Sync users from your CRM](/guides/sync-users)
-- Pagination — see [Pagination](/guides/api-pagination)
-- Conceptual overview — see [Segments](/guides/segments)
+- API surface: see [Main API → Lists](/main-api/introduction)
+- Rule node schema: see **RuleNode** in the [API reference](/main-api/introduction)
+- Sync users first: see [Sync users from your CRM](/guides/sync-users)
+- Pagination: see [Pagination](/guides/api-pagination)
+- Conceptual overview: see [Segments](/guides/segments)
