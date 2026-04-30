@@ -4,11 +4,15 @@ description: "HTTP status codes, error body shape, and the full code catalogue f
 keywords: ["errors", "http status", "error codes", "rfc 7807", "problem details", "request id"]
 ---
 
-The Main API returns standard HTTP status codes and a structured error body for every non-2xx response. The target body shape is the [RFC 7807 Problem Details](https://www.rfc-editor.org/rfc/rfc7807) envelope with a few Spotzee-specific extensions.
+The Main API returns standard HTTP status codes and a structured error body for every non-2xx response. The body is the [RFC 7807 Problem Details](https://www.rfc-editor.org/rfc/rfc7807) envelope with a few Spotzee-specific extensions, served with `Content-Type: application/problem+json`.
 
 <Note>
-  The RFC 7807 envelope and `application/problem+json` content type are rolling out on the Main API. Today, edge rate-limit `429` responses use the canonical envelope; other 4xx and 5xx responses use the legacy JSON shape until the rollout completes. The Extended API ships the canonical envelope on every error today.
+  The canonical envelope is live for every error on `apix.spotzee.com/api/client/*`, `apix.spotzee.com/api/admin/*`, and the Extended API. Edge rate-limit `429` responses also use this envelope. Build your client around the string `code` field — it's the stable, machine-readable identifier.
 </Note>
+
+<Warning>
+  **Numeric `code` values are deprecated.** Earlier releases occasionally returned numeric values like `1007`, `6000`, or `9000` in the `code` field. Those came from legacy internal catalogues and were never part of the public contract. Never switch on them. The current API returns only the string codes from the catalogue below; if you ever see a numeric `code`, treat it as an unrecognised error and key off the HTTP status instead.
+</Warning>
 
 ## Error body shape
 
