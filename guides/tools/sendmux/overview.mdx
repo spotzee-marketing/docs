@@ -1,0 +1,124 @@
+---
+title: "Sendmux integration"
+description: "Connect your Sendmux account to Spotzee, view delivery metrics and provider stats inside the app, and disconnect when you no longer need the link."
+keywords: ["sendmux", "email-proxy", "delivery", "integration", "metrics"]
+---
+
+The Sendmux integration is a read-only window into your Sendmux account from inside Spotzee. Connect once with an API key and the Spotzee **Email Proxy** Tool surfaces your Sendmux delivery metrics, provider stats, billing summary, and delivery logs without leaving the project.
+
+<Info>
+This integration is **read-only**. Provider configuration, routing rules, quotas, sending domains, and all account-level Sendmux setup live on `https://docs.sendmux.ai` and are managed from the Sendmux dashboard. Spotzee shows what's there; it doesn't configure it.
+</Info>
+
+## What you can see in Spotzee
+
+Once connected, the **Email Proxy** Tool inside your project has two tabs:
+
+- **Overview**: delivery metrics over a window you pick, provider statistics, billing balance, and a spend summary.
+- **Logs**: per-message delivery logs with filtering by status, date, and provider. See [Sendmux delivery logs](/guides/tools/sendmux/logs).
+
+What you can do **only on Sendmux.ai** (not in Spotzee):
+
+- Add or remove SMTP, Gmail, or Microsoft 365 providers.
+- Configure provider quotas, routing rules, and traffic distribution.
+- Manage sending domains, tracking domains, and DKIM.
+- Run test sends, import providers via CSV, and configure groups.
+
+For all of those, follow the link from the Spotzee Tool to your Sendmux dashboard.
+
+## Before you connect
+
+You'll need:
+
+- A **Sendmux account** at [sendmux.ai](https://sendmux.ai) with at least one provider configured.
+- A **Sendmux API key** that starts with `smx_root_`. Generate one in the Sendmux dashboard under your account's API settings.
+- The Spotzee project `admin` role.
+
+## Connect Sendmux
+
+<Steps>
+<Step title="Open the Email Proxy Tool">
+Inside the project, open **Tools** and pick **Email Proxy (Sendmux.ai)**. If no API key is configured, you'll land on a setup screen.
+</Step>
+
+<Step title="Paste your Sendmux API key">
+Paste the API key that starts with `smx_root_` into the field and submit.
+</Step>
+
+<Step title="Validate">
+Spotzee validates the key against Sendmux. On success, the Tool refreshes and the Overview tab populates with your account data.
+</Step>
+</Steps>
+
+If validation fails, the key was rejected. Common causes: wrong key copied (must start with `smx_root_`), key revoked in the Sendmux dashboard, or insufficient permissions on the key. Generate a fresh key and try again.
+
+## What the Overview tab shows
+
+| Section | What you see |
+|---|---|
+| **Email metrics** | Sent, delivered, bounced, complained counts over a window (last 24h, 7 days, 30 days, or custom range). With period-over-period change indicators. |
+| **Provider stats** | Per-provider activity: messages sent, success rate, last-seen activity, current status. |
+| **Billing balance** | Your Sendmux account's current credit balance. |
+| **Billing summary** | Spend over the past N days. |
+
+The data refreshes when you reload the page. There's also a manual refresh action on each section if you want to pull the latest values without a full page reload.
+
+## Filter by provider
+
+The Overview tab has a provider filter that scopes metrics to a single Sendmux provider. Useful when you want to compare two SMTP servers, or look at just your Gmail-routed traffic.
+
+The full list of providers comes from your Sendmux account; Spotzee doesn't manage providers itself.
+
+## Disconnect
+
+Removing the API key disconnects the integration. Spotzee stops calling Sendmux and the Tool surface returns to the setup screen.
+
+<Steps>
+<Step title="Open the Email Proxy Tool">
+Open **Tools** and pick **Email Proxy (Sendmux.ai)**.
+</Step>
+
+<Step title="Disconnect">
+Use the disconnect action on the Overview tab. Confirm at the prompt.
+</Step>
+</Steps>
+
+Disconnecting only removes the API key reference inside Spotzee. Your Sendmux account and providers are untouched on the Sendmux side. Reconnect any time by pasting the key back in.
+
+## Rotating the API key
+
+Two-step swap, like any credential rotation:
+
+<Steps>
+<Step title="Issue a new Sendmux API key">
+On the Sendmux dashboard, generate a new `smx_root_` key.
+</Step>
+
+<Step title="Update Spotzee">
+In the Email Proxy Tool, paste the new key. Spotzee validates and starts using it immediately.
+</Step>
+
+<Step title="Revoke the old key">
+On Sendmux, revoke the old key once Spotzee is using the new one.
+</Step>
+</Steps>
+
+## Next steps
+
+<Columns cols={2}>
+<Card title="Sendmux delivery logs" icon="list" href="/guides/tools/sendmux/logs">
+Read per-message logs pulled from your Sendmux account.
+</Card>
+
+<Card title="Sendmux documentation" icon="external-link" href="https://docs.sendmux.ai">
+Provider setup, routing, sending domains, and account configuration.
+</Card>
+
+<Card title="Set up email delivery" icon="mail" href="/guides/configure-email-delivery">
+Connect Spotzee directly to SMTP, SendGrid, Mailgun, or Amazon SES.
+</Card>
+
+<Card title="Provider catalogue" icon="plug" href="/guides/providers">
+The full list of email, SMS, push, webhook, and in-app providers.
+</Card>
+</Columns>

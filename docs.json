@@ -104,6 +104,18 @@
             ]
           },
           {
+            "group": "Tools",
+            "pages": [
+              {
+                "group": "Sendmux integration",
+                "pages": [
+                  "guides/tools/sendmux/overview",
+                  "guides/tools/sendmux/logs"
+                ]
+              }
+            ]
+          },
+          {
             "group": "API conventions",
             "pages": [
               "guides/api-versioning",

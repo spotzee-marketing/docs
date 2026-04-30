@@ -1,0 +1,78 @@
+---
+title: "Sendmux delivery logs"
+description: "Read per-message delivery logs pulled from your Sendmux account, filter by status and date, and inspect a single message's full delivery detail."
+keywords: ["sendmux", "logs", "delivery", "monitoring", "debugging"]
+---
+
+The **Logs** tab inside the Spotzee Email Proxy Tool surfaces per-message delivery logs from your Sendmux account. Useful for debugging individual sends, spot-checking delivery success, or auditing what got sent and when.
+
+<Info>
+Logs are pulled live from Sendmux. You're seeing the same data Sendmux's own dashboard shows; Spotzee just displays it without leaving the project. The integration must be connected (see [Sendmux integration](/guides/tools/sendmux/overview)).
+</Info>
+
+## What you see
+
+Each row in the logs view carries:
+
+- **Message ID** (Sendmux-issued identifier).
+- **Status** (delivered, bounced, complained, queued, failed).
+- **Recipient** (the destination email address).
+- **Provider** (which Sendmux-configured provider routed this send).
+- **Sent at** (timestamp).
+- **Subject** (where available).
+
+Logs are paginated using cursor-based pagination from Sendmux. Pulling additional pages doesn't drop earlier rows; they stay until you change filters or reload.
+
+## Filter the list
+
+The Logs tab supports four filters that narrow the result set:
+
+| Filter | What it does |
+|---|---|
+| **Status** | Show only logs in a specific delivery status |
+| **Date range** | Show logs sent within a window (last 24h, 7 days, 30 days, custom) |
+| **Provider** | Scope to a single Sendmux provider |
+| **Search** | Free-text search across recipient, subject, and message ID |
+
+Filters compose with AND. For example: status `bounced` plus date `last 7 days` plus provider `mailgun-prod` returns only bounced messages over the past week routed through that provider.
+
+## Inspect a single log
+
+Pick a row to open the message detail view. The detail surface shows everything Sendmux records for that send:
+
+- **Full status history** with timestamps for each delivery state transition (queued, sent, delivered, bounced).
+- **Provider response** including SMTP transaction codes and any error message returned by the recipient mail server.
+- **Sender and recipient details**.
+- **Subject and any custom headers** carried with the send.
+- **Tracking events** if the send had open or click tracking enabled (for Sendmux providers that support it).
+
+This is the level of detail you need when diagnosing a specific delivery problem (single recipient bouncing repeatedly, a provider rejecting a particular sender pattern, headers not being forwarded as expected).
+
+## Common debugging patterns
+
+A few flows that come up often:
+
+- **A specific recipient isn't getting email.** Filter by recipient via the search field. Check the status column for repeat bounces or complaints.
+- **A provider is failing more than usual.** Filter by provider, status `bounced` or `failed`, last 24 hours. Open a few logs to see the provider response messages.
+- **Audit what was sent during an incident window.** Set a custom date range covering the incident. Export or page through to confirm.
+- **Check a single send.** If you have the Sendmux message ID, search for it directly.
+
+## Next steps
+
+<Columns cols={2}>
+<Card title="Sendmux integration" icon="link" href="/guides/tools/sendmux/overview">
+Connect Sendmux and see the Overview tab.
+</Card>
+
+<Card title="Sendmux documentation" icon="external-link" href="https://docs.sendmux.ai">
+Configure providers, routing, and account-level settings.
+</Card>
+
+<Card title="Set up email delivery" icon="mail" href="/guides/configure-email-delivery">
+Connect Spotzee directly to SMTP, SendGrid, Mailgun, or Amazon SES.
+</Card>
+
+<Card title="Provider catalogue" icon="plug" href="/guides/providers">
+The full list of email, SMS, push, webhook, and in-app providers.
+</Card>
+</Columns>
