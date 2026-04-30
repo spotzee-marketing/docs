@@ -1,0 +1,144 @@
+---
+title: "Set up sending domains"
+description: "Add custom tracking and sending domains to your project, verify their DNS records, and brand link-wrapping and email under your own domains."
+keywords: ["domains", "dkim", "tracking", "sending", "dns", "custom-domain", "deliverability"]
+---
+
+Custom domains move tracking and sending off Spotzee's shared domains and onto your own. Tracking domains brand the URLs in your emails and push notifications. Sending domains brand the From address. Both improve deliverability and reduce the risk of being lumped in with someone else's reputation.
+
+<Info>
+Domain configuration lives under **Settings** → **Domains** and requires the project `admin` role. You'll need DNS access to the parent domain to add the records Spotzee asks for.
+</Info>
+
+## Two kinds of domain
+
+Spotzee distinguishes two domain types. The DNS setup differs.
+
+| Type | What it does | Records you'll add |
+|---|---|---|
+| **Tracking** | Hosts the wrapped links Spotzee inserts into emails and push notifications, so click-throughs go through your domain | One `CNAME` record |
+| **Sending** | The domain your email From address lives on, with DKIM authentication | DKIM record set (typically `CNAME` records or a `TXT` record) |
+
+You can run both on the same parent domain or split them. Common patterns:
+
+- `go.example.com` (tracking) plus `mail.example.com` (sending).
+- `t.example.com` (tracking) plus `example.com` (sending, root domain).
+- One agency-style sub-domain per project for white-label work.
+
+## Add a tracking domain
+
+<Steps>
+<Step title="Open Settings → Domains">
+Inside the project, open **Settings** and pick the **Domains** tab.
+</Step>
+
+<Step title="Add a tracking domain">
+Choose **Add domain**, enter the hostname you want to use (for example, `go.example.com`), and pick **Tracking** as the type. Save.
+</Step>
+
+<Step title="Add the CNAME at your DNS provider">
+Spotzee shows the **CNAME value** for the domain. Add a `CNAME` record at your DNS provider where:
+
+- **Name**: the subdomain you chose (`go`).
+- **Type**: `CNAME`.
+- **Target**: the value Spotzee displayed.
+- **TTL**: 300 or your provider's default.
+</Step>
+
+<Step title="Verify">
+Back in Spotzee, choose **Verify** on the domain. Spotzee checks the CNAME and provisions the SSL certificate. The status moves from **Pending** to **Verified** once both the DNS record and SSL are ready. SSL provisioning can take a few minutes.
+</Step>
+
+<Step title="Enable the domain">
+Once verified, enable the domain. Spotzee starts using it for new sends immediately. Existing wrapped links keep working through the previous tracking domain until they expire.
+</Step>
+</Steps>
+
+## Add a sending domain
+
+Sending domains use a richer DNS setup because email authentication needs DKIM at minimum, and SPF and DMARC for full coverage.
+
+<Steps>
+<Step title="Add a sending domain">
+In **Settings** → **Domains**, choose **Add domain**, enter the sending hostname (for example, `mail.example.com`), and pick **Sending** as the type. Save.
+</Step>
+
+<Step title="Add the DNS records Spotzee shows you">
+The domain row exposes a **DNS records** view. You'll see a set of records to add at your DNS provider, typically:
+
+- One or more `CNAME` records for **DKIM** that delegate signing keys to Spotzee.
+- An optional `TXT` record contribution for **SPF** if your parent domain doesn't yet authorise our infrastructure.
+- A recommended `TXT` record for **DMARC** policy.
+
+Add each record at your DNS provider exactly as shown.
+</Step>
+
+<Step title="Verify">
+Back in Spotzee, run **Verify** on the domain. Verification checks each DNS record and reports per-record status. Re-run after fixing any failed records; DNS propagation can take a few minutes.
+</Step>
+
+<Step title="Enable the domain">
+Once verified, enable the domain. Email templates can now use From addresses on this domain (for example, `hello@mail.example.com`). DKIM signing happens automatically.
+</Step>
+</Steps>
+
+## Verification statuses
+
+Each domain carries an overall status and an SSL status (tracking domains only).
+
+| Status | Meaning |
+|---|---|
+| **Pending** | DNS not yet detected, or detected but SSL still provisioning. |
+| **Verified** | DNS records match what Spotzee expects, and SSL is active for tracking domains. |
+| **Error** | One or more DNS records failed verification. The status reason explains which. |
+| **Inactive** | Domain disabled by an admin. Disabled domains aren't used for new sends. |
+
+Spotzee re-checks verified domains periodically. If a record disappears or changes, the status drops to **Error** and you'll see a notification.
+
+## Bulk import for many domains
+
+Agencies and white-label operators often manage dozens of domains. CD15 added a bulk CSV flow for adding many at once.
+
+<Steps>
+<Step title="Download the CSV template">
+In **Settings** → **Domains**, the bulk import action gives you a CSV template with the columns Spotzee expects.
+</Step>
+
+<Step title="Fill the CSV">
+Add one row per domain with the hostname, type (`tracking` or `sending`), and any optional metadata.
+</Step>
+
+<Step title="Upload">
+Upload the CSV. Spotzee creates each domain as **Pending** and reports per-row status. Failed rows surface error reasons so you can fix and re-upload just the problem rows.
+</Step>
+
+<Step title="Verify in batch">
+Use the bulk **Verify all** action once your DNS is in place. Spotzee runs verification jobs in parallel and reports each domain's outcome.
+</Step>
+</Steps>
+
+## Disable or remove a domain
+
+Disabling a domain stops new sends from using it but preserves the configuration so you can re-enable later. Removing a domain deletes the configuration. Once removed, links wrapped through that domain stop resolving and any email sent from it will be rejected by recipient mail servers.
+
+Disable rather than remove unless you're sure no historical campaigns will send again, and any tracking links wrapped through the domain have already expired or moved to a replacement.
+
+## Next steps
+
+<Columns cols={2}>
+<Card title="Set up email delivery" icon="mail" href="/guides/configure-email-delivery">
+Connect SMTP, SendGrid, Mailgun, or Amazon SES.
+</Card>
+
+<Card title="Set up a project" icon="folder-plus" href="/guides/setup-project">
+Toggle email and push link wrapping on or off.
+</Card>
+
+<Card title="Provider catalogue" icon="plug" href="/guides/providers">
+See which providers handle each channel type.
+</Card>
+
+<Card title="Build templates" icon="file-text" href="/guides/templates">
+Use the new sending domain in your email From address.
+</Card>
+</Columns>
