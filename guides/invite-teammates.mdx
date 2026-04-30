@@ -1,0 +1,127 @@
+---
+title: "Invite teammates and assign roles"
+description: "Invite team members to your Spotzee organisation, then assign organisation and project roles that match their day-to-day work."
+keywords: ["team", "roles", "invitations", "admins", "permissions", "members"]
+---
+
+Bringing your team into Spotzee takes two role decisions. One at the organisation level (billing, projects, team management). One per project (campaigns, journeys, settings). Pick deliberately. Spotzee defaults to least-privilege.
+
+<Info>
+Inviting at the organisation level requires the **Owner** or **Admin** organisation role. Adding someone to a specific project requires the project `admin` role (organisation owners and admins receive it automatically on every project).
+</Info>
+
+## The two role hierarchies
+
+Spotzee keeps organisation roles and project roles separate. Both apply at the same time. A teammate's project role governs their day-to-day work; their organisation role governs cross-project concerns like billing.
+
+<Tabs>
+<Tab title="Organisation roles">
+
+Three roles, narrowest to broadest:
+
+| Role | What they can do |
+|---|---|
+| `member` | Access only the projects they've been added to. No organisation settings, no billing. |
+| `admin` | Everything `member` can do, plus invite teammates, view billing, create projects. Auto-receives project `admin` on every project. |
+| `owner` | Full control. Edit organisation settings, delete the organisation, full billing access. |
+
+Hierarchy: `member` < `admin` < `owner`.
+
+</Tab>
+<Tab title="Project roles">
+
+Five roles, narrowest to broadest:
+
+| Role | Best for | Notable scope |
+|---|---|---|
+| `support` | Customer-support staff who need to read user data | Read-only across users, journeys, lists, custom domains |
+| `smtpproxy` | Service accounts running an SMTP-proxy workflow | Narrow set tied to that workflow only |
+| `editor` | Day-to-day operators building campaigns and journeys | Create and edit campaigns, journeys, lists, templates; access tools |
+| `publisher` | Operators trusted to push journeys live | Everything `editor` can, plus publish a journey to start sending |
+| `admin` | Project leads who configure providers and team | Everything `publisher` can, plus project settings, providers, custom domains, webhook endpoints, project team |
+
+Hierarchy: `support` < `smtpproxy` < `editor` < `publisher` < `admin`.
+
+The **Settings** tab inside a project is admin-only. Tabs like Team, Integrations, API Keys, Domains, Webhook Endpoints all gate at `admin`.
+
+</Tab>
+</Tabs>
+
+## Invite someone to your organisation
+
+Use this for someone who isn't yet in your organisation. They'll get an email with a sign-up link.
+
+<Steps>
+<Step title="Open the Admins page">
+From the organisation menu, open **Admins**.
+</Step>
+
+<Step title="Start an invitation">
+Choose **Add admin**, then fill in the form:
+- **Email address** (required).
+- **First name** and **Last name** if you want them pre-filled on the new account.
+- **Role**. Pick `member`, `admin`, or `owner` based on the hierarchy above.
+</Step>
+
+<Step title="Send the invitation">
+Submit the form. The invitation lands in **Pending Invitations**. The invitee receives an email with a sign-up link. Once they accept, they move from **Pending Invitations** into the main **Admins** list.
+</Step>
+</Steps>
+
+<Note>
+Cancel a pending invitation any time from the **Pending Invitations** section before the invitee accepts.
+</Note>
+
+## Add someone to a project
+
+Use this when the person is already in your organisation as a `member` but needs access to a specific project. Owners and admins are added to every project automatically and don't need this step.
+
+<Steps>
+<Step title="Open the project Team tab">
+Inside the project, open **Settings** and pick the **Team** tab.
+</Step>
+
+<Step title="Add a team member">
+Add a team member, then enter their email address and pick a project role from `support`, `smtpproxy`, `editor`, `publisher`, or `admin`.
+</Step>
+
+<Step title="Confirm">
+Confirm. They appear in the project team list with the role you assigned. Their organisation role stays as it was.
+</Step>
+</Steps>
+
+## Change or remove access
+
+Open the relevant team list. **Admins** at the organisation level for organisation access. **Settings** then **Team** inside a project for project access. Use the row's overflow action to:
+
+- **Edit** their role. New permissions take effect on their next request.
+- **Remove** them. Removal at organisation level cascades across every project. Removal at project level affects that project only.
+
+## Picking the right role
+
+A few rules of thumb:
+
+- Reserve `owner` for billing-responsible staff. The role can delete the organisation.
+- Grant organisation `admin` only to people who actively need to invite teammates or manage billing. Day-to-day operators don't need it.
+- For project work, default to `editor`. Promote to `publisher` only for those you trust to push journeys live. Reserve project `admin` for people who configure providers, custom domains, and the project team.
+- `support` is the safest read-only level for customer-support staff. Use it when the alternative is over-granting `editor`.
+
+## Next steps
+
+<Columns cols={2}>
+<Card title="Set up a project" icon="folder-plus" href="/guides/setup-project">
+Configure project defaults: locale, timezone, tracking.
+</Card>
+
+<Card title="Concepts" icon="book-open" href="/guides/concepts">
+Brush up on Users, Journeys, Segments, Channels, and Providers.
+</Card>
+
+<Card title="Quickstart" icon="rocket" href="/guides/quickstart">
+Send your first campaign in ten minutes.
+</Card>
+
+<Card title="Authentication" icon="key" href="/guides/authentication">
+Read the API-key model before issuing your first key.
+</Card>
+</Columns>
