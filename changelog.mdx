@@ -1,12 +1,12 @@
 ---
 title: "Changelog"
-description: "Per-version changes to the Spotzee API — additions, deprecations, and removals."
+description: "Per-version changes to the Spotzee API: additions, deprecations, and removals."
 keywords: ["changelog", "release notes", "versions", "api", "breaking changes", "deprecations"]
 ---
 
-The Spotzee API uses date-based versions. Pin a version with the `Spotzee-Version` request header — see [API versioning](/guides/api-versioning) for the full pinning model.
+The Spotzee API uses date-based versions. Pin a version with the `Spotzee-Version` request header. See [API versioning](/guides/api-versioning) for the full pinning model.
 
-## Tooling — 2026-04-29 (afternoon)
+## Tooling, 2026-04-29 (afternoon)
 
 ### Extended API consolidated onto `apix.spotzee.com`
 
@@ -24,11 +24,11 @@ This is a hard cutover with no overlap. Update your integrations.
 
 The Extended API now ships the same wire-level conventions as the Main API:
 
-- **`Spotzee-Version` header** — required to be either `2026-04-28` or omitted (server defaults to current). Echoed on every response.
-- **`X-Request-Id` header** — Stripe-style `req_<id>` on every response. Globally unique per request. Quote it in support tickets.
-- **`application/problem+json`** — error responses now use the RFC 7807 media type.
-- **OpenAPI 3.1** — the published spec is now OpenAPI 3.1.0 (was 3.0.0).
-- **Canonical error envelope** — `{status, code, title, message, error, type, request_id}` matches the Main API exactly. The legacy `error` field is kept as the canonical envelope's optional mirror until a future major version.
+- **`Spotzee-Version` header**: required to be either `2026-04-28` or omitted (server defaults to current). Echoed on every response.
+- **`X-Request-Id` header**: Stripe-style `req_<id>` on every response. Globally unique per request. Quote it in support tickets.
+- **`application/problem+json`**: error responses now use the RFC 7807 media type.
+- **OpenAPI 3.1**: the published spec is now OpenAPI 3.1.0 (was 3.0.0).
+- **Canonical error envelope**: `{status, code, title, message, error, type, request_id}` matches the Main API exactly. The legacy `error` field is kept as the canonical envelope's optional mirror until a future major version.
 
 ## 2026-04-28
 
@@ -41,39 +41,39 @@ The first publicly-versioned release of the Spotzee API.
 
 ### New conventions
 
-- **Versioning** — `Spotzee-Version` request header (date-based). Echoed back on every response.
-- **Idempotency** — `Idempotency-Key` header on `POST` and `PATCH`. 24-hour TTL, scoped per API key. Same key + same body returns the cached response; same key + different body returns `409 idempotency_key_mismatch`.
-- **Rate limits** — per-key sliding window, separate read and write buckets, generous tiers for MCP and agent workloads (`x-spotzee-client-type: mcp` doubles the base limit).
-- **Errors** — RFC 7807 `application/problem+json` envelope with stable string `code`, `title`, `message`, `request_id`, optional `param` and `errors[]` for per-field validation breakdowns.
-- **Correlation** — every response carries an `X-Request-Id` header (Stripe-style `req_<ULID>`). Quote it in support tickets.
+- **Versioning**: `Spotzee-Version` request header (date-based). Echoed back on every response.
+- **Idempotency**: `Idempotency-Key` header on `POST` and `PATCH`. 24-hour TTL, scoped per API key. Same key + same body returns the cached response; same key + different body returns `409 idempotency_key_mismatch`.
+- **Rate limits**: per-key sliding window, separate read and write buckets, generous tiers for MCP and agent workloads (`x-spotzee-client-type: mcp` doubles the base limit).
+- **Errors**: RFC 7807 `application/problem+json` envelope with stable string `code`, `title`, `message`, `request_id`, optional `param` and `errors[]` for per-field validation breakdowns.
+- **Correlation**: every response carries an `X-Request-Id` header (Stripe-style `req_<ULID>`). Quote it in support tickets.
 
 ### New endpoints
 
 Public surface for the first time:
 
-- **Users** — list, get, upsert (single + batch up to 100), delete. Public name is **User**.
-- **Lists** — full CRUD. Static and dynamic flavours; dynamic lists are how you express segments via the API.
-- **Subscriptions** — opt-in management per channel.
-- **Templates** — multi-channel template management with preview and proof endpoints.
-- **Campaigns** — full CRUD plus duplicate, preview, and trigger.
-- **Journeys** — full CRUD plus trigger. Live status required for entrances.
-- **Tags** — full CRUD.
-- **Events** — single + batch ingestion (up to 100 events per call), publishable-key-allowlisted for browser use.
-- **Project API keys** — manage your own `sk_` and `pk_` keys.
-- **Organisation API keys** — manage `ok_` keys (admin role required).
-- **Webhook endpoints** — manage outgoing webhook subscriptions and signing secrets.
+- **Users**: list, get, upsert (single + batch up to 100), delete. Public name is **User**.
+- **Lists**: full CRUD. Static and dynamic flavours; dynamic lists are how you express segments via the API.
+- **Subscriptions**: opt-in management per channel.
+- **Templates**: multi-channel template management with preview and proof endpoints.
+- **Campaigns**: full CRUD plus duplicate, preview, and trigger.
+- **Journeys**: full CRUD plus trigger. Live status required for entrances.
+- **Tags**: full CRUD.
+- **Events**: single + batch ingestion (up to 100 events per call), publishable-key-allowlisted for browser use.
+- **Project API keys**: manage your own `sk_` and `pk_` keys.
+- **Organisation API keys**: manage `ok_` keys (admin role required).
+- **Webhook endpoints**: manage outgoing webhook subscriptions and signing secrets.
 
 ### Migration notes
 
 This is the first dated release, so there's nothing to migrate from.
 
-## Tooling — 2026-04-29
+## Tooling, 2026-04-29
 
 These don't change the API surface but are worth knowing about if you're building against the spec.
 
 ### Typed JavaScript SDK
 
-The `@spotzee/js-sdk` package now ships a fully typed client generated from the live OpenAPI 3.1 spec at the `/generated` subpath. Every operation is exposed as a typed function with inputs, outputs, and the full RFC 7807 error envelope. The hand-written `Client` / `BrowserClient` / `Spotzee` classes for browser tracking are unchanged — the typed surface is purely additive.
+The `@spotzee/js-sdk` package now ships a fully typed client generated from the live OpenAPI 3.1 spec at the `/generated` subpath. Every operation is exposed as a typed function with inputs, outputs, and the full RFC 7807 error envelope. The hand-written `Client` / `BrowserClient` / `Spotzee` classes for browser tracking are unchanged. The typed surface is purely additive.
 
 ```ts
 import { Spotzee, client } from '@spotzee/js-sdk/generated'
