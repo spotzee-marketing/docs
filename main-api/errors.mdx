@@ -4,7 +4,11 @@ description: "HTTP status codes, error body shape, and the full code catalogue f
 keywords: ["errors", "http status", "error codes", "rfc 7807", "problem details", "request id"]
 ---
 
-The Main API returns standard HTTP status codes and a structured error body for every non-2xx response. The body follows the [RFC 7807 Problem Details](https://www.rfc-editor.org/rfc/rfc7807) shape with a few Spotzee-specific extensions.
+The Main API returns standard HTTP status codes and a structured error body for every non-2xx response. The target body shape is the [RFC 7807 Problem Details](https://www.rfc-editor.org/rfc/rfc7807) envelope with a few Spotzee-specific extensions.
+
+<Note>
+  The RFC 7807 envelope and `application/problem+json` content type are rolling out on the Main API. Today, edge rate-limit `429` responses use the canonical envelope; other 4xx and 5xx responses use the legacy JSON shape until the rollout completes. The Extended API ships the canonical envelope on every error today.
+</Note>
 
 ## Error body shape
 
@@ -21,18 +25,18 @@ The Main API returns standard HTTP status codes and a structured error body for 
 }
 ```
 
-Error responses set `Content-Type: application/problem+json`.
+Once the rollout completes, error responses set `Content-Type: application/problem+json`.
 
 | Field | Type | Description |
 |---|---|---|
 | `status` | string | Always `"error"` for non-2xx responses |
 | `code` | string | Stable, machine-readable identifier from the catalogue below |
-| `title` | string | RFC 7807 short title — same for every response with this `code` |
+| `title` | string | RFC 7807 short title. Same for every response with this `code`. |
 | `message` | string | Human-readable explanation, may include identifiers; safe to display in logs |
 | `type` | string | URL of the docs entry for this `code` |
 | `request_id` | string | Per-request correlation id (also returned as the `X-Request-Id` response header) |
-| `param` | string | Optional — names the offending parameter (e.g. `id`, `Spotzee-Version`) |
-| `errors` | array | Optional — per-field validation breakdown when multiple fields are invalid |
+| `param` | string | Optional. Names the offending parameter (e.g. `id`, `Spotzee-Version`). |
+| `errors` | array | Optional. Per-field validation breakdown when multiple fields are invalid. |
 
 ### Per-field errors
 
@@ -70,7 +74,7 @@ When `code` is `validation_failed`, the `errors` array lists every offending fie
 
 ## Code catalogue
 
-The `code` field is stable and documented. Add new codes to your switch statement only when you need to handle them differently — the catalogue is additive.
+The `code` field is stable and documented. Add new codes to your switch statement only when you need to handle them differently. The catalogue is additive.
 
 | `code` | HTTP | Meaning |
 |---|---|---|
@@ -85,13 +89,13 @@ The `code` field is stable and documented. Add new codes to your switch statemen
 | `permission_denied` | `403` | Credential lacks the role for this resource |
 | `idempotency_key_mismatch` | `409` | Same `Idempotency-Key` replayed with a different body |
 | `idempotency_key_invalid` | `400` | Empty or longer than 255 characters |
-| `idempotency_in_progress` | `409` | Original request still running — retry after `Retry-After` |
-| `rate_limited` | `429` | Per-second budget exhausted; check `Retry-After` |
+| `idempotency_in_progress` | `409` | Original request still running. Retry after `Retry-After`. |
+| `rate_limited` | `429` | Rate limit exceeded. Honour `Retry-After`. |
 | `version_unsupported` | `400` | `Spotzee-Version` value is not a known release |
 | `version_required` | `400` | Endpoint requires a pinned version (rare) |
 | `webhook_signature_invalid` | `400` | HMAC verification failed on inbound webhook configuration |
 | `quota_exceeded` | `402` | Credit-metered operation with insufficient balance |
-| `internal_error` | `500` | Unhandled platform error — report the `request_id` |
+| `internal_error` | `500` | Unhandled platform error. Report the `request_id`. |
 
 ## Retry guidance
 
