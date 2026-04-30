@@ -12,6 +12,10 @@ Spotzee-Version: 2026-04-28
 
 The current release is `2026-04-28`.
 
+<Note>
+  `Spotzee-Version` validation and response echo are live on the Extended API today and rolling out to the Main API. Including the header on Main API requests is forward-compatible: today the value is accepted as a forward-looking declaration; once the rollout completes, unrecognised values return `400 version_unsupported`.
+</Note>
+
 ## How it works
 
 - **Send the header**: the request runs against that version.
@@ -27,7 +31,7 @@ Spotzee-Version: 2026-04-28
 
 <Tabs>
   <Tab title="New integrations">
-    Pin to the latest version when you build, then schedule periodic upgrades — for example, once per quarter. Every breaking change earns a new dated release; the version you pinned keeps working until its deprecation window closes.
+    Pin to the latest version when you build, then schedule periodic upgrades. Once per quarter is a sensible cadence. Every breaking change earns a new dated release; the version you pinned keeps working until its deprecation window closes.
   </Tab>
   <Tab title="Existing integrations">
     Stay on the version you originally built against. Migrations are opt-in: a new dated release does not change the behaviour of an older pin.
