@@ -1,0 +1,214 @@
+---
+title: "Billing and credits"
+description: "Understand user-based subscription tiers, manage your plan, top up platform credits, and configure auto top-up to keep sending uninterrupted."
+keywords: ["billing", "subscription", "credits", "top-up", "tiers", "users"]
+---
+
+Spotzee bills you based on the number of users in your organisation. Your subscription covers the seat count; platform credits cover usage-based work that sits on top.
+
+<Info>
+The **Billing** page is gated to organisation `admin` and `owner` roles. Members can't see it.
+</Info>
+
+## How billing works
+
+Two things to know up front:
+
+- **Billing is at the organisation level**, not per project. Your user count totals across every project in your organisation.
+- **Users** are the people you message: customers, subscribers, app users.
+
+Your monthly subscription scales with your user tier. Platform credits are a separate top-up balance you draw on for usage-based features.
+
+## Subscription tiers
+
+Spotzee has 51 tiers covering every step from a free starter plan up to seven-figure user counts.
+
+| Tier | User range | Monthly cost |
+|---|---|---|
+| Free | 0–250 | $0 |
+| Paid (entry) | 251–500 | $10 |
+| Paid (mid) | 1,001–1,500 | $22.50 |
+| Paid (mid) | 5,001–5,500 | $55 |
+| Paid (mid) | 25,001–26,000 | $212.50 |
+| Paid (high) | 100,001–105,000 | $720 |
+| Paid (high) | 500,001–550,000 | $2,175 |
+| Paid (high) | 950,001–1,000,000 | $3,525 |
+| Custom | 1,000,001+ | Contact us |
+
+The slider on the **Billing** page shows the exact tier you'll land on for any user count. Self-service checkout runs up to **25,000 users**. Above that, the slider switches to **Let's talk** so we can build a custom plan.
+
+## Manage your subscription
+
+The **Billing** page in the organisation menu is the single place to view, change, or cancel your plan.
+
+<Tabs>
+<Tab title="View your plan">
+
+The status card at the top shows:
+
+- Current tier (for example, `Free (0-250 users)`).
+- Current user count vs limit (for example, `150 / 250 users`).
+- Monthly cost on paid tiers.
+- A progress bar of usage against the limit.
+
+</Tab>
+<Tab title="Upgrade">
+
+When you're approaching your limit or want headroom:
+
+<Steps>
+<Step title="Open Billing">
+From the organisation menu, open **Billing**.
+</Step>
+
+<Step title="Pick a new user limit">
+Use the slider to choose your new limit. The page shows the matching tier and monthly cost.
+</Step>
+
+<Step title="Check out">
+Choose **Upgrade now** (free tier) or **Change plan** (paid tier). Complete payment. The new limit takes effect immediately.
+</Step>
+</Steps>
+
+</Tab>
+<Tab title="Update payment or invoices">
+
+Choose **Manage billing** on the Billing page. You'll be taken to the Stripe Customer Portal where you can:
+
+- Update your card.
+- Download past invoices and receipts.
+- Adjust subscription details.
+
+</Tab>
+<Tab title="Downgrade">
+
+You can move to a lower tier once your active user count drops below the new tier's ceiling. Reduce the count by deleting inactive users in your projects, then pick the lower tier on the next billing cycle.
+
+You can't manually select a tier whose ceiling is below your current user count.
+
+</Tab>
+<Tab title="Cancel">
+
+Choose **Manage billing** to open the Stripe portal and cancel from there. After cancellation:
+
+- Your account stays accessible until the end of the billing period.
+- Your data is preserved with limited access afterwards.
+- You can resubscribe at any time.
+
+</Tab>
+</Tabs>
+
+## User limit alerts
+
+The Billing page surfaces three alert states based on your usage progress bar.
+
+| Usage | What you see |
+|---|---|
+| Below 90% | Normal. No alert. |
+| 90–99% | Amber warning: approaching your user limit. |
+| 100% and above | Red warning: user limit reached. |
+
+We don't block new users when you hit 100%. The system keeps accepting writes so your app keeps working. You'll see notifications and a banner pointing you to upgrade.
+
+### Payment failures and the grace period
+
+If a card payment fails:
+
+- A 7-day grace period begins.
+- A red banner appears on the Billing page.
+- You'll receive an email about the failed payment.
+- Your account functions normally during the grace window.
+
+If payment isn't resolved within 7 days, your user limit drops to 0 and feature access is restricted until you fix the payment in the Stripe portal.
+
+## Platform credits
+
+Credits are a pay-as-you-go monetary balance that supplements your subscription. They cover:
+
+- Additional messaging capacity beyond your subscription.
+- Per-use operations on certain Extended API utilities (for example, blacklist-monitoring checks, deliverability lookups).
+- Usage-based work that's billed per call rather than per seat.
+
+The **Credit Balance** card on the Billing page shows:
+
+- Your current balance (for example, `$250.00`).
+- Total **Purchased**.
+- Total **Consumed**.
+
+When the balance drops below **$10**, the card turns amber as a low-balance warning.
+
+## Top up credits manually
+
+<Steps>
+<Step title="Open the Credit Balance card">
+On the Billing page, scroll to the **Credit Balance** section.
+</Step>
+
+<Step title="Pick a top-up amount">
+Choose from the dropdown: **$20**, **$50**, **$100**, **$500**, **$1,000**, or **$5,000**.
+</Step>
+
+<Step title="Top up">
+Choose **Top up now**, complete payment through Stripe, and your balance updates immediately. The transaction lands in your credit history.
+</Step>
+</Steps>
+
+<Note>
+Top-ups use the same payment method as your subscription. To change cards, update them in the Stripe Customer Portal first, then return to top up.
+</Note>
+
+## Configure auto top-up
+
+Auto top-up keeps your balance topped up automatically when it drops below a threshold you set. Your monthly limit caps total auto spending so the system can never exceed what you've authorised.
+
+<Steps>
+<Step title="Open auto top-up configuration">
+On the Billing page, choose **Configure** in the Credit Balance section.
+</Step>
+
+<Step title="Enable and set values">
+Toggle **Enable auto top-up** on, then set:
+
+- **Threshold**: trigger when balance drops below this. Options: $50, $100, $200, $500.
+- **Amount**: how much to add each time. Options: $100, $200, $500, $1,000, $2,000.
+- **Monthly limit**: the cap on total auto top-ups in a calendar month. Options: $500, $1,000, $2,000, $5,000, $10,000.
+</Step>
+
+<Step title="Save">
+Save. The Billing page now shows auto top-up as **Active**, with the threshold, monthly limit, and amount used this month against the limit.
+</Step>
+</Steps>
+
+### Example configuration
+
+| Setting | Value | What it means |
+|---|---|---|
+| Threshold | $100 | Auto top-up triggers when balance falls below $100 |
+| Amount | $500 | Each top-up adds $500 |
+| Monthly limit | $2,000 | Auto top-ups stop once $2,000 has been added in a month |
+
+With these settings, a balance of $95 triggers a $500 top-up that lifts it to $595.
+
+### Credit history
+
+The credit history view on the Billing page lists every transaction with timestamps, amounts, and the balance before and after. Auto top-ups appear with an **Auto top-up** label so you can tell them apart from manual purchases and usage deductions.
+
+## Next steps
+
+<Columns cols={2}>
+<Card title="Set up a project" icon="folder-plus" href="/guides/setup-project">
+Configure project defaults: locale, timezone, tracking.
+</Card>
+
+<Card title="Invite teammates" icon="users" href="/guides/invite-teammates">
+Add organisation roles and project roles to your team.
+</Card>
+
+<Card title="Concepts" icon="book-open" href="/guides/concepts">
+Brush up on Users, Journeys, Segments, Channels, and Providers.
+</Card>
+
+<Card title="Quickstart" icon="rocket" href="/guides/quickstart">
+Send your first campaign in ten minutes.
+</Card>
+</Columns>
