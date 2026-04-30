@@ -70,7 +70,7 @@ Your endpoint should compute the same HMAC over the request body and compare it 
 </Step>
 </Steps>
 
-The production-dispatch scheme will switch to a Stripe-style timestamped envelope (`Spotzee-Signature: t=...,v1=...`) when the outbound loop ships. Until then, build your verifier against the test scheme.
+The production-dispatch scheme will switch to a timestamped signing envelope (`Spotzee-Signature: t=...,v1=...`) when the outbound loop ships. Until then, build your verifier against the test scheme.
 
 ## Rotate the signing secret
 

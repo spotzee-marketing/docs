@@ -16,7 +16,7 @@ Spotzee's webhook system has two halves: configuring endpoints (live today) and 
 ## What's rolling out
 
 - Production dispatch of the catalogued events. The event catalogue exists as a subscription model today, but no production loop dispatches them yet.
-- Stripe-style `Spotzee-Signature: t=<unix-ts>,v1=<hex-hmac-sha256>` signing scheme with replay protection. Test deliveries use a simpler `X-Spotzee-Signature: sha256=<hex>` header today; the timestamped scheme ships when production dispatch lights up.
+- Timestamped `Spotzee-Signature: t=<unix-ts>,v1=<hex-hmac-sha256>` signing scheme with replay protection. Test deliveries use a simpler `X-Spotzee-Signature: sha256=<hex>` header today; the timestamped scheme ships when production dispatch lights up.
 - Exponential-backoff retry policy with delivery logs and replay.
 
 ## Configure an endpoint

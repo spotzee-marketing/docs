@@ -67,9 +67,9 @@ The error shape matches the [RFC 7807 envelope](/guides/api-versioning) on the `
 
 ## Use the exported types
 
-Every component schema in the OpenAPI spec is exposed as a TypeScript type under the `Spotzee` namespace:
+Every component schema in the OpenAPI spec is exposed as a static type under the `Spotzee` namespace:
 
-```typescript
+```ts
 import type { Spotzee } from '@spotzee/js-sdk/generated'
 
 function summarise(user: Spotzee.User): string {

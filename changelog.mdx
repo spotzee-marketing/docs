@@ -25,7 +25,7 @@ This is a hard cutover with no overlap. Update your integrations.
 The Extended API now ships the same wire-level conventions as the Main API:
 
 - **`Spotzee-Version` header**: required to be either `2026-04-28` or omitted (server defaults to current). Echoed on every response.
-- **`X-Request-Id` header**: Stripe-style `req_<id>` on every response. Globally unique per request. Quote it in support tickets.
+- **`X-Request-Id` header**: `req_<id>` on every response. Globally unique per request. Quote it in support tickets.
 - **`application/problem+json`**: error responses now use the RFC 7807 media type.
 - **OpenAPI 3.1**: the published spec is now OpenAPI 3.1.0 (was 3.0.0).
 - **Canonical error envelope**: `{status, code, title, message, error, type, request_id}` matches the Main API exactly. The legacy `error` field is kept as the canonical envelope's optional mirror until a future major version.
@@ -45,7 +45,7 @@ The first publicly-versioned release of the Spotzee API.
 - **Idempotency**: `Idempotency-Key` header on `POST` and `PATCH`. 24-hour TTL, scoped per API key. Same key + same body returns the cached response; same key + different body returns `409 idempotency_key_mismatch`.
 - **Rate limits**: per-key sliding window, separate read and write buckets, generous tiers for MCP and agent workloads (`x-spotzee-client-type: mcp` doubles the base limit).
 - **Errors**: RFC 7807 `application/problem+json` envelope with stable string `code`, `title`, `message`, `request_id`, optional `param` and `errors[]` for per-field validation breakdowns.
-- **Correlation**: every response carries an `X-Request-Id` header (Stripe-style `req_<ULID>`). Quote it in support tickets.
+- **Correlation**: every response carries an `X-Request-Id` header (`req_<ULID>`). Quote it in support tickets.
 
 ### New endpoints
 

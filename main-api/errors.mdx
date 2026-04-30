@@ -84,6 +84,7 @@ The `code` field is stable and documented. Add new codes to your switch statemen
 |---|---|---|
 | `resource_missing` | `404` | The referenced resource does not exist or isn't visible to this key |
 | `resource_already_exists` | `409` | Unique-constraint violation on create |
+| `state_conflict` | `409` | Resource state does not permit the requested operation |
 | `parameter_missing` | `400` | A required field is absent |
 | `parameter_invalid_empty` | `400` | A required field is present but empty |
 | `parameter_invalid_format` | `400` | A field is present but malformed |
@@ -99,6 +100,7 @@ The `code` field is stable and documented. Add new codes to your switch statemen
 | `version_required` | `400` | Endpoint requires a pinned version (rare) |
 | `webhook_signature_invalid` | `400` | HMAC verification failed on inbound webhook configuration |
 | `quota_exceeded` | `402` | Credit-metered operation with insufficient balance |
+| `service_unavailable` | `503` | Temporary capacity or lock contention. Retry with backoff. |
 | `internal_error` | `500` | Unhandled platform error. Report the `request_id`. |
 
 ## Retry guidance
