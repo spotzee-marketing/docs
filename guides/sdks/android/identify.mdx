@@ -1,0 +1,155 @@
+---
+title: "Identify users"
+description: "Link anonymous Android activity to a known user with identify and alias from the Android SDK."
+keywords:
+  - android
+  - sdk
+  - identify
+  - alias
+  - external_id
+  - traits
+---
+
+`identify` joins your `external_id` (whatever you call users in your own database) to a Spotzee user record and updates that record's traits. Until you call it, the SDK records activity against a persisted anonymous ID it minted on first use.
+
+## Identify a known user
+
+`identify` is a `suspend` function. Call it from a coroutine (typically `lifecycleScope` in a Fragment or Activity, or a long-lived `CoroutineScope` you manage in your DI container).
+
+```kotlin
+import com.spotzee.android.Spotzee
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
+
+class SignInActivity : AppCompatActivity() {
+
+    fun onSignIn(userId: String, email: String) {
+        lifecycleScope.launch {
+            MainApplication.analytics.identify(
+                id = userId,
+                email = email,
+                phone = "+61491570006",
+                traits = mapOf(
+                    "first_name" to "Sam",
+                    "last_name" to "Patel",
+                    "plan" to "starter",
+                    "lifetime_value" to 199.50,
+                )
+            )
+        }
+    }
+}
+```
+
+`id` is your `external_id`. `email`, `phone`, and `traits` are all optional. Pass only what you have.
+
+## How traits flow
+
+Anything in the `traits` map lands as a top-level field on the user record. The set of accepted traits is defined by your project's data schema. Read [Define custom user attributes](/guides/data-schema) for how to add or rename traits.
+
+A few traits map to specific behaviour:
+
+- **`email`** and **`phone`**: top-level fields the email and SMS channels read from. Pass them as arguments to `identify` rather than nesting them in `traits` so the SDK puts them in the right place.
+- **`timezone`** and **`locale`**: drive personalisation and send-time logic. Set them via the `Identity` overload (below) or via `track(event, properties, user)` inline updates.
+
+The trait map accepts `Map<String, Any>`. Values serialise to JSON: strings, numbers, booleans, lists, nested maps.
+
+## The Identity overload
+
+For when you need to set the anonymous ID explicitly (for example, restoring a session after a crash) or pass `timezone` / `locale`, use the `Identity` overload:
+
+```kotlin
+import com.spotzee.android.Identity
+
+lifecycleScope.launch {
+    val identity = Identity(
+        anonymousId = MainApplication.analytics.anonymousId,
+        externalId = "u_42",
+        phone = null,
+        email = "sam@example.com",
+        traits = mapOf(
+            "timezone" to "Australia/Sydney",
+            "locale" to "en-AU",
+            "plan" to "starter",
+        )
+    )
+    MainApplication.analytics.identify(identity = identity)
+}
+```
+
+## Anonymous to known: automatic alias
+
+The first `identify` after an anonymous session aliases the anonymous ID to your `external_id`. All prior anonymous activity now belongs to the known user. Subsequent `track` and `identify` calls carry both IDs automatically.
+
+For server-flow contexts where you already know the anonymous ID, call `alias` directly:
+
+```kotlin
+lifecycleScope.launch {
+    MainApplication.analytics.alias(
+        anonymousId = "anon_xyz",
+        externalId = "u_42"
+    )
+}
+```
+
+The SDK guards against repeated aliasing: once `externalId` is set on the singleton, `identify` skips the auto-alias path. Calling `alias` directly always sends the request.
+
+## When to call identify
+
+- **On sign-up.** First call after the user creates an account.
+- **On sign-in.** So a user switching devices gets joined back to their record.
+- **When traits change.** Updating profile data, plan, lifetime value, billing state. Identify is upsert: pass only the traits that changed.
+
+Avoid calling `identify` on every Activity resume with the same data. The platform deduplicates server-side, but the network call is wasted.
+
+## Worked example: link anonymous browse to checkout
+
+```kotlin
+class ProductActivity : AppCompatActivity() {
+
+    fun onProductView(sku: String) {
+        // Track is fire-and-forget. Fires against the persisted anonymous ID.
+        MainApplication.analytics.track(
+            event = "Product viewed",
+            properties = mapOf("sku" to sku)
+        )
+    }
+
+    fun onSignInComplete(userId: String, email: String) {
+        // Sign-up. Anonymous events are aliased to u_42.
+        lifecycleScope.launch {
+            MainApplication.analytics.identify(
+                id = userId,
+                email = email,
+                traits = mapOf("plan" to "starter")
+            )
+
+            // Subsequent track carries both IDs. The "Product viewed" event from
+            // above now belongs to u_42's history.
+            MainApplication.analytics.track(
+                event = "Checkout started",
+                properties = mapOf("cart_total" to 89.95)
+            )
+        }
+    }
+}
+```
+
+## Reset on sign-out
+
+```kotlin
+MainApplication.analytics.reset()
+```
+
+`reset` clears the cached `externalId` and the persisted anonymous ID. The next call mints a new anonymous ID. Subsequent activity is anonymous until the next `identify`.
+
+## Next steps
+
+<Columns cols={2}>
+  <Card title="Track events" href="/guides/sdks/android/track" icon="bolt">
+    Trigger journeys and feed segments with custom events.
+  </Card>
+  <Card title="Define custom user attributes" href="/guides/data-schema" icon="table-properties">
+    Decide which traits Spotzee accepts.
+  </Card>
+</Columns>

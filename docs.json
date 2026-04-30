@@ -152,6 +152,16 @@
                   "guides/sdks/ios/push-notifications",
                   "guides/sdks/ios/in-app-and-deeplinks"
                 ]
+              },
+              {
+                "group": "Android",
+                "pages": [
+                  "guides/sdks/android/install",
+                  "guides/sdks/android/identify",
+                  "guides/sdks/android/track",
+                  "guides/sdks/android/push-notifications",
+                  "guides/sdks/android/in-app-and-deeplinks"
+                ]
               }
             ]
           },

@@ -1,0 +1,226 @@
+---
+title: "In-app notifications and deeplinks"
+description: "Render in-app banner, alert, and HTML notifications on Android and unwrap App Links and tracking URLs."
+keywords:
+  - android
+  - sdk
+  - in-app
+  - inappdelegate
+  - app links
+  - deeplinks
+---
+
+The Android SDK can render in-app notifications natively (banner, alert, HTML) and unwrap Spotzee click-tracking URLs so taps in emails open the right screen in your app. Both surfaces flow through delegates and standard Android intent handling.
+
+## In-app notifications
+
+In-app notifications are content campaigns or journey steps that target the user's open app session, not the OS notification tray. The SDK fetches them, asks your delegate what to do, and renders chosen ones in a `DialogFragment`.
+
+### Wire up the delegate
+
+Implement `InAppDelegate` and pass an instance into `Spotzee.initialize`:
+
+```kotlin
+import com.spotzee.android.InAppAction
+import com.spotzee.android.InAppDelegate
+import com.spotzee.android.InAppDisplayState
+import com.spotzee.android.Spotzee
+import com.spotzee.android.SpotzeeNotification
+
+class MainApplication : Application(), InAppDelegate {
+
+    override fun onCreate() {
+        super.onCreate()
+        analytics = Spotzee.initialize(
+            app = this,
+            apiKey = "pk_…",
+            isDebug = BuildConfig.DEBUG,
+            inAppDelegate = this,
+        )
+    }
+
+    override val autoShow: Boolean = true
+    override val useDarkMode: Boolean = false
+
+    override fun onNew(notification: SpotzeeNotification): InAppDisplayState {
+        return InAppDisplayState.SHOW
+    }
+
+    override fun handle(
+        action: InAppAction,
+        context: Map<String, Any>,
+        notification: SpotzeeNotification
+    ) {
+        when (action) {
+            InAppAction.DISMISS -> {
+                // SDK already marked it read.
+            }
+            InAppAction.CUSTOM -> {
+                // Custom action triggered from inside the notification HTML.
+                // context carries the payload passed via window.trigger(obj).
+            }
+        }
+    }
+
+    override fun onError(error: Throwable) {
+        // Telemetry hook
+    }
+
+    companion object {
+        lateinit var analytics: Spotzee
+    }
+}
+```
+
+Default implementations cover everything except `handle`. Only override what you need to change.
+
+### What each delegate hook does
+
+| Hook | Default | When it fires |
+|---|---|---|
+| `autoShow: Boolean` | `true` | Read on Activity resume. When `true`, the SDK fetches and displays the latest notification automatically. |
+| `useDarkMode: Boolean` | `false` | Read when rendering. Applies dark-mode styling to alert and HTML notifications. |
+| `onNew(notification): InAppDisplayState` | `SHOW` | Per fetched notification. Return `SHOW`, `SKIP` (try next), or `CONSUME` (mark read silently). |
+| `onNotificationShown(notification)` | no-op | After the dialog appears. Use for telemetry. |
+| `handle(action, context, notification)` | required | When the user dismisses or triggers a custom action from inside the notification HTML. |
+| `onError(error)` | no-op | When fetch or render fails. |
+
+### Auto-show on Activity resume
+
+The SDK observes `ProcessLifecycleOwner` and fires `showLatestNotification` the first time an `AppCompatActivity` resumes after init (when `autoShow = true`). You don't need to wire this yourself.
+
+For finer control, set `autoShow = false` and call `analytics.showLatestNotification()` from your own UI moment (after sign-in, after the home screen renders) to defer in-app delivery to a calmer surface than launch.
+
+```kotlin
+analytics.showLatestNotification()
+```
+
+To enumerate or render a specific notification yourself:
+
+```kotlin
+lifecycleScope.launch {
+    val page = analytics.getNotifications().getOrNull() ?: return@launch
+    page.results.forEach { notification ->
+        analytics.show(notification = notification)
+    }
+}
+```
+
+To mark a notification read without showing it:
+
+```kotlin
+lifecycleScope.launch {
+    analytics.consume(notification = notification)
+}
+```
+
+To dismiss a currently shown notification programmatically:
+
+```kotlin
+lifecycleScope.launch {
+    analytics.dismiss(supportFragmentManager, notification = notification)
+}
+```
+
+### The three content types
+
+| `contentType` | Renders as | Extra fields |
+|---|---|---|
+| `BANNER` | A small overlay with title + body | `custom: Map<String, String>?` |
+| `ALERT` | A dialog with title, body, optional image | `image: String?` |
+| `HTML` | A full HTML overlay | `html: String` |
+
+For `ALERT` and `HTML`, the embedded HTML can call `window.trigger({ … })` from JavaScript to invoke your delegate's `handle(action = InAppAction.CUSTOM, context, notification)` with the passed payload. Use this for "Buy now" buttons, "Open settings" actions, or anything that needs to bridge the WebView back to native code.
+
+## Deeplinks and App Links
+
+Spotzee click-tracks email links by wrapping them in a `https://<your-tracking-domain>/c?r=<encoded-target-url>` URL. The SDK's `getUriRedirect(uri)` unwraps the wrapper, registers the click with Spotzee, and returns the unwrapped target URI.
+
+### Configure App Links in your manifest
+
+Add an `intent-filter` to the Activity that should receive Spotzee deeplinks. Use `android:autoVerify="true"` for App Links so the OS hands the URL straight to your app instead of the browser.
+
+```xml
+<activity
+    android:name=".MainActivity"
+    android:exported="true"
+    android:launchMode="singleInstance">
+    <intent-filter>
+        <action android:name="android.intent.action.MAIN" />
+        <category android:name="android.intent.category.LAUNCHER" />
+    </intent-filter>
+
+    <intent-filter android:autoVerify="true" tools:targetApi="m">
+        <action android:name="android.intent.action.VIEW" />
+        <category android:name="android.intent.category.DEFAULT" />
+        <category android:name="android.intent.category.BROWSABLE" />
+        <data
+            android:host="apix.spotzee.com"
+            android:pathPrefix="/c"
+            android:scheme="https" />
+    </intent-filter>
+</activity>
+```
+
+| Setup | `android:host` |
+|---|---|
+| Default Spotzee tracking | `apix.spotzee.com` |
+| Custom tracking domain | `track.yourcompany.com` |
+
+For App Links to verify, the `assetlinks.json` for your domain must be served from `https://<host>/.well-known/assetlinks.json` and list your app's package name and SHA-256 fingerprint. Read [Android's Verify Android App Links guide](https://developer.android.com/training/app-links/verify-android-applinks).
+
+### Unwrap on intent delivery
+
+Override `onNewIntent` (or read the intent from `onCreate`) and pass the URI through `analytics.getUriRedirect(uri)`. The method returns the unwrapped target URI when it recognised the link, or `null` when it didn't.
+
+```kotlin
+import androidx.activity.viewModels
+
+class MainActivity : AppCompatActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        intent?.data?.let(::handleSpotzeeLink)
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        intent.data?.let(::handleSpotzeeLink)
+    }
+
+    private fun handleSpotzeeLink(uri: Uri) {
+        val redirect = MainApplication.analytics.getUriRedirect(uri) ?: return
+        // Open the unwrapped URL however your app routes deep links.
+        startActivity(Intent(Intent.ACTION_VIEW, redirect))
+    }
+}
+```
+
+`getUriRedirect` also fires the click-registration call to Spotzee in the background so analytics on your campaigns stay accurate.
+
+### One-shot navigation helper
+
+If you want the SDK to both register the click AND open the unwrapped URL on your behalf, use `handle(uri)` instead of `getUriRedirect(uri)`. It returns `true` when it handled the URL, `false` when the URL wasn't a Spotzee tracking link.
+
+```kotlin
+override fun onNewIntent(intent: Intent) {
+    super.onNewIntent(intent)
+    intent.data?.let { uri ->
+        if (!MainApplication.analytics.handle(uri)) {
+            // Not a Spotzee link. Route it through your normal deeplink handling.
+        }
+    }
+}
+```
+
+`handle(uri)` opens the redirect via `Intent.ACTION_VIEW` with `FLAG_ACTIVITY_NEW_TASK`. Use `getUriRedirect` instead if you need full control over how the destination opens.
+
+## Next steps
+
+<Columns cols={2}>
+  <Card title="Set up push providers" href="/guides/configure-push-notifications" icon="bell">
+    FCM credentials must be configured before pushes deliver.
+  </Card>
+  <Card title="Configure custom domains" href="/guides/custom-domains" icon="globe">
+    Set up a custom tracking domain to use as your App Links host.
+  </Card>
+</Columns>

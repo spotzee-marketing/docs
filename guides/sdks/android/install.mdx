@@ -1,0 +1,141 @@
+---
+title: "Install the Android SDK"
+description: "Add the Spotzee Android SDK via JitPack and initialise it from your Application subclass."
+keywords:
+  - android
+  - sdk
+  - install
+  - jitpack
+  - kotlin
+  - initialise
+---
+
+The Android SDK is a Kotlin library distributed through JitPack. Add the JitPack repo, pull the dependency, then initialise the singleton from your `Application` subclass.
+
+## Requirements
+
+- Android SDK 23+ (Android 6.0 Marshmallow and later)
+- Java 17 toolchain
+- Kotlin (Java consumers work, but the API uses Kotlin's `suspend` and default arguments)
+
+## Install
+
+In your project's **`settings.gradle`**, add the JitPack repo to `dependencyResolutionManagement`:
+
+```gradle
+dependencyResolutionManagement {
+    repositories {
+        google()
+        mavenCentral()
+        maven { url 'https://jitpack.io' }
+    }
+}
+```
+
+In your app module's **`build.gradle`**, add the dependency:
+
+```gradle
+dependencies {
+    implementation 'com.github.spotzee-marketing:android-sdk:1.0.5'
+}
+```
+
+Pin to the version range that suits your stability appetite. Check the [JitPack page](https://jitpack.io/#spotzee-marketing/android-sdk) for the latest release tag.
+
+## Initialise
+
+Subclass `Application` and call `Spotzee.initialize` from `onCreate`. Use a publishable key (`pk_…`); read [Manage API keys](/guides/manage-api-keys) for how to mint one.
+
+```kotlin
+import android.app.Application
+import com.spotzee.android.Spotzee
+
+class MainApplication : Application() {
+
+    override fun onCreate() {
+        super.onCreate()
+        analytics = Spotzee.initialize(
+            app = this,
+            apiKey = "pk_…",
+            isDebug = BuildConfig.DEBUG
+        )
+    }
+
+    companion object {
+        lateinit var analytics: Spotzee
+    }
+}
+```
+
+Wire the subclass in your `AndroidManifest.xml`:
+
+```xml
+<application
+    android:name=".MainApplication"
+    ...>
+```
+
+`initialize` returns the `Spotzee` instance. Stash it as a `companion object` (or inject through your DI framework) so other layers can call `analytics.track(…)`, `analytics.identify(…)`, and so on.
+
+To wire in-app notifications and deeplinks, also pass an `InAppDelegate`:
+
+```kotlin
+analytics = Spotzee.initialize(
+    app = this,
+    apiKey = "pk_…",
+    isDebug = BuildConfig.DEBUG,
+    inAppDelegate = this  // if your Application implements InAppDelegate
+)
+```
+
+Read [In-app notifications and deeplinks](/guides/sdks/android/in-app-and-deeplinks) for the delegate contract.
+
+## What every request carries
+
+The SDK adds these headers to every API call. You don't set them yourself.
+
+| Header | Value | Why |
+|---|---|---|
+| `Authorization` | `Bearer <your apiKey>` | Authenticates the request |
+| `Spotzee-Version` | `2026-04-28` | Pins the API version this SDK release targets |
+| `x-spotzee-client-type` | `sdk-android` | Identifies traffic from this SDK. Read [Identify your API client type](/guides/api-client-type) |
+| `Content-Type` | `application/json` | Set on POST and PUT requests |
+
+The SDK's Gson serialiser converts Kotlin camelCase property names to snake_case before sending, so `Identity(externalId = …)` lands as `external_id` on the wire.
+
+## Identity persistence
+
+The SDK persists three values in `SharedPreferences`:
+
+- `anonymousId`: minted on first call, kept across app launches.
+- `externalId`: cached on the singleton after `identify` succeeds.
+- `deviceId`: a per-install UUID, used when registering for push.
+
+Call `analytics.reset()` on sign-out to clear `externalId` and the persisted anonymous ID.
+
+## Errors
+
+Failed requests return `Result.failure(IOException(...))` with a one-line summary that includes the HTTP status, the API error code (when present), the message, and the `request_id`. The legacy `{ error: string }` shape and the new RFC 7807 envelope are both parsed; quote `request_id` to support.
+
+`track` and `register` are fire-and-forget and don't return failures to your code; check Logcat under the `Spotzee` tag for transient issues. `identify`, `alias`, `getNotifications`, and `consume` are `suspend` and surface results explicitly.
+
+## Debugging
+
+Pass `isDebug = true` (or `isDebug = BuildConfig.DEBUG`) to `Spotzee.initialize` to flip the SDK's HTTP logging to body level. Every request and response prints to Logcat under tag `OkHttp` so you can inspect payloads. Leave `isDebug = false` (the default) for production builds.
+
+## Next steps
+
+<Columns cols={2}>
+  <Card title="Identify users" href="/guides/sdks/android/identify" icon="user-check">
+    Link anonymous activity to a known user.
+  </Card>
+  <Card title="Track events" href="/guides/sdks/android/track" icon="bolt">
+    Send custom events with properties.
+  </Card>
+  <Card title="Push notifications" href="/guides/sdks/android/push-notifications" icon="bell">
+    Register for FCM and route incoming pushes through the SDK.
+  </Card>
+  <Card title="In-app notifications and deeplinks" href="/guides/sdks/android/in-app-and-deeplinks" icon="link">
+    Render in-app dialogs and unwrap App Links.
+  </Card>
+</Columns>

@@ -21,12 +21,15 @@ Spotzee ships three first-party SDKs. They share the same wire shape, the same p
 | iOS | Swift Package Manager + CocoaPods | iOS 13+, Mac Catalyst 13+, Xcode 14+ | APNs registration, in-app modals, Universal Links |
 | Android | JitPack | Android SDK 23+ (Android 6.0 Marshmallow) | FCM registration, in-app dialogs, App Links |
 
-<Columns cols={2}>
+<Columns cols={3}>
   <Card title="JavaScript SDK" href="/guides/sdks/javascript/install" icon="square-code">
     Install, identify users, track events, and register devices from a browser, Node app, or script tag.
   </Card>
   <Card title="iOS SDK" href="/guides/sdks/ios/install" icon="apple">
     Install via SPM or CocoaPods, identify users, track events, register for APNs, render in-app notifications, unwrap Universal Links.
+  </Card>
+  <Card title="Android SDK" href="/guides/sdks/android/install" icon="android">
+    Install via JitPack, identify users, track events, register for FCM, render in-app dialogs, unwrap App Links.
   </Card>
 </Columns>
 
@@ -46,7 +49,7 @@ Spotzee ships three first-party SDKs. They share the same wire shape, the same p
 | Browser tracking, web push, simple Node integrations | JavaScript ergonomic surface (`Client` / `BrowserClient` / `Spotzee`) |
 | Server-side, agentic, or full-coverage Node integrations | JavaScript [typed client](/guides/sdks/javascript/typed-client) (`@spotzee/js-sdk/generated`) |
 | Native iOS app | [iOS SDK](/guides/sdks/ios/install) |
-| Native Android app | Android SDK |
+| Native Android app | [Android SDK](/guides/sdks/android/install) |
 | React Native, Flutter, server-side language without an SDK | Call the [Main API](/main-api/introduction) directly with a publishable or secret key |
 
 ## Where the SDKs fit

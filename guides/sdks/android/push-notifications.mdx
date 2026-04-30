@@ -1,0 +1,135 @@
+---
+title: "Push notifications"
+description: "Register an Android device with FCM, send the token to Spotzee, and route incoming push payloads through the SDK."
+keywords:
+  - android
+  - sdk
+  - push
+  - fcm
+  - firebase
+  - register
+  - device token
+---
+
+Android push runs on Firebase Cloud Messaging (FCM). The pattern: add Firebase to your project, subclass `FirebaseMessagingService`, hand the FCM token to Spotzee from `onNewToken`, then route incoming payloads through `pushReceived` so silent in-app refreshes work.
+
+## Prerequisites
+
+- A push provider configured under **Settings → Integrations** with the FCM service-account JSON. Read [Set up push notifications](/guides/configure-push-notifications) for the project-side setup.
+- Firebase added to your Android project, with `google-services.json` placed under `app/`. Follow [Firebase's Add Firebase to your Android project guide](https://firebase.google.com/docs/android/setup).
+- The `com.google.firebase:firebase-messaging` dependency in your app module.
+- The Android Gradle plugin `com.google.gms.google-services` applied.
+
+## Manifest permissions
+
+Add the standard Android push permissions:
+
+```xml
+<uses-permission android:name="android.permission.INTERNET" />
+<uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+```
+
+`POST_NOTIFICATIONS` is required for runtime notification permission on Android 13+.
+
+## Subclass FirebaseMessagingService
+
+Spotzee plugs into the standard Firebase service. Subclass `FirebaseMessagingService` and:
+
+1. In `onNewToken`, hand the FCM registration token to `analytics.register(...)`.
+2. In `onMessageReceived`, hand the data bundle to `analytics.pushReceived(bundle)` so silent in-app pushes can trigger fetches.
+
+```kotlin
+import android.os.Bundle
+import androidx.core.os.bundleOf
+import com.google.firebase.messaging.FirebaseMessagingService
+import com.google.firebase.messaging.RemoteMessage
+import com.spotzee.android.Spotzee
+
+class MyFirebaseService : FirebaseMessagingService() {
+
+    override fun onNewToken(token: String) {
+        MainApplication.analytics.register(
+            token = token,
+            appBuild = BuildConfig.VERSION_CODE,
+            appVersion = BuildConfig.VERSION_NAME,
+        )
+    }
+
+    override fun onMessageReceived(remoteMessage: RemoteMessage) {
+        super.onMessageReceived(remoteMessage)
+        val bundle = bundleOf(*remoteMessage.data.toList().toTypedArray())
+
+        MainApplication.analytics.pushReceived(bundle)
+
+        if (Spotzee.isCheckMessagePush(bundle)) {
+            // Silent in-app message push. Don't draw a system notification.
+            return
+        }
+
+        // Visible push. Build and post a NotificationCompat.Builder here.
+        showSystemNotification(remoteMessage.data["title"], remoteMessage.data["content"])
+    }
+}
+```
+
+Register the service in `AndroidManifest.xml`:
+
+```xml
+<service
+    android:name=".MyFirebaseService"
+    android:enabled="true"
+    android:exported="false">
+    <intent-filter>
+        <action android:name="com.google.firebase.MESSAGING_EVENT" />
+    </intent-filter>
+</service>
+```
+
+## How register works
+
+`analytics.register(token, appBuild, appVersion)`:
+
+- Persists a per-install device UUID (created on first call) so the device is uniquely identifiable across app launches.
+- Reports OS version, model, app version, and the FCM token to the user record.
+- Picks up the persisted anonymous ID and the cached `externalId` (when set) so the token is bound to the right user.
+
+You can call `register` without an `identify` first; the device is bound to the anonymous user and joined to the known user the first time you call `identify`.
+
+If FCM registration fails or the user denies notification permission, you can still register the device's characteristics by calling `register` with an empty token string. The user becomes addressable for non-push channels and segment rules.
+
+## Silent in-app refresh
+
+A push with `spotzee = true` and `check_in_app_messages = true` in its data payload is a silent message that should trigger an in-app fetch, not a system notification. The SDK exposes a helper to detect them:
+
+```kotlin
+if (Spotzee.isCheckMessagePush(bundle)) {
+    // Silent. Don't post a system notification; the SDK will show the in-app modal.
+    return
+}
+```
+
+`pushReceived(bundle)` already triggers `showLatestNotification` for these silent pushes. You only need the helper to skip drawing your own system notification.
+
+## Test a push
+
+Configure a test user under **Settings → Integrations → Push** and trigger a test send. Read [Test a push](/guides/configure-push-notifications#test-a-push) for the project-side flow.
+
+## What lives where
+
+| Concern | Where |
+|---|---|
+| Provider credentials (FCM service-account JSON) | **Settings → Integrations** in the Spotzee app |
+| FCM token registration | `analytics.register(token, appBuild, appVersion)` from `onNewToken` |
+| Silent in-app refresh | `analytics.pushReceived(bundle)` + `Spotzee.isCheckMessagePush(bundle)` skip-guard |
+| App Links from email taps | `analytics.getUriRedirect(uri)`. Read [In-app notifications and deeplinks](/guides/sdks/android/in-app-and-deeplinks) |
+
+## Next steps
+
+<Columns cols={2}>
+  <Card title="In-app notifications and deeplinks" href="/guides/sdks/android/in-app-and-deeplinks" icon="link">
+    Render in-app dialogs and unwrap App Links.
+  </Card>
+  <Card title="Configure push providers" href="/guides/configure-push-notifications" icon="bell">
+    Set up FCM credentials before the SDK can deliver push.
+  </Card>
+</Columns>
