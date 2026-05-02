@@ -1,0 +1,87 @@
+---
+title: "Free Email Syntax Validator"
+description: "Free email syntax validator that checks any address against RFC 5321 and 5322 format rules. Catch malformed entries before they bounce or hurt deliverability."
+keywords: ["email syntax validator", "email format checker", "email address validator", "free email syntax checker", "rfc 5322 email validator", "valid email format checker", "email format checker free", "email syntax check online", "email format checker online"]
+---
+
+An email syntax validator checks whether an address is structured correctly per RFC 5321 and RFC 5322. The check runs on the string itself, splitting at the `@`, validating the local part and the domain, and returning a single verdict: valid format, or not. It is the cheapest first step in any list-cleaning workflow because it catches the most obvious failures before you spend a credit on deeper checks.
+
+<Info>
+Run a one-off check at [spotzee.com/tools/email-syntax-validator](https://spotzee.com/tools/email-syntax-validator/). The result is a binary pass or fail. Use this guide for the rules behind each check and the patterns that fail most often in real list imports.
+</Info>
+
+## Why syntax matters
+
+Sending to a malformed address always ends in a hard bounce. Hard bounces hit your sender reputation, and a damaged sender reputation drags inbox placement down for the legitimate addresses too. Filter syntax failures first, and the rest of the list moves through verification cleanly.
+
+There is also a cost angle. Provider lookups, MX resolution, and SMTP verification each consume credits or seconds. Running them on an address that has no chance of working is wasted budget. A syntax pass is free and catches the obvious junk in milliseconds.
+
+## What the validator checks
+
+A correct email address has three parts: a local part before the `@`, a separator, and a domain. The validator walks each part against the RFC rules.
+
+<Steps>
+<Step title="Parse the input">
+Split the string at the last `@`. The two halves become the local part and the domain. If there is no `@` at all, or more than one outside a quoted form, the address is invalid.
+</Step>
+<Step title="Validate the local part">
+RFC 5321 caps the local part at 64 octets. Letters, digits, plus a small set of punctuation are allowed. Leading dots, trailing dots, and consecutive dots in the unquoted form all fail.
+</Step>
+<Step title="Validate the domain">
+The domain must be a fully-qualified hostname or an IP literal in square brackets. Each label is at most 63 characters, the full domain at most 253, and the domain must contain at least one dot for public mail.
+</Step>
+<Step title="Return the verdict">
+If every rule passes, the address is syntactically valid. Anything else fails. The tool returns `Valid` or `Invalid` so you can drop the failures straight from your list.
+</Step>
+</Steps>
+
+## What to watch for in real lists
+
+Five patterns account for almost every syntax failure on a typical exported list.
+
+- **Missing `@` or two `@`s.** `usercompany.com`, `user@@example.com`. Usually paste errors or a CRM column merge that went wrong.
+- **Empty local part.** `@example.com`. Frequent in bot signups and form scrapes.
+- **Domain without a dot.** `user@localhost` is fine for internal mail and broken for marketing.
+- **Leading or trailing dots in the local part.** `.user@example.com`, `user.@example.com`. They look harmless and they break RFC 5321 every time.
+- **Consecutive dots.** `john..doe@example.com`. The most common typo on lists exported from spreadsheets.
+
+## What syntax validation is not
+
+Syntax validation tells you the string is shaped correctly. It does not tell you the mailbox exists, that the domain accepts mail, or that the address belongs to a real person.
+
+To answer those questions, chain in the related checks:
+
+- **[MX lookup](https://spotzee.com/tools/mx-lookup/)**: confirms the domain has mail-exchange records and can receive mail.
+- **[Email provider check](https://spotzee.com/tools/email-provider-check/)**: identifies the mailbox host (Gmail, Microsoft, custom).
+- **[Email health check](https://spotzee.com/tools/email-health-check/)**: runs the full SPF, DKIM, DMARC, ARC, and BIMI scan on the domain.
+- **[Temporary email checker](https://spotzee.com/tools/temp-email-checker/)**: flags disposable addresses that bots use to bypass signup gates.
+
+Run syntax first, then layer the deeper checks onto the survivors.
+
+## FAQs
+
+<AccordionGroup>
+<Accordion title="What does an email syntax validator actually check?">
+It checks the rules in RFC 5321 and RFC 5322. That covers presence and position of the `@`, length and character rules for the local part, and domain format including label lengths and at least one dot. It does not contact a mail server, so a syntactically valid address can still bounce in real life.
+</Accordion>
+
+<Accordion title="Why does a valid-looking email come back as invalid?">
+The usual culprits are leading or trailing dots in the local part, consecutive dots, missing top-level domain (`user@localhost`), or unsupported characters. Strict validators follow the unquoted-form rules word-for-word; permissive ones accept edge cases that work in practice but break the spec.
+</Accordion>
+
+<Accordion title="Is syntax validation the same as email verification?">
+No. Syntax validation checks the format of the string. Full verification adds an MX lookup to confirm the domain accepts mail, and an SMTP handshake to ask the server whether the mailbox exists. Use syntax first to filter the obvious failures, then verify the survivors.
+</Accordion>
+
+<Accordion title="Will a syntax validator catch typos like `gmial.com`?">
+No. `gmial.com`, `outlok.com`, and `yaho.com` are all syntactically valid; they just point at domains that don't exist. To catch them, pair this tool with an [MX lookup](https://spotzee.com/tools/mx-lookup/) or a typo-detection step that compares the domain against a list of known providers.
+</Accordion>
+
+<Accordion title="How accurate is the result?">
+The format check is exact. If the tool says `Valid`, the string conforms to RFC 5321 and RFC 5322. If it says `Invalid`, the string fails at least one rule. Whether the address actually delivers is a separate question that needs MX and SMTP checks to answer.
+</Accordion>
+</AccordionGroup>
+
+## Try it
+
+Head to [the live email syntax validator](https://spotzee.com/tools/email-syntax-validator/) and paste an address. Results come back instantly and you can run as many checks as you need from a single page.

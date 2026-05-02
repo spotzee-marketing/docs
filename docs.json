@@ -125,6 +125,12 @@
                   "guides/tools/blacklist-monitoring/alerts",
                   "guides/tools/blacklist-monitoring/troubleshoot"
                 ]
+              },
+              {
+                "group": "Email validation",
+                "pages": [
+                  "guides/tools/email-validation/email-syntax-validator"
+                ]
               }
             ]
           },
