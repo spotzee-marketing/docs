@@ -1,0 +1,106 @@
+---
+title: "Free Email Provider Check"
+description: "Free email provider check that resolves any domain's MX records and identifies the mailbox host. Use it for sales hygiene, list segmentation, and deliverability triage."
+keywords: ["email provider checker", "email provider check", "free email provider check", "find email provider for domain", "how to check email provider", "mailbox provider lookup", "who hosts this email", "domain email lookup"]
+---
+
+An email provider check identifies which mailbox service receives mail for a given domain. The tool resolves the domain's MX records via DNS, picks the highest-priority hostname, and matches it against a database of known providers. The answer is the friendly name (Gmail, Microsoft 365, iCloud, ProtonMail, Zoho, and more) plus the underlying mail-exchange hostname.
+
+If you've ever needed to find the email provider for a domain, you've probably done it the long way: open a terminal and run `dig MX example.com`, paste the domain into a generic DNS tool, or forward a message to a third-party detection service. They answer the same question. Who hosts this email, and what infrastructure handles it? A focused domain email lookup gives you the answer in one step.
+
+<Info>
+Run a one-off check at [spotzee.com/tools/email-provider-check](https://spotzee.com/tools/email-provider-check/). Paste either a bare domain or a full email address. The tool extracts the domain part automatically.
+</Info>
+
+This guide covers how to check the email provider for any domain, what each field in the result means, and how the lookup chains with the rest of the email-validation toolkit.
+
+## Why provider detection matters
+
+Knowing where mail actually lands changes how you reach the inbox. Microsoft 365 throttles aggressively on cold senders. Gmail rewards consistency over volume. Yahoo applies a different junk model again. A list segmented by mailbox provider lets you tune subject lines, sending cadence, and dedicated-IP rotation to match what each provider wants to see, instead of treating every recipient the same.
+
+There is also a hygiene angle. Domains with no MX records cannot receive mail at all. Sending to addresses on those domains generates an instant hard bounce, hits your sender reputation, and wastes credits on every downstream verification step. A quick provider check filters those domains out before they cost you anything.
+
+For regulated firms, the same lookup is a vendor due-diligence shortcut. If a supplier claims to use Microsoft 365 but the MX hostname points to a different provider, that's a flag worth investigating. Shadow IT, untracked migrations, and misconfigured forwarders all show up here.
+
+## How the check works
+
+The check is a thin layer on top of standard DNS. The lookup itself is fast because MX queries are cached aggressively at every recursive resolver in the chain.
+
+<Steps>
+<Step title="Parse the input">
+The tool accepts either `example.com` or `user@example.com`. If there is an `@`, the part after it becomes the domain. Everything else is treated as a bare domain.
+</Step>
+<Step title="Resolve the MX records">
+Query the domain for MX records. Each record has a priority (lower wins) and a hostname. The tool picks the lowest-priority record because that's the primary mail exchanger every real sender talks to first.
+</Step>
+<Step title="Match against the provider database">
+Compare the returned hostname against known patterns. `*.gmail-smtp-in.l.google.com` is Gmail. `*.protection.outlook.com` is Microsoft 365. `mx*.mail.icloud.com` is iCloud. `mail.protonmail.ch` is ProtonMail. Patterns cover the major mailbox providers and many of the popular regional and self-hosted platforms.
+</Step>
+<Step title="Return the verdict">
+If a match is found, return the friendly provider name and the raw MX record. If the domain has no MX records, return `exists: false`. If MX records exist but no pattern matches, return the raw hostname so you can identify a custom or self-hosted setup manually.
+</Step>
+</Steps>
+
+## What to watch for in the result
+
+Read the four fields the API returns in the order below. Each one has a different signal weight.
+
+- **`exists` flag.** A `false` result means the domain has no MX records. The address cannot receive mail. Drop it from any active list and flag the contact in your CRM.
+- **Provider name.** The friendly identifier (Gmail, Microsoft, iCloud, Zoho, ProtonMail, Yahoo). Use it to segment, route, or score the contact downstream.
+- **MX hostname.** The raw record returned by DNS. Useful when the provider name is missing, because the hostname tells you which infrastructure is handling the domain even if the friendly mapping has not been added to the database yet.
+- **MX priority.** Lower is better. A `priority: 0` record is the primary mail exchanger. The tool only returns the lowest-priority record, matching what a real sender would actually talk to.
+
+A custom-domain shop running its own mail server will return `exists: true` with no provider name. That's expected. Inspect the hostname directly to identify the platform. Self-hosted Postfix, Mailcow, Stalwart, and Mail-in-a-Box all show up this way.
+
+## Provider check vs ESP lookup
+
+These two get confused often. They answer different questions.
+
+A **provider check** identifies the mailbox host. It tells you where mail is delivered. The mechanism is an MX lookup. The answer is Gmail, Microsoft 365, or similar.
+
+An **ESP lookup** identifies the email service provider that sent a marketing email. It tells you what's behind the campaign. The mechanism is header inspection (`Received:` chain, DKIM signature, list-unsubscribe header). The answer is Mailchimp, Klaviyo, SendGrid, or similar.
+
+Use the provider check when you have a contact list and want to segment by mailbox host. Use an ESP lookup when you have an email in your inbox and want to know which sending platform produced it.
+
+## Common workflows
+
+The provider check chains naturally with the rest of the email-validation toolkit:
+
+- **[Email syntax validator](https://spotzee.com/tools/email-syntax-validator/)**: filter obvious format failures first, free.
+- **[MX lookup](https://spotzee.com/tools/mx-lookup/)**: see every MX record returned, not just the lowest-priority one.
+- **[Email health check](https://spotzee.com/tools/email-health-check/)**: run the full SPF, DKIM, DMARC, ARC, and BIMI scan once you know the provider.
+- **[Temporary email checker](https://spotzee.com/tools/temp-email-checker/)**: flag disposable addresses that bots use to bypass signup gates.
+
+The order matters. Syntax first (free), provider check second (one DNS call), full verification last (the expensive step).
+
+## FAQs
+
+<AccordionGroup>
+<Accordion title="What does an email provider check actually do?">
+It resolves a domain's MX records and identifies the mailbox service that receives mail for that domain. It does not connect to the mailbox itself, only to public DNS. The tool matches the returned hostname against known patterns to surface the friendly provider name (Gmail, Microsoft, iCloud, Zoho, ProtonMail, and others), or returns `exists: false` if no MX record is published.
+</Accordion>
+
+<Accordion title="What is the difference between an email provider check and an ESP lookup?">
+A provider check identifies the mailbox host (Gmail, Microsoft 365, iCloud). An ESP lookup identifies the sending platform behind a marketing email (Mailchimp, Klaviyo, SendGrid). The first answers where mail is delivered, the second answers what produced a campaign. They use different mechanisms and answer different questions.
+</Accordion>
+
+<Accordion title="Why does the tool show `exists: false` for some domains?">
+A `false` result means the domain has no MX records published. Most often the domain is not set up to receive mail at all. Parked domains, vanity URLs, and redirect-only hosts all show up this way. Sending to addresses on those domains will hard-bounce, so flag and remove them.
+</Accordion>
+
+<Accordion title="Can I use this on an email address or just on a domain?">
+Both. The tool accepts either form. If you paste `user@example.com`, it splits on the `@` and resolves `example.com`. If you paste `example.com` directly, it resolves the same way. The provider answer is identical because the lookup is keyed on the domain.
+</Accordion>
+
+<Accordion title="How accurate is the provider detection?">
+As accurate as the underlying DNS. If Gmail's MX records are published correctly, the result is exact. Edge cases include catch-all relays (a third party receives mail and forwards it on), regional Microsoft 365 endpoints (which can route through `*.protection.outlook.com` or `*.olc.protection.outlook.com`), and self-hosted servers. Those all return the raw MX hostname so you can identify them by hand.
+</Accordion>
+
+<Accordion title="Does the check work for international domains?">
+Yes. The tool resolves any valid domain, including IDN (internationalised domain names) submitted in their punycode form. UK `.co.uk`, German `.de`, Japanese `.jp`, and any other ccTLD work the same way.
+</Accordion>
+</AccordionGroup>
+
+## Try it
+
+Head to [the live email provider check](https://spotzee.com/tools/email-provider-check/) and paste a domain or an email address. Results come back instantly and there is no signup or daily limit.
