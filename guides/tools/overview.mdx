@@ -1,0 +1,77 @@
+---
+title: "Free Tools"
+description: "Free email validation, DNS, deliverability, blacklist, and content tools for marketers and developers. No signup, no daily limit."
+keywords: ["free email tools", "deliverability tools", "dns lookup tools", "blacklist monitoring", "spotzee tools"]
+---
+
+Spotzee runs a set of free tools that wrap the same checks our platform runs on every campaign. Each tool has a one-shot version on `spotzee.com/tools` (paste a value, get an answer) and a longer guide here in the docs.
+
+<Info>
+Use the tool when you need a single answer fast. Read the guide when you need to know what the answer means, what to do about it, and where it fits in the broader workflow.
+</Info>
+
+## Email validation
+
+Tools that check whether an address is real, who hosts it, and whether the domain is set up to receive mail.
+
+<CardGroup cols={2}>
+  <Card title="Email syntax validator" href="/guides/tools/email-validation/email-syntax-validator">
+    Check any address against RFC 5321 / 5322 format rules. Free, instant, no signup.
+  </Card>
+  <Card title="Email provider check" href="/guides/tools/email-validation/email-provider-check">
+    Identify the mailbox host (Gmail, Microsoft 365, iCloud, custom) for any domain.
+  </Card>
+</CardGroup>
+
+## Blacklist monitoring
+
+Continuous monitoring for sending IPs and domains against real-time blacklists.
+
+<CardGroup cols={2}>
+  <Card title="Overview" href="/guides/tools/blacklist-monitoring/overview">
+    What the tool watches, how it alerts, and how groups work.
+  </Card>
+  <Card title="Setup" href="/guides/tools/blacklist-monitoring/setup">
+    Add IPs, add domains, pick a check cadence, configure alerts.
+  </Card>
+  <Card title="IPs" href="/guides/tools/blacklist-monitoring/ips">
+    Manage monitored IPs, view per-IP history, run on-demand checks.
+  </Card>
+  <Card title="Domains" href="/guides/tools/blacklist-monitoring/domains">
+    Manage monitored domains and inspect domain-blacklist results.
+  </Card>
+  <Card title="Groups" href="/guides/tools/blacklist-monitoring/groups">
+    Group resources by client, brand, or product line for routed alerts.
+  </Card>
+  <Card title="Bulk import" href="/guides/tools/blacklist-monitoring/bulk">
+    Add many IPs or domains at once via CSV.
+  </Card>
+  <Card title="Alerts" href="/guides/tools/blacklist-monitoring/alerts">
+    Configure email and webhook notifications for new listings.
+  </Card>
+  <Card title="Troubleshoot" href="/guides/tools/blacklist-monitoring/troubleshoot">
+    Common issues, false positives, and how to interpret historical patterns.
+  </Card>
+</CardGroup>
+
+## Sendmux integration
+
+The companion tool for Spotzee customers running their own SMTP relay.
+
+<CardGroup cols={2}>
+  <Card title="Overview" href="/guides/tools/sendmux/overview">
+    What Sendmux does and how it integrates with the rest of Spotzee.
+  </Card>
+  <Card title="Logs" href="/guides/tools/sendmux/logs">
+    Inspect message-level delivery, bounce, and rejection logs.
+  </Card>
+</CardGroup>
+
+## Pick a tool by intent
+
+| If you want to… | Start here |
+|---|---|
+| Filter junk addresses out of a list | [Email syntax validator](/guides/tools/email-validation/email-syntax-validator) |
+| Know which mailbox host a domain uses | [Email provider check](/guides/tools/email-validation/email-provider-check) |
+| Stop a blacklist listing from killing deliverability | [Blacklist monitoring overview](/guides/tools/blacklist-monitoring/overview) |
+| Trace a delivery problem in your SMTP logs | [Sendmux logs](/guides/tools/sendmux/logs) |

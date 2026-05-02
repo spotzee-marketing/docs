@@ -106,6 +106,7 @@
           {
             "group": "Tools",
             "pages": [
+              "guides/tools/overview",
               {
                 "group": "Sendmux integration",
                 "pages": [
