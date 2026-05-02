@@ -1,6 +1,6 @@
 ---
-title: "Free Email Provider Check"
-description: "Free email provider check that resolves any domain's MX records and identifies the mailbox host. Use it for sales hygiene, list segmentation, and deliverability triage."
+title: "Email Provider Check"
+description: "Email provider check that resolves any domain's MX records and identifies the mailbox host. Use it for sales hygiene, list segmentation, and deliverability triage."
 keywords: ["email provider checker", "email provider check", "free email provider check", "find email provider for domain", "how to check email provider", "mailbox provider lookup", "who hosts this email", "domain email lookup"]
 ---
 
@@ -66,12 +66,12 @@ Use the provider check when you have a contact list and want to segment by mailb
 
 The provider check chains naturally with the rest of the email-validation toolkit:
 
-- **[Email syntax validator](https://spotzee.com/tools/email-syntax-validator/)**: filter obvious format failures first, free.
+- **[Email syntax validator](https://spotzee.com/tools/email-syntax-validator/)**: filter obvious format failures first. Runs in your browser, no API call.
 - **[MX lookup](https://spotzee.com/tools/mx-lookup/)**: see every MX record returned, not just the lowest-priority one.
 - **[Email health check](https://spotzee.com/tools/email-health-check/)**: run the full SPF, DKIM, DMARC, ARC, and BIMI scan once you know the provider.
 - **[Temporary email checker](https://spotzee.com/tools/temp-email-checker/)**: flag disposable addresses that bots use to bypass signup gates.
 
-The order matters. Syntax first (free), provider check second (one DNS call), full verification last (the expensive step).
+The order matters. Syntax first (no API call, browser-only), provider check second (one DNS call against your Spotzee credit), full verification last (the heaviest step in both runtime and credit cost).
 
 ## FAQs
 

@@ -1,14 +1,27 @@
 ---
-title: "Free Tools"
-description: "Free email validation, DNS, deliverability, blacklist, and content tools for marketers and developers. No signup, no daily limit."
-keywords: ["free email tools", "deliverability tools", "dns lookup tools", "blacklist monitoring", "spotzee tools"]
+title: "Tools"
+description: "Email validation, DNS, deliverability, blacklist, and content tools that wrap the Spotzee Extended API. Pay-as-you-go, with $1 starter credit on every new account."
+keywords: ["email validation tools", "deliverability tools", "dns lookup tools", "blacklist monitoring", "spotzee tools", "extended api tools"]
 ---
 
-Spotzee runs a set of free tools that wrap the same checks our platform runs on every campaign. Each tool has a one-shot version on `spotzee.com/tools` (paste a value, get an answer) and a longer guide here in the docs.
+Spotzee runs a set of tools that wrap the same checks the platform runs on every campaign. Each tool has a one-shot version on `spotzee.com/tools` (paste a value, get an answer) and a longer guide here in the docs.
+
+<Info>
+**Pricing model.** Every Spotzee account starts with $1 of free credit. Each tool call deducts a small per-call amount from that balance. Figures vary by tool, typically a fraction of a cent per call. Once the credit runs out, top up to keep using the tools. Live per-tool pricing is on the [Spotzee pricing page](https://spotzee.com/pricing/).
+</Info>
 
 <Info>
 Use the tool when you need a single answer fast. Read the guide when you need to know what the answer means, what to do about it, and where it fits in the broader workflow.
 </Info>
+
+## Pick a tool by intent
+
+| If you want to… | Start here |
+|---|---|
+| Filter junk addresses out of a list | [Email syntax validator](/guides/tools/email-validation/email-syntax-validator) |
+| Know which mailbox host a domain uses | [Email provider check](/guides/tools/email-validation/email-provider-check) |
+| Stop a blacklist listing from killing deliverability | [Blacklist monitoring overview](/guides/tools/blacklist-monitoring/overview) |
+| Trace a delivery problem in your SMTP logs | [Sendmux logs](/guides/tools/sendmux/logs) |
 
 ## Email validation
 
@@ -16,7 +29,7 @@ Tools that check whether an address is real, who hosts it, and whether the domai
 
 <CardGroup cols={2}>
   <Card title="Email syntax validator" href="/guides/tools/email-validation/email-syntax-validator">
-    Check any address against RFC 5321 / 5322 format rules. Free, instant, no signup.
+    Check any address against RFC 5321 / 5322 format rules. Runs in-browser, no API call.
   </Card>
   <Card title="Email provider check" href="/guides/tools/email-validation/email-provider-check">
     Identify the mailbox host (Gmail, Microsoft 365, iCloud, custom) for any domain.
@@ -66,12 +79,3 @@ The companion tool for Spotzee customers running their own SMTP relay.
     Inspect message-level delivery, bounce, and rejection logs.
   </Card>
 </CardGroup>
-
-## Pick a tool by intent
-
-| If you want to… | Start here |
-|---|---|
-| Filter junk addresses out of a list | [Email syntax validator](/guides/tools/email-validation/email-syntax-validator) |
-| Know which mailbox host a domain uses | [Email provider check](/guides/tools/email-validation/email-provider-check) |
-| Stop a blacklist listing from killing deliverability | [Blacklist monitoring overview](/guides/tools/blacklist-monitoring/overview) |
-| Trace a delivery problem in your SMTP logs | [Sendmux logs](/guides/tools/sendmux/logs) |
