@@ -131,7 +131,8 @@
                 "group": "Email validation",
                 "pages": [
                   "guides/tools/email-validation/email-syntax-validator",
-                  "guides/tools/email-validation/email-provider-check"
+                  "guides/tools/email-validation/email-provider-check",
+                  "guides/tools/email-validation/email-health-check"
                 ]
               }
             ]

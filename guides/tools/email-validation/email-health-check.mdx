@@ -1,0 +1,106 @@
+---
+title: "Email Health Check"
+description: "Email health check that audits SPF, DKIM, DMARC, BIMI, MTA-STS, TLS-RPT, CAA and blacklist status for any domain. Run it before campaigns or as a quarterly compliance review."
+keywords: ["email health check", "email deliverability test", "spf dmarc dkim check", "how to test email deliverability", "free email deliverability test", "free email health check", "domain email health check", "email health check online", "how to check email domain health"]
+---
+
+An email health check audits the technical foundation of your sending domain. It looks at MX records, SPF, DKIM, DMARC, BIMI, MTA-STS, TLS-RPT, CAA, and the domain's blacklist and reputation status. Each one gets a score, the scores roll up into a single percentage, and every failed check returns the record value and the fix to apply. It's the fastest one-shot deliverability audit you can run before a send.
+
+<Info>
+Run a one-off check at [spotzee.com/tools/email-health-check](https://spotzee.com/tools/email-health-check/). Paste a bare domain or a full email address. Pick `quick` DKIM scope for ongoing monitoring, `full` for the first audit on a new domain.
+</Info>
+
+This guide covers what each score means, how to read the output, and the order to remediate failures so the cheapest fixes give the largest score lifts.
+
+## Why this matters
+
+Email authentication is silent infrastructure until it breaks. SPF passes today, then a vendor change pushes the DNS lookup count past 10 and the record starts to `permerror` everywhere. DMARC reports go to a parsed-out address that nobody monitors. DKIM rotates, the new selector isn't published, and signature checks start failing. The first signal you usually get is a deliverability complaint from sales, and by that point the reputation damage has already happened.
+
+For regulated firms the stakes are higher. An unauthenticated message isn't just a deliverability problem. It's an audit-trail problem. Mailbox providers downgrade unauthenticated mail to spam, the customer never sees it, and the firm has no record of what was actually delivered. A scheduled email health check turns silent failure modes into something an oncall engineer can act on the same week.
+
+There are three moments worth running the audit. Before each campaign on a domain you haven't sent from this quarter. After any change to DNS, ESP routing, or DKIM key rotation. And on a fixed schedule. The first business day of each quarter is a defensible default for a marketing-comms compliance log.
+
+## How it works
+
+The audit is a parallel sweep across nine DNS-level signal groups. The whole thing runs in a couple of seconds because every query is cached aggressively at every recursive resolver in the chain.
+
+<Steps>
+<Step title="Submit a domain">
+The tool accepts either `example.com` or `user@example.com`. If there's an `@`, the part after it becomes the domain. Everything else is treated as a bare domain.
+</Step>
+<Step title="Resolve every authentication record">
+Query MX, SPF (with full `include:` expansion), DMARC, DKIM (popular selectors in `quick` mode, a wider sweep in `full` mode), BIMI, MTA-STS policy file, TLS-RPT, and CAA. Each query has a fixed weight in the final score based on how strongly it influences inbox placement.
+</Step>
+<Step title="Score each signal group">
+Each bucket reports `score` and `maxScore`. Pass when `score == maxScore`. Partial when between zero and `maxScore`. Fail when zero. Buckets the upstream considers non-applicable (most often BIMI on a domain with no logo published) report `maxScore: 0` and don't drag the percentage down.
+</Step>
+<Step title="Roll up the percentage">
+Sum obtained vs maximum across applicable buckets and return a single percentage 0–100. Anything below 80 has at least one structural problem worth fixing this week.
+</Step>
+<Step title="Surface the actions">
+Every failed check returns the record value, the failure reason, and the fix to apply. You can pull each one straight into a remediation ticket without hand-reading raw DNS output.
+</Step>
+</Steps>
+
+## What to watch for in the result
+
+Read the output in priority order. The cheapest fixes give the largest score lifts.
+
+- **Final percentage and `dataCompleteness`.** If `dataCompleteness.percentage` is below 100, your score has gaps. Fill the missing checks first. Incomplete data masks risk.
+- **SPF lookup count.** RFC 7208 caps SPF at 10 DNS lookups per evaluation. Anywhere near the cap, trim or flatten an `include:` chain before it `permerror`s. The audit returns the live count so you can see exactly how close you are.
+- **DMARC policy direction.** `p=none` is monitoring only. Receivers ignore alignment failures. Production sending domains should be on `p=quarantine` or `p=reject` once you trust your sender list.
+- **DKIM selector coverage.** Quick mode tests the most-used selectors. If your selectors are custom, switch to `full` mode and confirm the records the tool detected match what your provider actually signs with.
+- **Domain blacklist status.** A blacklisted domain or its mail-server IP is the first thing a receiver checks. One listing is recoverable. Multiple listings need urgent investigation.
+- **MTA-STS and TLS-RPT presence.** Both are increasingly mandatory for finance senders. Receivers like Google, Microsoft, and Apple use them to enforce TLS for inbound mail.
+
+## How the score buckets weight
+
+The scoring weights are fixed by the upstream service. They reflect how strongly each signal influences real inbox placement, not a guess at what's "important". The exact maxima vary slightly by domain (BIMI drops to zero when no logo is published, for example), but the relative weights are stable.
+
+| Bucket | Weight (approx) | Why it matters |
+|---|---|---|
+| MX | 30 points | Without MX, the domain can't receive mail. The check verifies records, providers, backup hosts, blacklist status of every IP, and reverse-DNS alignment. |
+| SPF | 80 points | Largest bucket. Catches the lookup-count cap, soft/hard fail qualifiers, recursive `include:`, void lookups, and mechanism breadth. |
+| DKIM | 60 points | Quick mode tests popular selectors, `full` does a wider sweep. Missing or misaligned signatures are the second most common silent failure. |
+| DMARC | 60 points | Policy direction (`p=` and `sp=`), `rua`/`ruf` reachability, `pct`, `aspf`, `adkim` alignment. |
+| Domain | 50 points | Domain age, expiry, blacklist status, registrar, hosting, parked-domain detection, TLS/DNSSEC. |
+| MTA-STS | 10 points | Policy file presence, mode (`enforce` vs `testing`), `max_age`, MX coverage. |
+| TLS-RPT | 5 points | TLS reporting endpoint reachability. |
+| CAA | 5 points | Authorised certificate issuers, incident-reporting contact, contact records. |
+| BIMI | 0–5 points | Optional. Only contributes when a BIMI record is published. |
+
+## FAQs
+
+<AccordionGroup>
+<Accordion title="What does an email health check actually audit?">
+Every public DNS-level signal mailbox providers use to grade your sending domain. MX (mail routing), SPF (sender authorisation), DKIM (signing keys), DMARC (alignment policy), BIMI (logo policy), MTA-STS (transport security), TLS-RPT (TLS reporting), CAA (certificate authority authorisation), and the domain's blacklist and reputation status. The result is a single percentage 0–100 plus a per-bucket breakdown of what passed, what failed, and the specific record value to change.
+</Accordion>
+
+<Accordion title="How is this different from an email deliverability test?">
+An email deliverability test usually means sending a probe message to a panel of seed inboxes and inspecting where it lands. An email health check looks at the static authentication records before any send happens. The two are complementary. The health check catches setup mistakes that would tank deliverability, while a probe test catches content and reputation issues the records don't reveal. Run the health check first. If everything passes and inbox placement is still poor, then run a probe.
+</Accordion>
+
+<Accordion title="What email health score is good enough?">
+Treat 80% as a hard floor for any production sending domain and 95%+ as the bar for compliance-sensitive senders. The drop-offs from 100% are usually predictable. BIMI and MTA-STS are still optional for many senders (each contributes a small share of the score), and a fresh domain (under three months old) loses a few points on age. Anything below 80% has at least one structural problem (typically a missing DMARC record or an SPF over the 10-lookup cap) worth fixing this week.
+</Accordion>
+
+<Accordion title="Why does my SPF or DMARC pass syntactically but still fail in real sends?">
+Three things break the alignment between record validation and actual delivery. An SPF that's syntactically valid but exceeds the 10-DNS-lookup cap (causes `permerror`). A DMARC policy of `p=none` that receivers treat as monitoring only. And DKIM signatures that pass for the rotating selector but fail the alignment check (the From header domain doesn't match the `d=` tag). The health check surfaces all three. The result panel highlights which is the active blocker.
+</Accordion>
+
+<Accordion title="Should I run quick or full DKIM mode?">
+Quick mode tests against the most-used DKIM selectors. `default`, `google`, `selector1`, `s1`, `mandrill`, `mailgun*`, `k1`, and similar. It's fast, low-cost, and catches every domain using a popular ESP. Full mode adds a sweep across less-common selectors and is worth running once on first audit so you know exactly which selectors a domain publishes. After the first full run, quick mode is fine for ongoing monitoring.
+</Accordion>
+
+<Accordion title="Can I run the audit on a domain I don't own?">
+Yes. Every record the audit reads is published in public DNS, so the check works on any domain. That's why provider security teams use it for vendor due diligence and competitive analysis. The audit doesn't authenticate, send mail, or touch the inbox. It's strictly a DNS-level read.
+</Accordion>
+
+<Accordion title="How does this chain with the other email-validation tools?">
+The health check is the broad audit. The single-signal lookups dig deeper into one bucket each. Use [SPF lookup](/guides/tools/dns-auth/spf-lookup) to inspect the lookup-count chain. Use [DMARC lookup](/guides/tools/dns-auth/dmarc-lookup) to see policy and reporting addresses. Use [MX lookup](/guides/tools/dns-auth/mx-lookup) for the full priority list. Use [domain blacklist check](/guides/tools/blacklist-security/domain-blacklist-check) for a deeper blacklist sweep across more lists than the health check covers.
+</Accordion>
+</AccordionGroup>
+
+## Try it
+
+Head to [the live email health check](https://spotzee.com/tools/email-health-check/) and paste a domain. The result panel returns the score, every per-bucket breakdown, and the records that need to change. The same audit is available programmatically via the Spotzee Extended API for batch and scheduled use.
