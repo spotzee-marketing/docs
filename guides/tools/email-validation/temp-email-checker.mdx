@@ -1,0 +1,96 @@
+---
+title: "Disposable Email Checker"
+description: "Disposable email checker that flags throwaway addresses against an open-source list of 55,000+ known providers. Block fake signups before they pollute your list."
+keywords: ["disposable email checker", "fake email checker", "temporary email checker", "free disposable email checker", "disposable email detector", "throwaway email checker", "block disposable emails", "detect disposable email address"]
+---
+
+A disposable email checker (also known as a fake email checker or disposable email detector) compares an email address or its domain against a maintained list of throwaway providers. Mailinator, Guerrilla Mail, YOPmail, 10MinuteMail, and tens of thousands more. The check is a fast string lookup. No DNS query, no probe message, no SMTP handshake. The result is a single boolean: temporary or not.
+
+<Info>
+Run a one-off check at [spotzee.com/tools/temp-email-checker](https://spotzee.com/tools/temp-email-checker/). Paste either a full email address or a bare domain. Both work.
+</Info>
+
+This guide covers the mechanics of the underlying blocklist, where the check fits in a signup flow, and the patterns that show up most often in production data.
+
+## Why this matters
+
+Disposable signups are the cheapest abuse vector on the internet. A bot grabs a free trial, a fraudster claims a referral bonus, a competitor scrapes your gated content. Every one of them needs an email address that survives long enough to confirm the form. Throwaway providers exist to give them exactly that. An inbox that lasts ten minutes and disappears.
+
+Catching them at the form is much cheaper than catching them later. A blocked signup costs you nothing. A confirmed account that turns out to be a bot costs you a database row, a welcome email, a credit-card pre-authorisation hold, and a customer-service ticket when the abuse is discovered. The disposable email checker is a five-millisecond gate that prevents most of that downstream cost.
+
+It's also the right shape for batch-list cleanup. If you receive a list from a vendor, partner, or an old marketing campaign, run the disposable check before the import. Anything on the blocklist gets dropped before it pollutes your sender reputation.
+
+## How the check works
+
+The lookup is local to the API. No DNS, no MX query, no probe. Each call resolves in single-digit milliseconds.
+
+<Steps>
+<Step title="Parse the input">
+Accept either `user@example.com` or a bare `example.com`. If there's an `@`, the part after it is the domain. Either form keys the lookup on the same value.
+</Step>
+<Step title="Lower-case and normalise">
+Trim whitespace, convert to lowercase, and strip any plus-suffix from the local part. Throwaway services don't care about case or sub-addressing, so neither does the lookup.
+</Step>
+<Step title="Run the blocklist lookup">
+Compare the normalised domain against the bundled list of 55,000+ known throwaway providers from the open-source [`mailchecker`](https://github.com/FGRibreau/mailchecker) project. The list ships embedded in the API. No external call.
+</Step>
+<Step title="Return the verdict">
+`isTemporaryEmail: true` when the domain is on the blocklist. `isTemporaryEmail: false` otherwise. Use it as a hard signal at signup or a soft signal during list cleanup.
+</Step>
+</Steps>
+
+## What to watch for
+
+The check returns a single boolean. Two patterns are worth thinking through.
+
+- **False negatives are the main risk.** New throwaway domains pop up every week. The blocklist has 55,000+ entries but isn't exhaustive. Pair the disposable check with rate limiting on signups, CAPTCHA, and a behavioural check (rapid-fire signups from one IP, identical UA strings, etc.) to catch the long tail.
+- **False positives are rare but possible.** A handful of domains in the blocklist were repurposed legitimately after the entry was added. If a real user reports being blocked, double-check before you trust the verdict — and make the block soft (re-enter or contact-support fallback) rather than hard.
+- **Bare domains and email addresses both work.** Internally both reduce to the same domain lookup, so the answer is identical for `user@example.com` and `example.com`.
+- **Plus-suffix tricks don't fool the check.** `user+test@mailinator.com` keys on `mailinator.com`, same as `user@mailinator.com`. Sub-addressing is irrelevant to the lookup.
+
+## Where it fits in the email-validation workflow
+
+Run the disposable check before any paid step. It's the cheapest filter you have.
+
+- **Step 1 — [Email syntax validator](/guides/tools/email-validation/email-syntax-validator)**. Filter obvious format failures. Runs in your browser, no API call.
+- **Step 2 — Disposable email checker**. Drop throwaway domains. Five-millisecond lookup, single API call.
+- **Step 3 — [Email provider check](/guides/tools/email-validation/email-provider-check)**. Identify the mailbox host (Gmail, Microsoft 365, iCloud, custom). Useful for segmentation.
+- **Step 4 — Full email verification**. Per-call cost, runs SMTP handshake. Save it for the addresses that survive steps 1–3.
+
+The order matters. Each step is more expensive than the last. Filtering early keeps your verification budget pointed at addresses that are actually worth verifying.
+
+## FAQs
+
+<AccordionGroup>
+<Accordion title="What does a disposable email checker actually do?">
+It compares the domain part of an email address against a maintained list of known throwaway providers (Mailinator, Guerrilla Mail, YOPmail, 10MinuteMail and tens of thousands more). The lookup is a fast string match — no DNS query, no probe message — and returns a single boolean: temporary or not. Use it as the cheapest first-pass gate at signup or during list cleanup.
+</Accordion>
+
+<Accordion title="How is a disposable email checker different from full email verification?">
+A disposable email checker only answers one question: is this domain a known throwaway provider? Full email verification answers a different and more expensive question: does this specific mailbox actually exist and accept mail? They're complementary. The disposable check is a five-millisecond filter you run at signup or on every import. Full verification is a credit-cost step you run on the survivors only.
+</Accordion>
+
+<Accordion title="How big is the blocklist and how often is it updated?">
+The tool wraps the open-source [`mailchecker`](https://github.com/FGRibreau/mailchecker) blocklist, which contains over 55,000 known throwaway domains. The upstream repo accepts community pull requests and merges new domains regularly. Spotzee picks up upstream releases on each redeploy of the underlying API.
+</Accordion>
+
+<Accordion title="Will the check catch newly-created throwaway domains?">
+Not always. New disposable services launch every week, and there's a lag between the domain going live and being added to the blocklist. To catch the long tail, pair the disposable check with rate limiting on signups, CAPTCHA, and a behavioural check (rapid-fire signups from one IP, identical UA strings, identical referral codes). The disposable check handles the bulk; the rest fills in the gaps.
+</Accordion>
+
+<Accordion title="Can I run the check on a bare domain without an `@`?">
+Yes. The tool accepts either form. If you paste `user@mailinator.com`, it splits on the `@` and resolves `mailinator.com`. If you paste `mailinator.com` directly, it resolves the same way. Both produce the same verdict because the lookup is keyed on the domain.
+</Accordion>
+
+<Accordion title="Does the check work for international domains?">
+Yes. Internationalised domain names (IDN) submitted in their punycode form work the same way. The blocklist itself is mostly Western-language domains, but if a temp provider runs on `.co.uk`, `.de`, `.jp`, or any other ccTLD and is in the list, the check catches it.
+</Accordion>
+
+<Accordion title="Should I block disposable signups hard or soft?">
+Soft is safer for B2C. Reject the address, show the message "this looks like a disposable provider — try another address", and let the user retry. Hard blocks (silently rejecting and never telling the user why) catch fraudsters but also frustrate the rare legitimate user whose corporate domain ended up on the list. For B2B and finance flows where compliance demands a clean audit trail, hard blocks are reasonable.
+</Accordion>
+</AccordionGroup>
+
+## Try it
+
+Head to [the live disposable email checker](https://spotzee.com/tools/temp-email-checker/) and paste an address or domain. The result panel returns the verdict instantly. The same check is available programmatically via the Spotzee Extended API for batch and signup-flow use.
