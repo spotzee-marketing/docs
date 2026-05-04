@@ -1,0 +1,88 @@
+---
+title: "Domain Blacklist Check"
+description: "Domain blacklist check that scans any sending domain against 17 major DNS blacklists. Per-blacklist verdict with delisting guidance. Credit-based usage via the Spotzee Extended API."
+keywords:
+  - domain blacklist check
+  - email domain blacklist check
+  - email blacklist checker
+  - domain blacklist lookup
+  - free domain blacklist checker
+  - domain blacklist check online
+  - how to check domain blacklist
+  - domain blacklist financial services
+  - domain blacklist check free
+---
+
+Domain blacklists — also called Domain-based Blacklists (DBLs), URI Blacklists (URIBLs) or Realtime Blackhole Lists (RBLs) — are databases maintained by anti-spam organisations that flag domains associated with spam, phishing or malware. Mailbox providers query these lists in real time when filtering inbound mail. A listing can cause your emails to be blocked at the gateway before they ever reach a spam folder.
+
+<Info>
+Run a free domain blacklist check at [spotzee.com/tools/domain-blacklist-check](https://spotzee.com/tools/domain-blacklist-check).
+</Info>
+
+## Why this matters
+
+Unlike IP blacklisting — which targets the mail server — domain blacklisting targets your brand domain and follows it across any sending infrastructure. Switching ESPs, changing IPs or moving to a new mail server does not clear a domain listing. The only fix is a successful delisting request with the relevant blacklist operator.
+
+For financial services senders, the stakes are higher. Transactional notifications, account alerts, fraud warnings and regulatory communications all originate from the same sending domain. A single domain listing can block all of them at once — creating a customer-communication gap that regulators and customers will notice quickly.
+
+And timing matters. Most domain listings take 24–72 hours to clear even after the root cause is fixed. Catching a listing before a major send is far cheaper than managing a blocked campaign retroactively.
+
+## How it works
+
+<Steps>
+  <Step title="Enter your sending domain">
+    Type or paste your domain name. The tool also accepts a full email address and extracts the domain automatically.
+  </Step>
+  <Step title="Choose scan depth">
+    Popular checks the most commonly consulted blacklists — a fast first check covering the lists most likely to affect inbox placement. Full scans all 17 blacklists in the index, including specialist lists used by specific gateways and filters.
+  </Step>
+  <Step title="Query each blacklist via DNS">
+    The tool queries each database using standard DNS lookups — the same method mailbox providers use when filtering inbound mail in real time.
+  </Step>
+  <Step title="Read the verdict">
+    A clean result means your domain is not listed on any checked blacklist. A listed result shows exactly which blacklists flagged the domain.
+  </Step>
+  <Step title="Act on any listings">
+    Each major blacklist has its own delisting form. Fix the root cause first, then submit — repeat listings lead to extended blackout periods.
+  </Step>
+</Steps>
+
+## What to watch for
+
+- **Any listing on Spamhaus DBL.** Spamhaus DBL is the most widely consulted domain blacklist. A listing causes immediate blocking at most major mailbox providers. Submit a removal at spamhaus.org after identifying the root cause.
+- **Listings on URIBL Multi or other URI blacklists.** These URI-based lists are embedded in many spam filters and gateway appliances. A listing typically means your domain appeared in spam campaigns — audit recent sends for compromised content or hijacked links.
+- **Multiple simultaneous listings.** Being listed on several blacklists at once suggests a systemic problem — a security breach, compromised account, or spam complaint spike. Investigate sending logs and authentication records immediately.
+- **Check errors on full scan.** Errors usually mean a blacklist zone was temporarily unreachable. Re-run the check; persistent errors on the same blacklist typically mean the zone is inactive.
+- **Clean domain but still hitting spam folders.** Domain blacklists are one signal among many. If the check is clean but delivery is poor, audit IP reputation, SPF/DKIM/DMARC alignment and complaint rates — these are often the actual root causes.
+
+## FAQs
+
+<AccordionGroup>
+  <Accordion title="What is a domain blacklist?">
+    A domain blacklist is a database of domains associated with spam, phishing or malware distribution. Anti-spam systems query these lists in real time when filtering email. A domain listing can cause messages to be blocked or routed to junk regardless of the sending IP. The most widely consulted domain blacklists include Spamhaus DBL and URIBL Multi.
+  </Accordion>
+
+  <Accordion title="What's the difference between a domain blacklist and an IP blacklist?">
+    An IP blacklist flags the mail server address; a domain blacklist flags your brand domain. IP blacklisting affects all senders on that server. Domain blacklisting follows your domain across any sending infrastructure — switching ESPs or IPs does not clear a domain listing. Both can cause delivery failures, so checking both is part of a thorough deliverability audit.
+  </Accordion>
+
+  <Accordion title="How do I get my domain removed from a blacklist?">
+    Each blacklist has its own delisting process. Spamhaus DBL and URIBL Multi provide self-service removal forms on their websites. Before submitting, identify and fix the root cause — spam complaints, compromised links, phishing reports — or the domain will be re-listed quickly. Delisting typically takes 24–72 hours after approval.
+  </Accordion>
+
+  <Accordion title="What's the difference between Popular and Full scan?">
+    The Popular scan checks the most commonly consulted blacklists — a fast first check that catches the listings most likely to affect inbox placement. The Full scan queries all 17 blacklists in the index, including specialist lists used by specific filters and gateways. Use Full for a thorough pre-campaign or quarterly audit; use Popular for quick routine checks.
+  </Accordion>
+
+  <Accordion title="My domain is listed — will it affect all my emails?">
+    Not every mailbox provider consults every blacklist. A listing on Spamhaus DBL will affect most providers; a listing on a niche list may only affect a subset of recipients. The check result shows which lists flagged your domain so you can assess the likely reach of the impact. Prioritise removal from Spamhaus DBL and URIBL Multi first.
+  </Accordion>
+
+  <Accordion title="Where can I learn more about domain blacklisting?">
+    This guide covers delisting procedures and monitoring cadences in detail. Pair it with the [IP blacklist check guide](/guides/tools/blacklist-security/ip-blacklist-check) and the [email health check guide](/guides/tools/email-validation/email-health-check) — which audits SPF, DKIM, DMARC, blacklists and reputation in one pass — for a complete deliverability audit.
+  </Accordion>
+</AccordionGroup>
+
+## Try it
+
+Check any sending domain at [spotzee.com/tools/domain-blacklist-check](https://spotzee.com/tools/domain-blacklist-check). No sign-up needed for the one-shot web check. Programmatic access deducts a small per-call amount from your Spotzee credit balance — see live per-tool pricing on the [Spotzee pricing page](https://spotzee.com/pricing/).

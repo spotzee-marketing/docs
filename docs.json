@@ -148,6 +148,12 @@
                   "guides/tools/dns-auth/dns-lookup",
                   "guides/tools/dns-auth/senderscore-lookup"
                 ]
+              },
+              {
+                "group": "Blacklist & security",
+                "pages": [
+                  "guides/tools/blacklist-security/domain-blacklist-check"
+                ]
               }
             ]
           },
