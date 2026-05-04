@@ -1,0 +1,119 @@
+---
+title: "DNS Lookup"
+description: "DNS lookup that queries A, AAAA, MX, TXT, CNAME, NS, SOA, PTR, SRV and CAA records for any hostname. Returns live DNS data with TTL values for each record."
+keywords: ["dns lookup", "dns record lookup", "check dns records", "dns record checker", "how to check dns records", "free dns lookup", "dns lookup online", "a record lookup", "txt record lookup"]
+---
+
+A DNS lookup queries the Domain Name System for a specific record type on any hostname. Each record type answers a different question: A records return IPv4 addresses, AAAA returns IPv6, MX returns mail servers, TXT returns SPF policies and verification tokens, CNAME returns aliases, NS returns nameservers, SOA returns zone authority, PTR returns reverse lookups, SRV returns service discovery entries, and CAA returns certificate authority authorisation records.
+
+<Info>
+Run a one-off DNS query at [spotzee.com/tools/dns-lookup](https://spotzee.com/tools/dns-lookup/) — enter any hostname, choose a record type, and get the live DNS response instantly. No signup.
+</Info>
+
+This guide is for the API audience. Each call to `POST /generic/dns/dns-record-lookup` deducts a small per-call amount from your Spotzee credit balance. See the [Spotzee pricing page](https://spotzee.com/pricing/) for live figures.
+
+## Why this matters
+
+DNS records are the source of truth for how a domain behaves on the internet. An incorrect A record sends visitors to the wrong server. A missing TXT record causes SPF to fail. A stale CNAME alias after a migration causes intermittent failures. A misconfigured CAA record blocks TLS certificate issuance entirely.
+
+These are live production problems — every one of them is visible from a DNS lookup before they become incidents. And the tool queries the live resolver, not a stale cache, so what you see is what mail servers and browsers see right now.
+
+For regulated firms, DNS records are also an audit surface. Querying and documenting the DNS state of your own domains and counterparty domains is part of infrastructure due diligence — particularly TXT records for SPF and domain ownership, MX records for inbound mail routing, and CAA records for TLS certificate authority authorisation.
+
+## Record types
+
+| Type | Resolves | Common use |
+|---|---|---|
+| `A` | IPv4 address | Web hosting, mail server IP |
+| `AAAA` | IPv6 address | IPv6 hosting |
+| `MX` | Mail server hostname + priority | Inbound email routing |
+| `TXT` | Arbitrary text | SPF, DKIM keys, domain verification tokens, DMARC |
+| `CNAME` | Alias hostname | CDN, subdomain redirects, third-party services |
+| `NS` | Authoritative nameserver hostnames | DNS provider, zone delegation |
+| `SOA` | Zone authority record | DNS administration, serial number |
+| `PTR` | Reverse lookup (IP to hostname) | SMTP reverse DNS, logging |
+| `SRV` | Service endpoint (host, port, priority) | SIP, XMPP, autodiscovery |
+| `CAA` | Certificate authority authorisation | TLS certificate issuance control |
+
+## How it works
+
+<Steps>
+<Step title="Submit the query">
+Send a `POST` to `/generic/dns/dns-record-lookup` with `hostname` and `type`. The API forwards a live DNS query to a resolver — not a cache — and returns the raw response.
+</Step>
+<Step title="Read the Answer section">
+Each record in the `Answer` array contains the record `data` value and `TTL` (time-to-live in seconds). If the Answer array is empty and Status is 0 (NOERROR), the hostname exists but has no records of that type. If Status is 3 (NXDOMAIN), the hostname does not exist in DNS.
+</Step>
+<Step title="Check the TTL">
+TTL tells you how long resolvers are allowed to cache the record. A low TTL (under 300 seconds) means the record is changing soon — or that a migration is in progress. A very high TTL (86400 seconds or more) means changes will take up to 24 hours to propagate globally.
+</Step>
+</Steps>
+
+## Request parameters
+
+| Parameter | Type | Required | Description |
+|---|---|---|---|
+| `hostname` | string | Yes | The fully qualified hostname to query. |
+| `type` | `A` / `AAAA` / `MX` / `TXT` / `CNAME` / `NS` / `SOA` / `PTR` / `SRV` / `CAA` | No | DNS record type. Defaults to `A`. |
+
+## Response shape
+
+```json
+{
+  "status": "success",
+  "data": {
+    "exists": true,
+    "data": {
+      "Status": 0,
+      "Answer": [
+        { "name": "example.com", "type": 1, "TTL": 3600, "data": "93.184.216.34" }
+      ]
+    }
+  }
+}
+```
+
+- `Status: 0` — NOERROR. Records may or may not be in `Answer`.
+- `Status: 3` — NXDOMAIN. The hostname does not exist.
+- `Answer` — present when records of the queried type exist.
+- `Authority` — present when the domain exists but has no records of that type (SOA from the authoritative nameserver).
+
+## What to watch for
+
+- **Empty Answer on a NOERROR response.** The hostname exists but has no record of that type. Check you queried the correct hostname and record type.
+- **NXDOMAIN on a hostname you expect to exist.** The hostname is either misspelled, not yet published, or was deleted. Check your DNS provider's dashboard.
+- **Very low TTL.** A TTL under 60 seconds suggests a live migration. The record may change again before you act on what you see.
+- **Multiple A records.** Normal for load-balanced services. But if you see an unexpected IP alongside the known one, it may be a misconfiguration or an unauthorised change.
+- **TXT records you don't recognise.** Third-party verification tokens from services you no longer use stay in DNS indefinitely unless manually removed. Audit TXT records periodically to remove stale tokens.
+
+## FAQs
+
+<AccordionGroup>
+<Accordion title="What is a DNS lookup?">
+A DNS lookup queries the Domain Name System to retrieve specific records for a hostname. Each record type answers a different question: A records return IPv4 addresses, TXT records return SPF and verification strings, MX records return mail servers. The tool queries the live resolver and returns whatever the authoritative nameserver currently publishes.
+</Accordion>
+
+<Accordion title="What is the difference between an A record and a CNAME record?">
+An A record maps a hostname directly to an IPv4 address. A CNAME maps a hostname to another hostname (an alias), which then resolves to an address. A domain apex (e.g. `example.com`) cannot use a CNAME — only subdomains can. CNAME chains (one CNAME pointing to another CNAME) add resolution latency and can break if any link in the chain is removed.
+</Accordion>
+
+<Accordion title="What does TTL mean in DNS records?">
+TTL (time-to-live) is the number of seconds other servers and resolvers may cache the record before re-querying. A TTL of 3600 means the record can be cached for one hour. When planning a change, lower the TTL to 300 seconds 24 hours in advance so the old cached value expires quickly after you make the cutover.
+</Accordion>
+
+<Accordion title="Why does my DNS lookup return no records?">
+Two different states produce no records: NXDOMAIN (Status 3) means the hostname does not exist in DNS. NOERROR (Status 0) with an empty answer means the hostname exists but has no record of the queried type. Check the record type is correct and the hostname matches exactly what is published in your DNS provider.
+</Accordion>
+
+<Accordion title="What does a TXT record lookup show?">
+TXT records contain almost anything: SPF policy strings (starting with `v=spf1`), DKIM public keys (at `selector._domainkey.yourdomain.com`), DMARC policy references, domain ownership verification tokens from Google, Microsoft, Adobe and others, and BIMI assertion records. Query the exact hostname — including any selector prefix — to see the specific record you are looking for.
+</Accordion>
+
+<Accordion title="Where can I learn more about DNS record types?">
+This guide covers all supported types. For email-authentication-specific records, the [email health check guide](https://docs.spotzee.com/guides/tools/email-validation/email-health-check) audits MX, SPF (TXT), DKIM (TXT), DMARC (TXT), BIMI, and MTA-STS in a single scan. The [SPF lookup guide](https://docs.spotzee.com/guides/tools/dns-auth/spf-lookup) and [DMARC lookup guide](https://docs.spotzee.com/guides/tools/dns-auth/dmarc-lookup) cover those specific record types in depth.
+</Accordion>
+</AccordionGroup>
+
+## Try it
+
+Run a one-off DNS record check at the [free DNS lookup tool](https://spotzee.com/tools/dns-lookup/) for any hostname and record type, or call `POST /generic/dns/dns-record-lookup` via the Extended API for batch infrastructure audits.
