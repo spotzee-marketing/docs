@@ -1,0 +1,103 @@
+---
+title: "DMARC Generator"
+description: "DMARC generator that builds a correctly formatted v=DMARC1 record from your policy, subdomain settings, and reporting addresses. Ready to publish at _dmarc.yourdomain.com."
+keywords: ["dmarc generator", "create dmarc record", "dmarc record generator", "free dmarc record generator", "dmarc policy generator", "how to create dmarc record", "dmarc record builder", "dmarc generator online", "dmarc generator financial services"]
+---
+
+A DMARC generator builds the `v=DMARC1` TXT record that tells receiving mail servers how to handle messages that fail SPF or DKIM alignment. Getting the syntax right matters: a missing semicolon, an invalid tag value, or a mistyped `mailto:` URI renders the record malformed — receivers quietly ignore it, and you get neither enforcement nor reports.
+
+<Info>
+Generate a record at [spotzee.com/tools/dmarc-generator](https://spotzee.com/tools/dmarc-generator/) — choose your policy, add a reporting address, and copy the formatted record to DNS. No signup.
+</Info>
+
+This guide is for the API audience. Each call to `POST /generic/email/dmarc-generator` deducts a small per-call amount from your Spotzee credit balance. See the [Spotzee pricing page](https://spotzee.com/pricing/) for live figures.
+
+## Why this matters
+
+DMARC is the policy layer that turns SPF and DKIM authentication into enforcement. Without a DMARC record, even a domain with perfect SPF and DKIM provides no protection against From-header spoofing — the address the recipient actually sees in their inbox. With `p=reject`, messages that fail authentication are dropped before they reach any inbox.
+
+The publishing requirement now has teeth. Google and Yahoo mandated at minimum `p=none` with an `rua=` address for bulk senders from February 2024. Non-compliance means mail goes to spam or is rejected outright. And for financial services firms under FCA Consumer Duty, the inability to demonstrate authenticated outbound communications is an audit finding. The FCA forced 19,766 financial promotions to be amended or withdrawn in 2024 — a 97.5% increase from 2023. Sender authentication is part of the evidence regulators expect.
+
+Most domains are stuck. They published `p=none` at some point, stopped there, and have no plan to escalate. A generator makes the next step easy — change the policy, regenerate, republish.
+
+## How to create a DMARC record
+
+<Steps>
+<Step title="Identify your current authentication state">
+Before generating, confirm SPF and DKIM are passing for every legitimate sender. DMARC enforcement only works when both underlying mechanisms are in place. Run the [email health check](https://spotzee.com/tools/email-health-check/) first if you are unsure.
+</Step>
+<Step title="Call the generator with your policy">
+Send a `POST` to `/generic/email/dmarc-generator` with `domain`, `failure_response`, and `subdomains`. Add `aggregate_reporting_email` (strongly recommended) and optionally `failure_reporting_email` and `percent`.
+</Step>
+<Step title="Start at p=none with an rua= address">
+`p=none` gathers reports but takes no enforcement action. Without an `rua=` address you get no reports and no visibility. Publish `p=none; rua=mailto:dmarc@yourdomain.com` as the minimum viable record, then read the reports for four to eight weeks.
+</Step>
+<Step title="Escalate gradually through pct=">
+When moving to `p=quarantine` or `p=reject`, start at `percent=10`. Set `percent=10` in the request, verify the aggregate reports show no false positives at that fraction, then raise it to 25, 50, and finally 100. The `pct=` tag in the record tells receivers to apply the stated policy to only that percentage of failing messages — the rest are treated as `p=none`.
+</Step>
+<Step title="Publish and verify">
+Copy the generated `v=DMARC1` string and add it as a TXT record at `_dmarc.yourdomain.com`. There must be exactly one DMARC record — delete any existing one first. Allow up to 48 hours for propagation, then verify with the [DMARC lookup tool](https://spotzee.com/tools/dmarc-lookup/).
+</Step>
+</Steps>
+
+## Request parameters
+
+| Parameter | Type | Required | Description |
+|---|---|---|---|
+| `domain` | string | Yes | The domain the DMARC record will be published on. |
+| `failure_response` | `none` / `quarantine` / `reject` | Yes | Enforcement policy (`p=` tag). |
+| `subdomains` | `none` / `quarantine` / `reject` | Yes | Subdomain policy (`sp=` tag). |
+| `percent` | number (0–100) | No | Percentage of failing messages the policy applies to. Defaults to 100. |
+| `aggregate_reporting_email` | string | No | Email address for daily aggregate reports (`rua=` tag). |
+| `failure_reporting_email` | string | No | Email address for per-message forensic reports (`ruf=` tag). |
+
+## Response shape
+
+```json
+{
+  "status": "success",
+  "data": "v=DMARC1; p=quarantine; sp=none; pct=100; rua=mailto:dmarc@yourdomain.com; ri=86400;"
+}
+```
+
+The `data` value is the complete, ready-to-publish TXT record string.
+
+## What to watch for
+
+- **Policy matches your current SPF and DKIM state.** `p=quarantine` or `p=reject` will affect legitimate mail if any sender is not yet passing SPF or DKIM. Confirm with the email health check before escalating.
+- **`rua=` is set.** Without aggregate reports you cannot verify your enforcement is working or that no legitimate senders are failing. Add it before raising the policy level.
+- **`pct=` at 100 in production.** `pct=` below 100 means partial enforcement — the remaining fraction is treated as `p=none`. It is a useful rollout tool but not a final state.
+- **Only one DMARC record per domain.** Two `v=DMARC1` TXT records at `_dmarc.yourdomain.com` cause evaluation errors. Delete the old record before publishing the new one.
+- **Subdomain policy reflects your subdomain landscape.** If you have active sending subdomains, confirm they have DKIM configured before a root `p=reject` pushes them into enforcement via the default subdomain inheritance.
+
+## FAQs
+
+<AccordionGroup>
+<Accordion title="How do I create a DMARC record for my domain?">
+Enter your domain, choose your enforcement policy (`none` to start monitoring, `quarantine` or `reject` for enforcement), set a subdomain policy, and add an `rua=` address to receive aggregate reports. The generator outputs a correctly formatted `v=DMARC1` string — publish it as a TXT record at `_dmarc.yourdomain.com`. There must be exactly one record; edit existing ones rather than adding a second.
+</Accordion>
+
+<Accordion title="What policy should I start with?">
+`p=none` with an `rua=` address is the right starting point. It puts you in monitoring mode — receivers send daily reports but take no action on failing messages. Read the reports for four to eight weeks to confirm every legitimate sender is passing before moving to `p=quarantine`.
+</Accordion>
+
+<Accordion title="What is the difference between rua= and ruf= in DMARC?">
+`rua=` receives daily XML aggregate reports — summaries of every IP that sent mail claiming your domain, with pass/fail counts. `ruf=` receives individual forensic reports for each failed message. Start with `rua=`. It's widely supported and gives you the most actionable data. `ruf=` is optional and not all providers send forensic reports.
+</Accordion>
+
+<Accordion title="Can I set different policies for my root domain and subdomains?">
+Yes. The `sp=` tag sets a separate policy for subdomains. If you want the root domain at `p=reject` but need new subdomains to stay in monitoring mode, set `sp=none`. Without `sp=`, subdomains inherit the root `p=` policy.
+</Accordion>
+
+<Accordion title="What does pct= do in a DMARC record?">
+`pct=` sets the percentage of failing messages the stated policy applies to. The remainder are treated as `p=none`. It's a useful rollout tool — start at `pct=10` when first moving to quarantine, raise it incrementally as you verify no false positives. Once you're at `pct=100`, you have full enforcement.
+</Accordion>
+
+<Accordion title="Where can I learn more about DMARC records?">
+This guide covers the generator in depth. For understanding an existing record, use the [DMARC lookup tool](https://spotzee.com/tools/dmarc-lookup/) and the [DMARC lookup guide](https://docs.spotzee.com/guides/tools/dns-auth/dmarc-lookup). For a full authentication audit covering SPF, DKIM, DMARC, BIMI, and MTA-STS in one scan, run the [email health check](https://spotzee.com/tools/email-health-check/).
+</Accordion>
+</AccordionGroup>
+
+## Try it
+
+Generate a DMARC record at the [free DMARC generator](https://spotzee.com/tools/dmarc-generator/) for a one-off build, or call `POST /generic/email/dmarc-generator` via the Extended API for automated generation as part of a domain onboarding workflow.
