@@ -1,0 +1,102 @@
+---
+title: "Email Spam Checker"
+description: "Email spam checker that sends a test message through real spam filters and scores SPF, DKIM, DMARC, blacklists, content and links across 9 signal groups and 400 points."
+keywords: ["email spam checker", "email deliverability test", "free email spam checker", "how to test email deliverability", "email spam test free", "email inbox placement test", "email spam checker online", "cold email spam checker", "check if email goes to spam"]
+---
+
+An email spam checker is a deliverability tool that sends a real test message through public spam filters and authentication checks, then scores the result so you can see exactly why an inbox would accept or reject it. Unlike a static record audit, the spam checker reads the actual headers and body of a delivered message and grades nine signal groups: SPF, DKIM, ARC, DMARC, sending domain, sending IP, message body, subject line and links.
+
+<Info>
+Run a one-off check at [spotzee.com/tools/email-spam-checker](https://spotzee.com/tools/email-spam-checker/). Click once to issue a one-time `@spotzee.marketing` address, send any draft to it from your real ESP, and the score lands within seconds of the message arriving.
+</Info>
+
+This guide is written for the API audience: each call to `GET /generic/email/email-tester` issues a fresh test inbox, and each call to `GET /generic/email/email-tester-results/{uniqueCode}` polls for the analysed result. Both endpoints deduct a small per-call amount from your Spotzee credit balance. See the [Spotzee pricing page](https://spotzee.com/pricing/) for live numbers.
+
+## Why this matters
+
+A campaign that lands in spam costs everything it would have earned plus the sender-reputation hit that follows. Mailbox providers downgrade unauthenticated mail before any human ever sees it. Spam-trigger language, broken DKIM signatures and IPs that appear on a blacklist all push placement from inbox to junk in a single send.
+
+For regulated firms the cost is steeper. An unauthenticated message is an audit-trail problem, not just a deliverability problem. Mailbox providers junk-fold the message, the customer never sees it, and the firm has no record of what was actually delivered to whom. A pre-send spam check gives compliance, marketing and oncall the same evidence in the same place: what the receiver sees, scored against the things receivers grade you on.
+
+The cheapest way to find these issues is to test before the campaign goes out, not after.
+
+## How it works
+
+The flow is two API calls separated by a real send from your sending infrastructure. Each call carries an idempotency-friendly identifier so you can run several tests in parallel.
+
+<Steps>
+<Step title="Generate a test inbox">
+Call `GET /generic/email/email-tester`. The API returns `{ test_email, uniqueCode }`. The address looks like `<uniqueCode>@spotzee.marketing` and is valid for one captured message. Cloudflare Email Routing routes any inbound message at that address to the analysis worker.
+</Step>
+<Step title="Send your draft from real infrastructure">
+Send any campaign, transactional message or cold-email draft to the test address from your production ESP, SMTP relay or mail client. The score reflects what receivers actually see, so the send must come from the same setup you use in production. Sending from a personal Gmail when production traffic flows through SendGrid will give you a different score for both.
+</Step>
+<Step title="Poll for the result">
+Call `GET /generic/email/email-tester-results/{uniqueCode}` every few seconds. The API returns one of four shapes:
+
+- **`{ data: { result_code: false, message: "Please check back later." } }`** — no inbound message yet; keep polling.
+- **`{ data: { message: "No such a unique id available" } }`** — the unique code expired or never existed.
+- **`{ data: { result_code, message: "Captured email could not be analysed." } }`** — message arrived but its body could not be parsed.
+- **`{ data: { result_code, result: { totalCritereaScore, obtainedScore, finalScorePercentage, spf, dkim, arc, dmarc, domain, ip, messageBody, subjectLine, links } } }`** — the full analysis is ready.
+</Step>
+<Step title="Read the score">
+The final percentage is `obtainedScore / totalCritereaScore` (out of 400 points across nine buckets). Each bucket exposes its own `score` so you can rank fixes by impact: SPF, DKIM and DMARC dominate authentication; sending domain and sending IP cover reputation; message body, subject line and links cover content and link health.
+</Step>
+</Steps>
+
+## What to watch for
+
+Read the response in priority order. The cheapest fixes give the biggest score lifts.
+
+- **Final score under 80%.** Anything below 80% has at least one structural issue worth fixing this week. Above 90% is the bar for production sending domains. 95%+ for compliance-sensitive senders.
+- **SPF, DKIM and DMARC failures.** These three buckets dominate the score. An SPF over the 10-DNS-lookup cap, a DKIM signature with a missing selector, or a DMARC policy of `p=none` will each knock 30–50 points off the total in a single move.
+- **Domain or sending-IP blacklist hits.** A domain or IP listed on more than one blacklist is the fastest way to land in spam. Resolve listings before the next campaign send, not after.
+- **Spammy subject and body words.** The subject-line module flags shouty punctuation and common spam triggers. The body module flags spammy phrases, hidden content (`display:none`, `opacity:0`) and image-only payloads with no readable text.
+- **Missing `List-Unsubscribe` header.** RFC 8058 one-click unsubscribe is now a hard requirement for bulk senders at Gmail and Yahoo. The body module checks both the header and an in-body unsubscribe link.
+- **Broken, oversized or shortened links.** The links module scores broken HTTP fetches, URLs over 70 characters, blacklisted domains in any link and any use of a known URL shortener. Each is a small subtraction. Together they add up.
+
+## Where it fits in the email-validation workflow
+
+The spam checker is a pre-send gate, not a list-cleaning step. Pair it with the static-record tools to cover both inbound and outbound deliverability.
+
+- **[Email health check](/guides/tools/email-validation/email-health-check)** — audits your domain's authentication and reputation records before any send. Run this first so the spam checker isn't reporting issues you could have found from DNS alone.
+- **Email spam checker** — sends a real probe through the receiver-side checks. Catches issues that only appear in delivered mail: header content, alignment, body and link health.
+- **[SPF lookup](/guides/tools/dns-auth/spf-lookup)** and **[DMARC lookup](/guides/tools/dns-auth/dmarc-lookup)** — drill into the specific authentication records flagged by either tool.
+
+The order matters. The health check is free of an actual send. The spam checker requires you to send a probe and consumes inbound capacity. Run the health check on every domain change and the spam checker before every campaign.
+
+## FAQs
+
+<AccordionGroup>
+<Accordion title="What does an email spam checker actually check?">
+An email spam checker reads a delivered test message and scores nine signal groups: SPF, DKIM, ARC, DMARC, sending-domain reputation, sending-IP reputation, message body, subject line and links. Each bucket has its own maximum score (400 points total), and the final percentage is the obtained score divided by the total. The checker reads the actual headers, HTML body and DNS records that mailbox providers see, so the score reflects how a receiver would grade the message in production.
+</Accordion>
+
+<Accordion title="How is the email spam checker different from an email deliverability test?">
+A deliverability test usually means seeding a probe message into a panel of inboxes (Gmail, Outlook, Yahoo, iCloud) and reporting where it lands. An email spam checker scores the underlying signals that drive that placement: authentication, reputation, content. The two are complementary. Use the spam checker first to fix the structural issues; then run a seedbox-style deliverability test to confirm the fix lands the message in the inbox tab on each provider.
+</Accordion>
+
+<Accordion title="What spam-checker score should I aim for?">
+Treat 80% as the floor for any production sending domain and 95% as the bar for compliance-sensitive senders. A score in the 60–80% range usually has one or two heavy issues (SPF over the 10-lookup cap, DMARC at `p=none`, a single blacklist listing) that account for the gap. Below 60% is structural — the domain probably needs SPF, DKIM and DMARC rebuilt before it sends anything else.
+</Accordion>
+
+<Accordion title="Do I need to send the test email from my real sending infrastructure?">
+Yes. The spam checker scores authentication and reputation against the IP that delivered the message, the headers your ESP added and the body the user would receive. Sending from a personal Gmail account when production traffic flows through SendGrid will give you a different score for both. Run the test from the same provider, domain and IP your real campaigns use.
+</Accordion>
+
+<Accordion title="Will the spam checker catch every reason a message lands in spam?">
+No. The spam checker covers the public, measurable signals: authentication records, blacklist status, content patterns and link health. Engagement-driven filters (low open rates, high complaint rates, low folder-promotion rates on the recipient end) are private to each mailbox provider and only show up after a real send. Pair the spam checker with engagement monitoring to cover both halves.
+</Accordion>
+
+<Accordion title="How long does the unique code stay valid?">
+Each `uniqueCode` is consumed by the first analysed message captured at that address. After the analysis is stored, polling the same code returns the result indefinitely. If no message arrives, generate a fresh inbox rather than reusing an old code. The web tool times out polling after five minutes; the API has no client-side timeout — set your own deadline.
+</Accordion>
+
+<Accordion title="Can I run several spam tests in parallel?">
+Yes. Each call to `GET /generic/email/email-tester` returns a fresh `uniqueCode`, and each is scoped to its own captured message. Issue as many addresses as you need, send a different draft to each, and poll each `uniqueCode` independently. The analysis runs per-message so concurrency is bound only by your credit balance.
+</Accordion>
+</AccordionGroup>
+
+## Try it
+
+Head to [the live email spam checker](https://spotzee.com/tools/email-spam-checker/) for a one-off check, or call the Extended API for batch and CI use. Both surfaces run the same underlying analysis.

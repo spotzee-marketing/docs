@@ -133,7 +133,8 @@
                   "guides/tools/email-validation/email-syntax-validator",
                   "guides/tools/email-validation/email-provider-check",
                   "guides/tools/email-validation/email-health-check",
-                  "guides/tools/email-validation/temp-email-checker"
+                  "guides/tools/email-validation/temp-email-checker",
+                  "guides/tools/email-validation/email-spam-checker"
                 ]
               }
             ]
