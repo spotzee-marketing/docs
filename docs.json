@@ -145,7 +145,8 @@
                   "guides/tools/dns-auth/dmarc-lookup",
                   "guides/tools/dns-auth/dmarc-generator",
                   "guides/tools/dns-auth/mx-lookup",
-                  "guides/tools/dns-auth/dns-lookup"
+                  "guides/tools/dns-auth/dns-lookup",
+                  "guides/tools/dns-auth/senderscore-lookup"
                 ]
               }
             ]

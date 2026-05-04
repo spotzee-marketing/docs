@@ -1,0 +1,89 @@
+---
+title: "Sender Score Lookup"
+description: "Sender score lookup that checks any IPv4 address against the Validity SenderScore index. Instant 0–100 rating, 30-day trend and volume tier. Credit-based usage via the Spotzee Extended API."
+keywords:
+  - ip reputation lookup
+  - email reputation check
+  - sender reputation check
+  - email sender reputation check
+  - free senderscore lookup
+  - sender score lookup online
+  - check ip sender reputation
+  - sender reputation financial services
+  - what is sender score
+---
+
+SenderScore is a 0–100 reputation metric from Validity (formerly Return Path) that rates email-sending IP addresses based on 30 days of aggregated sending behaviour. Mailbox providers use reputation signals like SenderScore alongside SPF, DKIM and DMARC when deciding whether to deliver mail to the inbox or route it to spam.
+
+<Info>
+Run a free sender score lookup at [spotzee.com/tools/senderscore-lookup](https://spotzee.com/tools/senderscore-lookup).
+</Info>
+
+## Why this matters
+
+A score below 70 is a leading indicator of deliverability problems. Mailbox providers weigh IP reputation when filtering inbound mail, so a falling score can mean the difference between inbox placement and silent discard. The score compounds fast: a bad week of complaints or bounces can drag a score from 85 to 60 within a month.
+
+For financial services senders — banks, wealth managers, insurers and fintechs — email is a primary customer channel. Transactional alerts, account notifications and regulatory communications all depend on reliable delivery. A compromised sending IP affects all of them simultaneously. Regular reputation monitoring lets teams catch abuse, warm-up mistakes or shared-IP contamination before they affect open rates or trigger regulator scrutiny.
+
+The score also provides early warning ahead of blacklisting. IPs that fall below 50 are frequently listed on major DNSBLs within days. Catching a decline at 60 gives teams time to intervene before a full blacklisting incident occurs.
+
+## How it works
+
+<Steps>
+  <Step title="Enter your IPv4 address">
+    Type or paste the IPv4 address of your mail server. Find it in your outbound email headers under the `Received:` field closest to the sending server.
+  </Step>
+  <Step title="Query the SenderScore index">
+    The tool submits your IP to the Validity API and retrieves the current reputation record from the SenderScore database.
+  </Step>
+  <Step title="Read your 0–100 score">
+    A score appears alongside a rating category: Excellent (90–100), Good (70–89), Fair (50–69), Poor (25–49) or Very Poor (0–24).
+  </Step>
+  <Step title="Review the 30-day trend">
+    The result shows whether your score is rising, falling or stable so you can spot problems before they affect inbox placement.
+  </Step>
+  <Step title="Check certification status">
+    The result flags whether the IP holds Return Path Certification, which unlocks preferential inbox treatment at participating mailbox providers.
+  </Step>
+</Steps>
+
+## What to watch for
+
+- **Score below 70.** Investigate recent bounce rates and complaint spikes immediately. Pause high-volume sends until the score recovers.
+- **Rating: Insufficient data.** A new or low-volume IP has no history yet. Ramp sending gradually over 4–6 weeks to build a score before bulk campaigns.
+- **Rating: Poor or Very Poor.** These categories correlate with high complaint rates. Audit your unsubscribe handling and list hygiene before sending further.
+- **Declining 30-day trend.** A steadily falling score is more alarming than a single bad day. Cross-reference the dip dates with your send calendar to identify which campaigns triggered it.
+- **Volume tier mismatch.** Sending at High volume with a score below 80 suggests list quality or authentication issues. Check SPF, DKIM and DMARC alignment.
+- **Certified: No on high-volume IP.** Return Path Certification unlocks whitelisting at major providers. If you send at scale, investigate whether your practices meet Validity's certification criteria.
+
+## FAQs
+
+<AccordionGroup>
+  <Accordion title="What is SenderScore?">
+    SenderScore is a 0–100 reputation metric from Validity that measures the trustworthiness of an email-sending IP address. Mailbox providers use it as one input — alongside SPF, DKIM and DMARC — when filtering inbound mail. A score above 90 is considered excellent; below 70 typically leads to increased filtering at major providers.
+  </Accordion>
+
+  <Accordion title="Why does my IP show 'Insufficient data'?">
+    IPs with little or no recent sending history haven't accumulated enough data for Validity to assign a score. This is common for new IPs or addresses used only occasionally. The solution is a gradual warm-up: start with small sends to your most engaged subscribers and increase volume over 4–6 weeks until a score appears.
+  </Accordion>
+
+  <Accordion title="Does SenderScore affect Gmail deliverability?">
+    Gmail uses its own internal reputation signals rather than SenderScore directly. But the underlying factors that drag down a SenderScore — high complaint rates, high bounce rates, poor authentication — also negatively affect Gmail's filtering. A low score is a reliable proxy for broader deliverability health, even for Gmail-heavy lists.
+  </Accordion>
+
+  <Accordion title="My sending IP is shared — whose score am I seeing?">
+    SenderScore scores the IP address, not the account. On shared infrastructure — common with ESPs and cloud mailers — the score reflects all senders on that IP. If your score is low despite good list hygiene, ask your ESP whether you qualify for a dedicated IP so your reputation is isolated.
+  </Accordion>
+
+  <Accordion title="How often does SenderScore update?">
+    Validity updates scores daily based on the previous 30 days of sending activity. Changes made to your sending practices today won't appear instantly; allow 7–14 days to see meaningful movement after fixing a deliverability issue.
+  </Accordion>
+
+  <Accordion title="Where can I learn more about sender reputation?">
+    This guide covers score thresholds, warm-up strategies and recovery playbooks in detail. For the full email authentication picture, pair it with the [SPF lookup guide](/guides/tools/dns-auth/spf-lookup) and the [email health check guide](/guides/tools/email-validation/email-health-check), which audits SPF, DKIM, DMARC, blacklists and reputation in one pass.
+  </Accordion>
+</AccordionGroup>
+
+## Try it
+
+Check any sending IP's reputation at [spotzee.com/tools/senderscore-lookup](https://spotzee.com/tools/senderscore-lookup). No sign-up needed for the one-shot web check. Programmatic access deducts a small per-call amount from your Spotzee credit balance — see live per-tool pricing on the [Spotzee pricing page](https://spotzee.com/pricing/).
