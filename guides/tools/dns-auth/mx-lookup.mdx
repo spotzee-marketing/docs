@@ -1,0 +1,75 @@
+---
+title: "MX Lookup"
+description: "MX lookup that resolves any domain's Mail Exchanger records, shows each mail server hostname and priority order, and confirms whether the domain can receive email."
+keywords: ["mx lookup", "mx record lookup", "check mx records", "free mx lookup", "mx record checker", "mx lookup online", "how to check mx records", "mx record lookup 2026", "mx lookup financial services"]
+---
+
+An MX lookup resolves the Mail Exchanger records published for a domain. MX records tell the internet which mail servers are responsible for receiving inbound email. Each record carries a hostname and a priority value — lower numbers are tried first. When any server wants to deliver email to `you@example.com`, it performs an MX lookup on `example.com`, connects to the highest-priority server, and falls back to lower-priority entries if the first is unreachable.
+
+<Info>
+Run a one-off check at [spotzee.com/tools/mx-lookup](https://spotzee.com/tools/mx-lookup/) — enter any domain, get the full MX record list with priorities and the primary server identified. No signup.
+</Info>
+
+This guide is for the API audience. Each call to `POST /generic/email/mx-lookup` deducts a small per-call amount from your Spotzee credit balance. See the [Spotzee pricing page](https://spotzee.com/pricing/) for live figures.
+
+## Why this matters
+
+MX records are the first thing a sending server checks when delivering email. No MX records means no inbound delivery — any send attempt bounces immediately. Records pointing at a decommissioned server after a migration means inbound email silently disappears. Neither failure is obvious on the sender's side.
+
+For deliverability work, MX records are also an intelligence signal. The primary MX hostname usually reveals the email service provider — Google Workspace, Microsoft 365, Proofpoint, Mimecast, or a custom server. That matters when segmenting outbound lists, diagnosing provider-specific delivery rates, or vetting counterparties before onboarding.
+
+And for regulated firms, verifying inbound infrastructure is part of counterparty due diligence. A financial services firm still routing mail through a legacy on-premises server while claiming a cloud provider in their SPF record is a misconfiguration flag worth surfacing.
+
+## How it works
+
+<Steps>
+<Step title="Query the domain for MX records">
+The API performs a DNS query for the domain's MX records. All returned records are collected regardless of priority.
+</Step>
+<Step title="Sort by priority">
+Records are sorted by their numeric priority value, ascending. The lowest number is the primary server — tried first by sending mail servers. Equal values indicate load-balanced peers.
+</Step>
+<Step title="Return the full list">
+The response includes every MX record, the primary hostname, and a flag for whether any records exist at all. A domain with no MX records cannot receive standard SMTP email.
+</Step>
+</Steps>
+
+## What to watch for
+
+- **No MX records.** The domain cannot receive email. Common causes: records were never set up, accidentally deleted during a DNS migration, or the domain is website-only with no email infrastructure.
+- **Stale records after migration.** Old providers' hostnames still in the MX list can cause partial delivery to decommissioned servers, which then bounce or silently drop messages. Remove old records promptly after cutover.
+- **Single MX record with no fallback.** Any downtime on that server blocks all inbound email. Critical domains should have at least one fallback record at a higher priority number.
+- **Primary host doesn't match expected provider.** If SPF says Sendgrid but MX says a legacy on-premises host, the inbound and outbound paths are from different eras of the infrastructure. Likely a migration that wasn't completed.
+- **Equal-priority records for load balancing.** Multiple records at the same priority are tried in random order. This is intentional for load distribution but can cause inconsistent delivery if the servers aren't synchronised.
+
+## FAQs
+
+<AccordionGroup>
+<Accordion title="What is an MX lookup?">
+An MX lookup queries the DNS records for a domain to retrieve its Mail Exchanger entries. Each MX record contains a hostname (the mail server that accepts inbound email for the domain) and a priority value. The lookup is the first step any SMTP server performs before attempting to deliver email to an address on that domain.
+</Accordion>
+
+<Accordion title="What does the priority number in an MX record mean?">
+Lower priority numbers are tried first. A domain with records at priority 10 and 20 will have sending servers try the priority-10 server first. If that server is unreachable or returns a temporary error, they fall back to the priority-20 server. Equal priority values (e.g. two records both at priority 1) are tried in random order for load distribution.
+</Accordion>
+
+<Accordion title="Why does a domain have no MX records?">
+Common causes: the domain was never configured for email, the MX records were deleted during a DNS migration, or the domain is a subdomain that relies on the parent domain's records. A domain with no MX records cannot receive email via standard SMTP delivery. Any send attempt will bounce with a "no MX record" or "host not found" error.
+</Accordion>
+
+<Accordion title="How do I identify the email provider from MX records?">
+The primary MX hostname usually reveals the provider. Hostnames ending in `.google.com` or `googlemail.com` indicate Google Workspace. `.mail.protection.outlook.com` indicates Microsoft 365. `.mimecast.com`, `.proofpoint.com`, or `.barracuda.com` indicate third-party security gateways. Custom hostnames like `mail.yourdomain.com` indicate self-hosted or custom infrastructure.
+</Accordion>
+
+<Accordion title="Do MX records affect email sending?">
+MX records only control inbound delivery — they tell other servers where to send email addressed to your domain. They have no direct effect on outbound email. Outbound authentication is governed by SPF records and DKIM signing. Use the [SPF lookup tool](https://spotzee.com/tools/spf-lookup/) and [email health check](https://spotzee.com/tools/email-health-check/) for outbound configuration.
+</Accordion>
+
+<Accordion title="Where can I learn more about MX records?">
+This guide covers MX record structure and common failure patterns. For a full picture of your domain's email authentication posture — covering MX, SPF, DKIM, DMARC, BIMI, MTA-STS, and blacklist status — run the [email health check guide](https://docs.spotzee.com/guides/tools/email-validation/email-health-check) for the full audit walkthrough.
+</Accordion>
+</AccordionGroup>
+
+## Try it
+
+Run an MX record check at the [free MX lookup tool](https://spotzee.com/tools/mx-lookup/) for a one-off query, or call `POST /generic/email/mx-lookup` via the Extended API for batch domain audits and automated infrastructure checks.
