@@ -1,0 +1,77 @@
+---
+title: "Malicious URL Lookup"
+description: "Malicious URL lookup that checks any web address against threat intelligence feeds. Instant safe or flagged verdict with guidance on next steps. Credit-based usage via the Spotzee Extended API."
+keywords:
+  - url safety check
+  - malicious url checker
+  - check url for malware
+  - free malicious url checker
+  - malicious url checker online
+  - phishing url check
+  - check url before clicking
+  - url safety checker free
+  - link safety checker
+---
+
+A malicious URL check queries threat intelligence databases to determine whether a web address has been flagged as a phishing site, malware host, command-and-control server or other unsafe destination. Threat intelligence feeds — maintained by security researchers, anti-abuse organisations and browser vendors — continuously catalogue harmful URLs reported by their global sensor networks.
+
+<Info>
+Run a free malicious URL lookup at [spotzee.com/tools/malicious-url-lookup](https://spotzee.com/tools/malicious-url-lookup).
+</Info>
+
+## Why this matters
+
+Phishing URLs in email campaigns — embedded in buttons, images or tracked links — can get a sending domain flagged by spam filters. A single malicious link in a newsletter triggers complaints, blacklistings and domain reputation damage that can take weeks to clear. The source of the problem is usually third-party content: a partner link, an affiliate URL, or a destination that was clean when the campaign was drafted but was later compromised.
+
+Checking every outbound link before a send is a simple gate that prevents inherited reputation damage. And when a suspected phishing email arrives in a recipient's inbox — reported by a customer or caught by a spam trap — checking the URL quickly confirms whether it is a live threat before your team decides on a response.
+
+## How it works
+
+<Steps>
+  <Step title="Enter a URL">
+    Paste any web address — with or without `https://`. The tool normalises the URL before querying.
+  </Step>
+  <Step title="Query threat intelligence feeds">
+    The tool submits the URL to the threat intelligence index and retrieves the current verdict.
+  </Step>
+  <Step title="Read the verdict">
+    A safe result means the URL has not been flagged. A flagged result means at least one feed has reported the URL as harmful.
+  </Step>
+  <Step title="Act on flagged URLs">
+    Remove flagged URLs from campaigns immediately. Report phishing URLs to the hosting provider and submit them to browser Safe Browsing programmes.
+  </Step>
+</Steps>
+
+## What to watch for
+
+- **Flagged verdict.** Remove the URL from your campaign immediately. Do not send until the link is replaced or the flagging is confirmed as a false positive by the feed operator.
+- **Safe verdict but URL looks suspicious.** Threat intelligence feeds are not exhaustive — a URL can be harmful before it has been reported. Verify the destination by checking the domain registration date, WHOIS data and whether the page matches what you expect.
+- **URL points to a redirect chain.** The check evaluates the URL you enter, not every hop in a redirect chain. For shortened or redirect URLs, expand the final destination first and check that URL directly.
+
+## FAQs
+
+<AccordionGroup>
+  <Accordion title="What does the tool check against?">
+    The tool queries threat intelligence feeds that aggregate reports from security researchers, anti-abuse organisations and browser vendor Safe Browsing programmes. These feeds flag URLs associated with phishing, malware distribution, command-and-control activity and other harmful behaviour.
+  </Accordion>
+
+  <Accordion title="A URL is flagged — what do I do?">
+    Remove it from your campaign before sending. If you believe the flagging is a false positive, contact the threat intelligence feed operator to request a review. Use an alternative URL for the same destination in the meantime. Never include a flagged URL in an outbound campaign — it risks domain reputation damage regardless of whether the flag is accurate.
+  </Accordion>
+
+  <Accordion title="A URL looks safe here but my spam filter still blocks it — why?">
+    Different spam filters use different threat intelligence sources. A URL can be absent from one feed and present in another. A safe result here rules out one common cause of filtering but does not guarantee the URL passes every filter. Check the URL in additional tools and review the sending domain's reputation if deliverability issues persist.
+  </Accordion>
+
+  <Accordion title="Does the tool check shortened URLs?">
+    The tool checks the URL you enter. For shortened URLs (bit.ly, tinyurl, etc.), the redirect target is not automatically evaluated. Expand the short URL first using a URL expander, then paste the final destination into this tool for a complete check.
+  </Accordion>
+
+  <Accordion title="Where can I learn more about malicious URL detection?">
+    This guide covers how threat intelligence feeds work, how to handle flagged links, and how to run a pre-send URL audit across a full email campaign. Pair it with the [domain blacklist check guide](/guides/tools/blacklist-security/domain-blacklist-check) and the [URL verifier guide](/guides/tools/blacklist-security/url-verifier) for a complete link-safety workflow.
+  </Accordion>
+</AccordionGroup>
+
+## Try it
+
+Check any URL at [spotzee.com/tools/malicious-url-lookup](https://spotzee.com/tools/malicious-url-lookup). No sign-up needed for the one-shot web check. Programmatic access deducts a small per-call amount from your Spotzee credit balance — see live per-tool pricing on the [Spotzee pricing page](https://spotzee.com/pricing/).
