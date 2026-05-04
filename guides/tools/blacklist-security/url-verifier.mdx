@@ -1,0 +1,83 @@
+---
+title: "URL Verifier"
+description: "URL verifier, URL checker and link checker that sends an HTTP request to any HTTPS web address and confirms whether the server responds. Instant pass or fail verdict, credit-based usage via the Spotzee Extended API."
+keywords:
+  - url checker
+  - link checker
+  - url verifier
+  - free url checker
+  - url verifier online
+  - check if url is working
+  - url checker tool
+  - website link checker
+  - check url online
+---
+
+A URL verifier — also called a URL checker or link checker — sends an HTTP request to a web address and checks whether the server responds, confirming the URL is live and reachable. It tests the connection at the network level: resolves the domain, completes the TLS handshake and waits for a response before returning a pass or fail verdict.
+
+<Info>
+Run a free URL verification check at [spotzee.com/tools/url-verifier](https://spotzee.com/tools/url-verifier).
+</Info>
+
+## Why this matters
+
+A broken link in an email campaign is one of the most avoidable problems in email marketing. When a recipient clicks a CTA button and lands on a connection error, the experience damages trust. That click will never convert. Broken unsubscribe links are worse. They are a compliance risk under CAN-SPAM and GDPR, where a working unsubscribe mechanism is a legal requirement, not a nice-to-have.
+
+URL verification is most effective as a pre-send gate. Before any campaign goes live, every link in the template — CTA buttons, unsubscribe URLs, tracking redirects, image sources and footer links — should be confirmed as reachable. One failed URL in a high-volume send means tens of thousands of failed clicks. But catching it before you press send costs nothing.
+
+## How it works
+
+<Steps>
+  <Step title="Enter a URL">
+    Paste the full HTTPS web address, including the `https://` prefix. The tool only accepts HTTPS URLs.
+  </Step>
+  <Step title="Resolve the domain">
+    The tool looks up the DNS records for the URL's domain to confirm the domain exists and points to a server.
+  </Step>
+  <Step title="Attempt a connection">
+    An HTTP request is sent to the URL. The tool completes the TLS handshake and waits for the server to respond.
+  </Step>
+  <Step title="Read the result">
+    A pass means the server responded — the URL is live. A fail means no response was received within the timeout window.
+  </Step>
+</Steps>
+
+## What to watch for
+
+- **Fail on a URL that works in your browser.** Some servers block automated HTTP requests from data-centre IP ranges. If the URL loads fine in a browser, the fail is a false negative — verify it manually rather than treating the link as broken.
+- **HTTP URLs only.** The tool only accepts HTTPS URLs. Any campaign link served over plain HTTP should be migrated to HTTPS — browsers flag unencrypted connections and spam filters penalise them.
+- **URL contains a redirect.** The tool tests the URL you enter, not the final destination after redirects. For click-tracking URLs and short links, verify the redirect destination separately.
+- **Fail on a freshly deployed domain.** DNS propagation can take up to 48 hours. A new domain or subdomain may fail the check until records have fully propagated — wait and recheck before assuming the URL is permanently broken.
+- **URL requires authentication.** URLs behind a login, API key or IP allowlist will fail from an external check. These need internal verification rather than a public-facing tool.
+
+## FAQs
+
+<AccordionGroup>
+  <Accordion title="What does the tool actually check?">
+    The tool sends an HTTPS request to the URL you enter and checks whether the server responds. It confirms whether a connection was established. It does not inspect the page content, HTTP status code or page structure — just whether the server answered.
+  </Accordion>
+
+  <Accordion title="Why does a URL that works in my browser show as fail?">
+    Some servers block automated requests from known data-centre IP ranges. This produces a fail result even when the URL is perfectly accessible in a browser. If you are confident the URL works, treat the result as a false negative and verify it manually rather than removing the link.
+  </Accordion>
+
+  <Accordion title="Does the tool work with HTTP URLs?">
+    No — only HTTPS URLs are accepted. Any email campaign link should be served over HTTPS to avoid browser security warnings and spam filter penalties. If your destination is still on HTTP, that is a problem worth fixing before you check accessibility.
+  </Accordion>
+
+  <Accordion title="Does it follow redirects?">
+    The tool attempts a connection to the URL you enter. For click-tracking URLs and short links that redirect to a destination page, verify the final destination URL separately to confirm the entire chain is live.
+  </Accordion>
+
+  <Accordion title="Can I check all links in a campaign at once?">
+    The web tool handles one URL at a time. For bulk pre-send link audits across a full template, use the Spotzee Extended API programmatically to check every URL in your campaign before triggering a send.
+  </Accordion>
+
+  <Accordion title="Where can I find a link checker for email campaign audits?">
+    This URL verifier is the fastest link checker for pre-send audits — paste any URL and get an instant pass or fail. For bulk checks across a full template, use the Extended API to run the link checker programmatically against every URL in your campaign. Pair it with the [malicious URL lookup guide](/guides/tools/blacklist-security/malicious-url-lookup) — first verify the URL is live, then check it against threat intelligence feeds.
+  </Accordion>
+</AccordionGroup>
+
+## Try it
+
+Check any URL at [spotzee.com/tools/url-verifier](https://spotzee.com/tools/url-verifier). No sign-up needed for the one-shot web check. Programmatic access deducts a small per-call amount from your Spotzee credit balance — see live per-tool pricing on the [Spotzee pricing page](https://spotzee.com/pricing/).

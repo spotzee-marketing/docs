@@ -154,7 +154,8 @@
                 "pages": [
                   "guides/tools/blacklist-security/domain-blacklist-check",
                   "guides/tools/blacklist-security/ip-blacklist-check",
-                  "guides/tools/blacklist-security/malicious-url-lookup"
+                  "guides/tools/blacklist-security/malicious-url-lookup",
+                  "guides/tools/blacklist-security/url-verifier"
                 ]
               }
             ]
