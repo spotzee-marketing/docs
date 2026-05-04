@@ -1,0 +1,114 @@
+---
+title: "SPF Generator"
+description: "SPF record generator that builds a correctly formatted Sender Policy Framework record from your domain's senders, IPs and includes. Counts DNS lookups and warns before you exceed the RFC 7208 limit."
+keywords: ["spf record generator", "create spf record", "spf generator", "free spf record generator", "spf record generator online", "spf record generator tool", "how to create an spf record", "spf record builder", "Sender Policy Framework generator"]
+---
+
+An SPF generator builds the `v=spf1` TXT record that tells receiving mail servers which IPs and hostnames are authorised to send mail on behalf of your domain. Getting the syntax exactly right matters: mechanisms must appear in the correct order, DNS-lookup-consuming mechanisms count toward an RFC 7208 limit of ten, and the qualifier at the end determines whether unauthorised senders are rejected or merely soft-failed.
+
+<Info>
+Generate a record at [spotzee.com/tools/spf-generator](https://spotzee.com/tools/spf-generator/) — enter your domain, add your senders and choose a policy. The tool counts DNS lookups and warns if you approach the limit.
+</Info>
+
+This guide is for the API audience. Each call to `POST /generic/email/spf-generator` deducts a small per-call amount from your Spotzee credit balance. See the [Spotzee pricing page](https://spotzee.com/pricing/) for live figures.
+
+## Why this matters
+
+SPF is the first layer of the email-authentication baseline. Without it, any sender can forge your domain in the envelope sender and pass basic delivery checks. A correctly formatted SPF record, paired with DKIM and DMARC, closes that door.
+
+For regulated firms, a misconfigured SPF record is a compliance risk, not just a deliverability one. Mailbox providers may junk or reject unauthenticated mail, the customer never sees it, and the firm has no audit trail of what was delivered. The FCA forced 19,766 financial promotions to be amended or withdrawn in 2024 — a 97.5% increase from 2023. Sender authentication is part of the evidence regulators expect to see.
+
+And the mechanics bite harder than most teams expect. The RFC 7208 limit of ten DNS lookups applies per message evaluation, not per record. Each `include:` your record references resolves to its own mechanisms, which may include further `include:` entries. A record with five `include:` entries can consume ten or more lookups during evaluation. The generator counts your direct mechanisms and flags the risk.
+
+## How to create an SPF record
+
+<Steps>
+<Step title="Identify every sending source">
+Before generating, list every service that sends mail as your domain: your MX servers (for direct server-to-server relay), dedicated sending IPs, third-party ESPs (each with their own `include:` domain), and any internal applications. Missing a sender means SPF fails for that traffic stream.
+</Step>
+<Step title="Call the generator">
+Send a `POST` to `/generic/email/spf-generator` with at minimum `domain` and `policy`. Add your senders via the optional parameters — `ipv4`, `ipv6`, `hostnames_to_send_email`, `other_includes`, and the `allow_mx_to_send_email` / `allow_ip_to_send_email` flags.
+</Step>
+<Step title="Check the DNS lookup count">
+The response includes `lookupCount`. If it is at or above 7, reconsider whether every `include:` is necessary. At 10 or above, the record will cause a `permerror` during evaluation — receivers treat the message as if it had no SPF record at all. Flatten lookup-heavy chains using IP-based mechanisms where possible.
+</Step>
+<Step title="Choose your policy qualifier">
+Use `~all` (soft fail) while DMARC is at `p=none` and you are still discovering senders. Switch to `-all` (hard fail) once DMARC is enforcing and every legitimate sender is confirmed. Never use `+all` in production — it accepts mail from any sender and disables SPF entirely.
+</Step>
+<Step title="Publish in DNS">
+Copy the `spfString` from the response and add it as a TXT record at your domain apex. There must be exactly one `v=spf1` record — if one already exists, edit it rather than adding a second. Allow up to 48 hours for propagation, then verify with the [SPF lookup tool](https://spotzee.com/tools/spf-lookup/).
+</Step>
+</Steps>
+
+## Request parameters
+
+| Parameter | Type | Required | Description |
+|---|---|---|---|
+| `domain` | string | Yes | The domain the SPF record will be published on. |
+| `policy` | `-all` / `~all` / `?all` / `+all` | Yes | The qualifier for the `all` mechanism. |
+| `allow_mx_to_send_email` | `true` / `false` | No | Include the domain's MX records as authorised senders. |
+| `allow_ip_to_send_email` | `true` / `false` | No | Include the domain's A record as an authorised sender. |
+| `ipv4` | string | No | Comma-separated IPv4 addresses or CIDR blocks (e.g. `203.0.113.10, 198.51.100.0/24`). |
+| `ipv6` | string | No | Comma-separated IPv6 addresses or CIDR blocks. |
+| `hostnames_to_send_email` | string | No | Comma-separated hostnames added as `a:hostname` mechanisms. |
+| `other_includes` | string | No | Comma-separated domains added as `include:domain` mechanisms (e.g. `_spf.google.com, _spf.mailchimp.com`). |
+| `keep_existing` | `true` / `false` | No | Fetch the current SPF record and merge existing mechanisms into the output. |
+
+## Response shape
+
+```json
+{
+  "status": "success",
+  "data": {
+    "spfString": "v=spf1 ip4:203.0.113.10 mx include:_spf.google.com include:_spf.mailchimp.com -all",
+    "lookupCount": 3,
+    "warnings": [],
+    "requiresStringSplitting": false
+  }
+}
+```
+
+- `spfString` — the generated record, ready to publish as a DNS TXT value.
+- `lookupCount` — estimated count of direct DNS-lookup-consuming mechanisms.
+- `warnings` — advisory strings; non-empty when the record has issues worth reviewing.
+- `requiresStringSplitting` — `true` when the record exceeds 255 characters. Some DNS providers require it to be split into multiple quoted strings.
+
+## What to watch for
+
+- **Lookup count at or above 7.** At 10 the record `permerror`s. Keep well below the limit — each `include:` you reference may expand to further lookups during live evaluation.
+- **Missing senders.** Every ESP, transactional provider, billing platform and internal app that sends as your domain must be represented. A missing sender silently fails SPF for that traffic.
+- **`+all` policy.** Accepts mail from any sender and disables all SPF protection. Replace with `~all` (monitoring) or `-all` (enforcing).
+- **Two SPF records at the domain apex.** Only one `v=spf1` TXT record is allowed. Adding a second causes an immediate `permerror`. Edit the existing record using `keep_existing=true` rather than generating a fresh one alongside it.
+- **`requiresStringSplitting: true`.** The record is over 255 characters. Check whether your DNS provider handles long TXT records as a single string, or whether it needs to be published as multiple quoted strings.
+
+## FAQs
+
+<AccordionGroup>
+<Accordion title="How do I create an SPF record for my domain?">
+Call `POST /generic/email/spf-generator` with your `domain`, `policy`, and any senders you want to authorise. The response `spfString` is a ready-to-publish TXT value. Add it at your domain apex in your DNS provider — one record only. Verify it with the [SPF lookup tool](https://spotzee.com/tools/spf-lookup/) after propagation.
+</Accordion>
+
+<Accordion title="What policy qualifier should I use?">
+Start with `~all` (soft fail) while DMARC is at `p=none` and you are discovering your senders. Switch to `-all` (hard fail) once DMARC is at `p=quarantine` or `p=reject` and every legitimate sender is confirmed in the record. Avoid `+all` — it accepts mail from any IP and disables SPF protection entirely.
+</Accordion>
+
+<Accordion title="How many DNS lookups can an SPF record have?">
+RFC 7208 caps SPF at 10 DNS lookups per message evaluation. The generator counts direct lookup-consuming mechanisms. Each `include:` you add also resolves to further mechanisms during live evaluation, so the real count under message delivery may be higher than the direct count shown. Keep below 7 to leave headroom.
+</Accordion>
+
+<Accordion title="Can I add multiple ESPs in one record?">
+Yes. Pass their SPF `include:` domains as a comma-separated string in `other_includes` — for example `_spf.google.com, _spf.mailchimp.com, email.amazonaws.com`. Each `include:` consumes one direct lookup, plus however many that domain's SPF record itself consumes during evaluation.
+</Accordion>
+
+<Accordion title="What does keep_existing do?">
+When `keep_existing=true`, the generator fetches your domain's current SPF record and merges its existing mechanisms into the output alongside any new senders you specify. Deprecated `ptr` mechanisms are automatically removed. Use this when adding a new sender without losing existing configuration.
+</Accordion>
+
+<Accordion title="Where can I learn more about SPF?">
+The [SPF lookup guide](https://docs.spotzee.com/guides/tools/dns-auth/spf-lookup) covers how SPF records are evaluated during message delivery, what each mechanism type does, and how to interpret lookup results. Run a lookup after publishing to confirm the record is correctly propagated.
+</Accordion>
+</AccordionGroup>
+
+## Try it
+
+Run an SPF record check at the [free SPF generator](https://spotzee.com/tools/spf-generator/) for a one-off build, or call `POST /generic/email/spf-generator` via the Extended API for automated generation as part of a domain onboarding workflow.
