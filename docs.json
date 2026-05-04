@@ -152,7 +152,8 @@
               {
                 "group": "Blacklist & security",
                 "pages": [
-                  "guides/tools/blacklist-security/domain-blacklist-check"
+                  "guides/tools/blacklist-security/domain-blacklist-check",
+                  "guides/tools/blacklist-security/ip-blacklist-check"
                 ]
               }
             ]
