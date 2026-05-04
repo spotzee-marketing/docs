@@ -141,7 +141,8 @@
                 "group": "DNS & auth",
                 "pages": [
                   "guides/tools/dns-auth/spf-lookup",
-                  "guides/tools/dns-auth/spf-generator"
+                  "guides/tools/dns-auth/spf-generator",
+                  "guides/tools/dns-auth/dmarc-lookup"
                 ]
               }
             ]

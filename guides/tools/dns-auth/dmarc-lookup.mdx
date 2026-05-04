@@ -1,0 +1,84 @@
+---
+title: "DMARC Lookup"
+description: "DMARC lookup that resolves any domain's enforcement policy, alignment settings, and reporting addresses from the _dmarc TXT record. No signup required."
+keywords: ["dmarc lookup", "dmarc record check", "check dmarc record", "free dmarc lookup", "dmarc checker online", "how to check dmarc record", "dmarc lookup 2026", "dmarc policy checker", "dmarc record check financial services"]
+---
+
+A DMARC lookup reads the Domain-based Message Authentication, Reporting and Conformance record published as a TXT record at `_dmarc.yourdomain.com`. DMARC tells receiving mail servers what to do with messages that fail SPF or DKIM alignment — `none` (monitor only), `quarantine` (divert to junk), or `reject` — and where to send authentication failure reports.
+
+<Info>
+Run a one-off check at [spotzee.com/tools/dmarc-lookup](https://spotzee.com/tools/dmarc-lookup/) — enter any domain, get the enforcement policy, alignment modes, and reporting addresses instantly.
+</Info>
+
+This guide is written for the API audience. Each call to `POST /generic/email/dmarc-lookup` deducts a small per-call amount from your Spotzee credit balance. See the [Spotzee pricing page](https://spotzee.com/pricing/) for live figures.
+
+## Why this matters
+
+DMARC is the layer that binds SPF and DKIM authentication to the From header — the address the recipient actually sees. Without it, a sender can pass SPF on a different envelope domain while the visible From is entirely spoofed. With `p=none`, you gather reports but do nothing. With `p=quarantine` or `p=reject`, you close the door on domain spoofing.
+
+The enforcement picture has shifted. Google and Yahoo mandated at minimum `p=none` with an `rua=` address for any domain sending more than 5,000 messages per day from February 2024. Non-compliance means mail goes to spam or is rejected outright — not a theoretical risk. And for regulated firms, the FCA forced 19,766 financial promotions to be amended or withdrawn in 2024, a 97.5% increase from 2023. Sender authentication is part of the audit trail regulators expect to find.
+
+But most organisations still haven't finished the rollout. A domain stuck at `p=none` is doing the monitoring work without getting any protection. A domain at `p=quarantine; pct=50` is enforcing policy on half of failing messages. Neither is the destination.
+
+## How it works
+
+<Steps>
+<Step title="Query the _dmarc. subdomain">
+The API resolves TXT records at `_dmarc.yourdomain.com` — not the apex. The underscore prefix is the RFC 7489 convention; it scopes DMARC queries away from other TXT records on the domain.
+</Step>
+<Step title="Locate the v=DMARC1 record">
+The record must begin with `v=DMARC1;`. If no such record exists, the domain has no DMARC policy and receivers handle authentication failures independently — which means no enforcement.
+</Step>
+<Step title="Parse the policy tag">
+The `p=` tag is the enforcement action: `none` reports only, `quarantine` diverts to junk, `reject` drops the message. It's the most important tag. If it's absent, the record is malformed and receivers will ignore it.
+</Step>
+<Step title="Read alignment modes">
+`adkim=` and `aspf=` control whether the authenticated domain must exactly match the From header domain (`s` = strict) or can be a parent or subdomain (`r` = relaxed). Relaxed is the default and the safe choice for most senders.
+</Step>
+<Step title="Surface reporting addresses">
+`rua=` lists addresses for aggregate reports — daily XML digests showing which IPs sent mail for your domain and whether they passed or failed. `ruf=` lists forensic report addresses for per-message failures. Both are optional, but `rua=` is essential for monitoring.
+</Step>
+</Steps>
+
+## What to watch for
+
+Check these fields in order. The first failure you find is almost always the most important.
+
+- **No record exists.** No DMARC record means no enforcement and no reporting. Publish `p=none; rua=mailto:dmarc@yourdomain.com` as the starting point, then read the aggregate reports before escalating.
+- **Policy is `p=none`.** Monitoring mode provides zero enforcement. You'll see failures in reports but messages still reach the inbox. Set a timeline to move to `p=quarantine`.
+- **`pct=` below 100.** A partial percentage means only that fraction of failing messages gets the stated policy — the rest are treated as `p=none`. Useful during rollout, but it must reach 100 before you can claim enforcement.
+- **No `rua=` address.** Without an aggregate reporting address, you're flying blind. You can't tell if your policy change will break legitimate senders, and you can't see who is spoofing you. Add `rua=` before raising the policy level.
+- **Subdomain policy unset.** If `sp=` is absent, subdomains inherit the root policy. That's usually fine. But if you're deploying new subdomains for transactional mail, they'll be subject to `p=reject` from day one — which can surprise a new ESP that hasn't set up DKIM signing yet.
+- **Strict alignment on a complex setup.** `adkim=s` or `aspf=s` requires an exact From-header match. If your domain sends via subdomains or multiple ESPs using different signing domains, strict mode will cause false DMARC failures. Check this before tightening.
+
+## FAQs
+
+<AccordionGroup>
+<Accordion title="What does a DMARC lookup check?">
+A DMARC lookup queries the TXT records at `_dmarc.yourdomain.com` and retrieves the `v=DMARC1` record. The tool surfaces the enforcement policy (`p=`), alignment modes for DKIM and SPF, the percentage of traffic the policy applies to, and any aggregate or forensic reporting addresses. If no record exists, the domain has no DMARC policy.
+</Accordion>
+
+<Accordion title="What does p=none mean in a DMARC record?">
+`p=none` is a monitoring-only policy. Receivers run the DMARC check and generate reports, but take no action — messages that fail authentication still reach the inbox. It's the safe starting point for rollout, but it provides no spoofing protection. You need to progress to `p=quarantine` or `p=reject` for enforcement.
+</Accordion>
+
+<Accordion title="What is the difference between rua= and ruf= in DMARC?">
+`rua=` is the aggregate reporting address. Receivers send daily XML digests showing which IPs sent mail claiming to be from your domain and whether each passed or failed. `ruf=` is the forensic reporting address for individual failure reports, sometimes including message headers or body content. Start with `rua=`. `ruf=` is optional and not supported by all providers.
+</Accordion>
+
+<Accordion title="What happens if a domain has no DMARC record?">
+Receivers treat the domain as having `p=none` by default. Authentication failures are not enforced and no reports are sent. The domain is effectively unprotected from spoofing. Anyone can send mail with that domain in the From header without triggering a DMARC failure at the receiver.
+</Accordion>
+
+<Accordion title="How do I move from p=none to p=reject?">
+The standard rollout path: publish `p=none` with an `rua=` address, review aggregate reports until you can identify every legitimate sender, add missing senders to SPF or DKIM, move to `p=quarantine; pct=10` and raise the percentage gradually, then shift to `p=reject` once false positives drop to zero. The process typically takes four to eight weeks for a well-managed domain.
+</Accordion>
+
+<Accordion title="Where can I learn more about DMARC records?">
+This guide covers DMARC record syntax and the rollout path in depth. For a broader picture of your domain's authentication posture, the [email health check guide](https://docs.spotzee.com/guides/tools/email-validation/email-health-check) audits SPF, DKIM, DMARC, BIMI, MTA-STS, and blacklist status in one scan. Run both when setting up a new sending domain or diagnosing a deliverability problem.
+</Accordion>
+</AccordionGroup>
+
+## Try it
+
+Run a one-off DMARC record check at the [DMARC lookup tool](https://spotzee.com/tools/dmarc-lookup/), or call the Extended API at `POST /generic/email/dmarc-lookup` for batch and automated workflows. Both surfaces resolve the same live DNS record.
