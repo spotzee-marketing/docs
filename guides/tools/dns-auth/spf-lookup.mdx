@@ -1,0 +1,80 @@
+---
+title: "SPF Lookup"
+description: "SPF lookup that resolves any domain's Sender Policy Framework record, counts DNS lookup mechanisms against the RFC 7208 limit, and surfaces the final qualifier. No signup required."
+keywords: ["spf lookup", "spf record check", "spf lookup limit", "spf lookup failure", "free spf lookup", "spf record check online", "spf record check tool", "how to check spf record", "Sender Policy Framework lookup"]
+---
+
+An SPF lookup reads the Sender Policy Framework record published as a TXT record on a domain. SPF tells receiving mail servers which IPs and hostnames are permitted to send mail using that domain in the envelope sender. When a receiver sees a message, it does an SPF lookup on the sending domain and decides whether to accept, soft-fail, or reject based on the record's qualifier.
+
+<Info>
+Run a one-off check at [spotzee.com/tools/spf-lookup](https://spotzee.com/tools/spf-lookup/) — enter any domain, get the raw record, qualifier, and DNS lookup count instantly.
+</Info>
+
+The SPF lookup tool resolves TXT records for the domain, locates the `v=spf1` entry, counts the direct DNS-lookup-consuming mechanisms, and displays the final qualifier. This guide is written for the API audience. Each call to `POST /generic/email/spf-lookup` deducts a small per-call amount from your Spotzee credit balance. See the [Spotzee pricing page](https://spotzee.com/pricing/) for live figures.
+
+## Why this matters
+
+SPF is one third of the modern email-authentication baseline alongside DKIM and DMARC. Without it, any sender can spoof your domain into the inbox. With it misconfigured — too many DNS lookups, missing senders, an over-permissive qualifier — the protection is theatre, not real.
+
+For regulated firms, an SPF record that silently fails is a compliance issue, not just a deliverability one. Mailbox providers downgrade unauthenticated mail to spam, the customer never sees it, and the firm has no audit trail of what was actually delivered. That matters whether you're subject to FCA Consumer Duty, FINRA Rule 2210, or SEC communication-archiving obligations.
+
+And the enforcement picture is sobering. The FCA forced 19,766 financial promotions to be amended or withdrawn in 2024 — a 97.5% increase from 2023. Sender authentication is part of the audit trail regulators expect to find.
+
+## How it works
+
+<Steps>
+<Step title="Query the domain's TXT records">
+The API resolves the apex domain's TXT records and looks for the one beginning with `v=spf1`. There must be exactly one. Two records starting `v=spf1` cause an immediate `permerror`.
+</Step>
+<Step title="Parse every mechanism">
+The record is split into its components: `ip4:`, `ip6:`, `include:`, `a`, `mx`, `exists:`, `redirect:` and `all`. Any mechanism that triggers a further DNS query — `include:`, `a`, `mx`, `exists:`, `ptr:`, `redirect:` — counts toward the RFC 7208 limit of ten.
+</Step>
+<Step title="Count DNS lookups">
+RFC 7208 caps SPF at 10 DNS lookups per message evaluation. Going over the cap triggers a `permerror` and most receivers treat the message as if it had no SPF record. The tool counts direct lookup-consuming mechanisms. Nested `include:` chains also consume lookups during evaluation, so the actual count under message evaluation may be higher than the direct count shown.
+</Step>
+<Step title="Read the final qualifier">
+The `all` mechanism at the end of the record carries the policy: `-all` rejects unauthorised senders, `~all` soft-fails (commonly junk-foldered), `?all` is neutral, and `+all` or bare `all` accepts anyone. Only `-all` gives you real protection.
+</Step>
+</Steps>
+
+## What to watch for
+
+Read the result in this order. The first issue you find is almost always the most important.
+
+- **More than one SPF record.** If `dig TXT yourdomain.com` returns two lines starting `v=spf1`, SPF will `permerror` immediately for every receiver. Merge them into one before anything else.
+- **Lookup count at or above 10.** SPF evaluation fails with `permerror` when the chain exceeds the RFC 7208 cap. Each `include:`, `a`, `mx`, `exists:`, `ptr:` and `redirect:` in the record consumes one lookup — and each nested `include:` may consume further lookups. Trim or flatten chains using IP-based mechanisms or SPF flattening services.
+- **Qualifier of `+all` or `?all`.** `+all` accepts mail from any sender and disables all protection. `?all` is neutral and equally useless. Replace with `~all` while you discover your senders, then `-all` in production.
+- **Missing legitimate senders.** Every ESP, transactional provider, billing system, payroll platform, and calendar invite service that sends on your domain needs either an `include:` or an `ip4:`/`ip6:` entry. A missing sender silently fails SPF for those messages.
+- **Using `~all` in production.** Soft fail is appropriate during DMARC monitoring (`p=none`). Once you've confirmed every sender and moved DMARC to `p=quarantine` or `p=reject`, switch SPF to `-all`.
+
+## FAQs
+
+<AccordionGroup>
+<Accordion title="What does an SPF lookup actually check?">
+An SPF lookup queries the TXT records on your domain to read the Sender Policy Framework record. The tool identifies the `v=spf1` entry, counts the direct DNS-lookup-consuming mechanisms, and surfaces the final qualifier — `-all`, `~all`, `?all` or `+all` — so you can see whether unauthorised senders will be rejected, soft-failed, or accepted.
+</Accordion>
+
+<Accordion title="How many DNS lookups can an SPF record have?">
+RFC 7208 caps SPF at 10 DNS lookups per message evaluation. Going over the limit triggers a `permerror` and most receivers will treat the message as if it had no SPF record at all. The tool counts every direct lookup-consuming mechanism in the record. Nested `include:` chains resolve to further lookups during live evaluation, so the real count may exceed what the tool shows for the top-level record.
+</Accordion>
+
+<Accordion title="Should I use -all or ~all in my SPF record?">
+For a domain that has finished SPF rollout and knows every legitimate sender, `-all` (hard fail) is the correct production setting. `~all` (soft fail) is appropriate while you're still discovering senders during a DMARC monitoring phase. Avoid `?all` and `+all` in production — both accept unauthorised senders and provide no real protection.
+</Accordion>
+
+<Accordion title="Why does my SPF record cause a permerror?">
+`Permerror` means SPF evaluation failed permanently. Common causes: the record exceeds the 10-DNS-lookup cap, there are two `v=spf1` records on the domain, a referenced `include:` domain no longer exists, or an `include:` chain creates a `redirect:` loop. Use the lookup count in the tool to identify which mechanism is consuming budget.
+</Accordion>
+
+<Accordion title="Does SPF cover forwarded mail?">
+No. When a message is forwarded, the envelope sender's IP changes to the forwarder's, breaking SPF alignment. This is why SPF alone isn't enough. DMARC with SPF or DKIM identifier alignment, plus ARC for trusted forwarder chains, is the modern baseline. Check your DMARC record with the [DMARC lookup tool](https://spotzee.com/tools/dmarc-lookup/) once SPF is in place.
+</Accordion>
+
+<Accordion title="Where can I learn more about SPF records?">
+This guide covers SPF in depth. For a broader picture of your domain's authentication posture, the [email health check guide](https://docs.spotzee.com/guides/tools/email-validation/email-health-check) audits SPF, DKIM, DMARC, BIMI, MTA-STS and blacklist status in a single scan. Run both when setting up a new sending domain or troubleshooting a deliverability issue.
+</Accordion>
+</AccordionGroup>
+
+## Try it
+
+Run a one-off SPF record check at the [free SPF lookup tool](https://spotzee.com/tools/spf-lookup/), or call the Extended API at `POST /generic/email/spf-lookup` for batch and automated workflows. Both surfaces run the same live DNS resolution.

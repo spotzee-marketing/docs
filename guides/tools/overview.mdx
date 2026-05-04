@@ -23,6 +23,7 @@ Use the tool when you need a single answer fast. Read the guide when you need to
 | Audit SPF, DKIM, DMARC and the rest before a send | [Email health check](/guides/tools/email-validation/email-health-check) |
 | Block disposable signups before they pollute your list | [Disposable email checker](/guides/tools/email-validation/temp-email-checker) |
 | Score a campaign through real spam filters before you send | [Email spam checker](/guides/tools/email-validation/email-spam-checker) |
+| Resolve and read an SPF record for any domain | [SPF lookup](/guides/tools/dns-auth/spf-lookup) |
 | Stop a blacklist listing from killing deliverability | [Blacklist monitoring overview](/guides/tools/blacklist-monitoring/overview) |
 | Trace a delivery problem in your SMTP logs | [Sendmux logs](/guides/tools/sendmux/logs) |
 
@@ -45,6 +46,16 @@ Tools that check whether an address is real, who hosts it, and whether the domai
   </Card>
   <Card title="Email spam checker" href="/guides/tools/email-validation/email-spam-checker">
     Send a test message and score SPF, DKIM, DMARC, blacklists, content and links across nine signal groups.
+  </Card>
+</CardGroup>
+
+## DNS & auth
+
+Tools for resolving and auditing the DNS records that underpin email authentication.
+
+<CardGroup cols={2}>
+  <Card title="SPF lookup" href="/guides/tools/dns-auth/spf-lookup">
+    Resolve any domain's SPF record, count DNS lookup mechanisms, and read the final qualifier.
   </Card>
 </CardGroup>
 

@@ -136,6 +136,12 @@
                   "guides/tools/email-validation/temp-email-checker",
                   "guides/tools/email-validation/email-spam-checker"
                 ]
+              },
+              {
+                "group": "DNS & auth",
+                "pages": [
+                  "guides/tools/dns-auth/spf-lookup"
+                ]
               }
             ]
           },
