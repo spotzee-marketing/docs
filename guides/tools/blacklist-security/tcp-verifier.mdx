@@ -1,0 +1,73 @@
+---
+title: "TCP Port Checker"
+description: "TCP port checker that tests whether any port is open and reachable on a domain or IP address. Useful for SMTP port diagnostics, firewall verification, and service reachability checks."
+keywords: ["tcp port checker", "open port checker", "port scanner online", "free tcp port checker", "smtp port checker", "tcp connection test", "check if port is open"]
+---
+
+A TCP port checker tests whether a specific port is open and accepting connections on a domain or IP address. It attempts a raw TCP handshake without exchanging application-layer data, making it a protocol-agnostic way to confirm whether any service is reachable from the outside world.
+
+<Info>
+Run a one-off check at [spotzee.com/tools/tcp-verifier](https://spotzee.com/tools/tcp-verifier/). Enter the host and port in `host:port` format (e.g. `smtp.example.com:587`). Use this guide for interpreting results, diagnosing failures, and understanding common port patterns.
+</Info>
+
+## Why this matters
+
+Most connectivity tests bundle TCP with higher-level protocol negotiation. When they fail, it is not always clear whether the port itself is blocked or whether the service on that port has a configuration error. A raw TCP check isolates the transport layer and answers the simplest question first: can traffic reach this port at all?
+
+For email senders, blocked outbound SMTP ports are among the most common delivery problems. Port 25 is blocked by most residential and cloud ISPs to prevent spam. Port 587 (submission with STARTTLS) and port 465 (implicit TLS) are the standard alternatives. A TCP check is the fastest way to confirm which ports are actually reachable before configuring a mail server.
+
+This check deducts a small per-call amount from your Spotzee credit balance. See the [Spotzee pricing page](https://spotzee.com/pricing/) for live figures.
+
+## How it works
+
+<Steps>
+<Step title="Submit the host and port">
+Pass `domain_ip` (domain or IP) and `port` (integer, 1-65535) as form fields in a `POST` request to `/generic/dns/tcp-verifier`.
+</Step>
+<Step title="DNS resolution">
+If a domain name was provided, it is resolved to an IP address. If resolution fails, the check returns an error before any TCP attempt is made.
+</Step>
+<Step title="TCP handshake attempt">
+The API tries to complete a TCP three-way handshake with the resolved IP on the specified port. This is the same as running `telnet host port` or `nc -zv host port` from a shell.
+</Step>
+<Step title="Return the verdict">
+The response includes a single `connection` field: `"success"` if the handshake completed, or `"fail"` if the connection was refused, dropped, or timed out.
+</Step>
+</Steps>
+
+## What to watch for
+
+Four result patterns require action or follow-up.
+
+- **Fail on port 25.** Port 25 is blocked by most residential and cloud providers to prevent spam relaying. Switch to port 587 (STARTTLS) or 465 (implicit TLS) for authenticated SMTP submission.
+- **Fail on a port that should be open.** Check host firewall rules, cloud security group settings, and load-balancer listener configuration. A TCP fail occurs at the transport layer, so the problem is at the network or OS level, not the application.
+- **Slow timeout versus quick refused.** A timeout means traffic is being silently dropped, typically by a stateful firewall with no explicit deny rule. A quick connection refused means the port is actively rejecting connections. These require different fixes.
+- **Private IP ranges.** Addresses in RFC 1918 ranges (10.x.x.x, 172.16-31.x.x, 192.168.x.x) are not routable from the public internet. A TCP check against them will always fail from an external vantage point.
+
+## FAQs
+
+<AccordionGroup>
+<Accordion title="What does a TCP port checker do?">
+It attempts to open a raw TCP connection to the specified host and port. If the three-way handshake completes, the port is open. If the connection is refused or times out, the port is not reachable. No application-layer data is exchanged — this is a transport-layer check only.
+</Accordion>
+
+<Accordion title="What is the difference between port 25, 587, and 465?">
+Port 25 is the original SMTP relay port, now blocked by most ISPs to prevent spam. Port 587 is the IANA-designated submission port, requiring STARTTLS for encryption. Port 465 is SMTPS, wrapping the SMTP session in TLS from the start. For sending from an email client or API integration, use 587 or 465.
+</Accordion>
+
+<Accordion title="Why would a port show as closed even though the service is running?">
+Three common causes: a host firewall (iptables, Windows Firewall) blocking the port; a cloud security group or network ACL not permitting inbound traffic; or the service listening on localhost (127.0.0.1) rather than on the public interface (0.0.0.0). All three block the TCP handshake before the service can answer.
+</Accordion>
+
+<Accordion title="Can I test ports on private IP addresses like 192.168.x.x?">
+No. Private IP ranges defined in RFC 1918 are not routable from the public internet. A TCP check from an external vantage point cannot reach these addresses. Use a local tool like `nc -zv host port` or `telnet host port` from within the same network instead.
+</Accordion>
+
+<Accordion title="Where can I learn more about TCP port checking?">
+Read the in-depth [TCP port checker guide](https://docs.spotzee.com/guides/tools/blacklist-security/tcp-verifier) for common email and service port patterns, firewall diagnosis, and how TCP checks fit into a broader [SMTP server test](https://spotzee.com/tools/smtp-server-test/) workflow.
+</Accordion>
+</AccordionGroup>
+
+## Try it
+
+Run a check at [spotzee.com/tools/tcp-verifier](https://spotzee.com/tools/tcp-verifier/). For batch or programmatic use, call the Extended API endpoint directly with your Spotzee API key.
