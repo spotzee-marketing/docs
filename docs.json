@@ -170,7 +170,8 @@
               {
                 "group": "SMTP testing",
                 "pages": [
-                  "guides/tools/smtp-testing/smtp-server-test"
+                  "guides/tools/smtp-testing/smtp-server-test",
+                  "guides/tools/smtp-testing/smtp-email-test"
                 ]
               }
             ]

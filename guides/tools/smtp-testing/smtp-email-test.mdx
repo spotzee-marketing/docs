@@ -1,0 +1,76 @@
+---
+title: "SMTP Email Test"
+description: "SMTP email test that sends a real message through your SMTP server to verify credentials, TLS settings and successful delivery. Enter hostname, port, security mode and credentials to test."
+keywords: ["SMTP email test", "SMTP email tester", "free SMTP email test", "send test email SMTP", "verify SMTP settings", "test SMTP credentials", "SMTP email configuration test", "SMTP email test online"]
+---
+
+An SMTP email test connects to your mail server using the credentials you provide, authenticates over the chosen security protocol, and sends a real test message to a recipient you specify. If the message is accepted for delivery, the server configuration and credentials are confirmed working.
+
+Most SMTP email tester tools only check connectivity. This one authenticates fully and submits a real message — so a successful result means credentials, TLS negotiation and relay permission all passed.
+
+<Info>
+Run this test at [spotzee.com/tools/smtp-email-test](https://spotzee.com/tools/smtp-email-test/).
+</Info>
+
+## Why this matters
+
+SMTP credential errors are among the most common causes of email delivery failures that are difficult to diagnose quickly. A send failure in an application or marketing platform surfaces as a generic error — "message not sent" — without telling you whether the issue is authentication, network, TLS mismatch or the server rejecting the from address. An SMTP email test isolates credentials and configuration from the application entirely.
+
+For financial services teams managing their own SMTP relay or switching providers, this test is a mandatory pre-deployment check. It confirms the new credentials work before they go into production configuration files, so you are not debugging a failed migration under send-queue pressure. And it catches configuration drift — when credentials that worked six months ago silently stopped working after a password rotation or account policy change.
+
+## How it works
+
+<Steps>
+  <Step title="Enter your SMTP credentials">
+    Provide the hostname, port, security mode (None, STARTTLS or SSL), username and password for your SMTP account.
+  </Step>
+  <Step title="Set the sender and recipient">
+    Enter a from address — typically within your sending domain — and a to address where you want the test message delivered.
+  </Step>
+  <Step title="Authenticate and send">
+    The tool connects to your SMTP server, authenticates with your credentials, and submits a test message for delivery.
+  </Step>
+  <Step title="Review the result">
+    A successful result confirms your server is reachable, credentials are valid and the server accepted the message. A failure identifies where the handshake broke down.
+  </Step>
+</Steps>
+
+## What to watch for
+
+- **Authentication failure (535).** The server is rejecting your username and password. Check for typos, confirm the account is active, and verify whether your provider requires an app-specific password. Google, Microsoft and others block direct password access when two-factor authentication is enabled.
+- **Connection refused or timed out.** Port is blocked or the wrong port number is configured. Port 587 with STARTTLS is the standard submission port. Port 465 uses SSL from the start. Port 25 is for server-to-server MTA connections, not authenticated submission.
+- **TLS negotiation failed.** Security mode mismatch — the server expects STARTTLS but SSL was selected, or vice versa. Try switching the security mode and re-running the test.
+- **Sender address rejected.** The from address is not permitted by the SMTP account. Many providers restrict which from addresses an account can send from — use an address within your authenticated sending domain.
+- **Test delivered but marked spam.** The SMTP credentials work but the message landed in spam. Run an email spam checker on your content to identify the filter triggers.
+
+## FAQs
+
+<AccordionGroup>
+  <Accordion title="Is my SMTP password secure?">
+    Your password is sent directly to your SMTP server over the security protocol you select — the same path it takes from any email client. The tool never stores, logs or echoes your credentials in results. Use a dedicated SMTP account or app password rather than your main account login wherever your provider supports it.
+  </Accordion>
+
+  <Accordion title="Which port and security mode should I use?">
+    Port 587 with STARTTLS is the current standard for authenticated email submission. Port 465 with SSL is an older alternative still supported by many providers. Port 25 is for server-to-server transfer, not authenticated submission. If your provider specifies which to use, follow their documentation.
+  </Accordion>
+
+  <Accordion title="What does a '535 authentication failed' error mean?">
+    The server is rejecting your username and password. Check for typos, confirm the account is active, and verify whether your provider requires an app-specific password — Google, Microsoft and others block direct password access when two-factor authentication is enabled.
+  </Accordion>
+
+  <Accordion title="Can I use this to test Gmail or Outlook SMTP?">
+    Gmail (`smtp.gmail.com`, port 587) and Outlook (`smtp.office365.com`, port 587) both support SMTP with STARTTLS. Both require an app-specific password when two-factor authentication is enabled. Entering your main account password will result in an authentication failure.
+  </Accordion>
+
+  <Accordion title="Does the test actually deliver an email?">
+    Yes — if the test succeeds, a real message is delivered to the recipient address you enter. Use an address you own and can check. A successful delivery confirms your SMTP credentials and server configuration are both working.
+  </Accordion>
+
+  <Accordion title="Where can I learn more about SMTP email testing?">
+    Run the test at [spotzee.com/tools/smtp-email-test](https://spotzee.com/tools/smtp-email-test/). For programmatic access — verifying SMTP credentials as part of an onboarding flow or automated infrastructure check — the Spotzee Extended API exposes the same endpoint, charged per call from your credit balance. See [spotzee.com/pricing](https://spotzee.com/pricing/) for live per-call rates.
+  </Accordion>
+</AccordionGroup>
+
+## Try it
+
+Send a real test email through your SMTP server at [spotzee.com/tools/smtp-email-test](https://spotzee.com/tools/smtp-email-test/). Enter your credentials and get an instant result — delivered or failed, with the full SMTP response.
