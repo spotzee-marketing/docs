@@ -161,7 +161,8 @@
               {
                 "group": "Content analysis",
                 "pages": [
-                  "guides/tools/content-analysis/email-subject-score"
+                  "guides/tools/content-analysis/email-subject-score",
+                  "guides/tools/content-analysis/email-subject-suggest"
                 ]
               }
             ]
