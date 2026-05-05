@@ -1,0 +1,82 @@
+---
+title: "Email Address Validator"
+description: "Email address validator that checks syntax, MX records, SMTP deliverability, disposable status and role detection for any email address."
+keywords: ["email validation", "email address validator", "email validation api", "disposable email checker", "free email validation tool", "bulk email validator", "free email checker"]
+---
+
+An email address validator checks whether an address is real and deliverable. It combines syntax parsing, MX record resolution, SMTP-level mailbox probing, and disposable-provider detection into a single result. The outcome is a six-way verdict: valid, invalid, catch-all, unknown, disposable, or spam trap.
+
+<Info>
+Run a one-off check at [spotzee.com/tools/email-validation](https://spotzee.com/tools/email-validation/). The result is instant and includes the full verdict, role and free-provider flags, and a typo suggestion where applicable. Use this guide for what each result means and how to act on it.
+</Info>
+
+## Why this matters
+
+Invalid addresses cost money in two ways. Sending providers charge per message, valid or not. Mail servers penalise senders for the resulting bounces, dragging inbox placement down for the whole list, including the valid contacts.
+
+Full email validation catches the failures a syntax check misses: correctly formatted addresses at domains with no MX records, defunct mailboxes on live domains, disposable addresses created to bypass signup forms, and role accounts that spam filters treat with more scrutiny. And it catches all four without requiring separate checks.
+
+The API version deducts a small per-call amount from your Spotzee credit balance. That cost is negligible compared with the deliverability damage a single bad send can cause. See the [Spotzee pricing page](https://spotzee.com/pricing/) for live per-call figures.
+
+## How it works
+
+<Steps>
+<Step title="Submit the email address">
+Pass the address as the `email` field in a `POST` request to `/generic/email/email-validation`. The API accepts any string; format failures return immediately without consuming an SMTP check.
+</Step>
+<Step title="Syntax check">
+The format is validated against RFC 5321 and RFC 5322 rules. A failure at this stage means the address cannot possibly deliver. No MX or SMTP calls are made.
+</Step>
+<Step title="Domain and MX resolution">
+The domain is resolved in DNS to confirm MX records exist. No MX records means the domain cannot receive mail. The `expanded_result` field will return `bad_domain` or `dns_error` in this case.
+</Step>
+<Step title="SMTP handshake">
+The API connects to the highest-priority MX server and asks whether the mailbox exists. The server response determines the final `result` verdict. Some servers accept any address (catch-all), some reject unknown mailboxes explicitly, and some refuse to answer definitively (unknown).
+</Step>
+<Step title="Return the result">
+The response includes the primary `result`, the `expanded_result` detail code, `free` and `role` boolean flags, and a `didyoumean` suggestion if the domain looks like a typo.
+</Step>
+</Steps>
+
+## What to watch for
+
+Six result patterns require action.
+
+- **`result: invalid`.** The address cannot receive mail. Remove it. If `expanded_result` is `bad_domain`, the domain itself does not resolve. That is a strong signal the address was fabricated or belongs to an expired domain.
+- **`result: disposable`.** The address was created with a throwaway provider. These expire quickly and hard-bounce. Remove them immediately and block the domain at your signup form.
+- **`result: spam_trap`.** The address is operated by a blacklist or ISP to identify senders who skip list hygiene. Sending to one damages your sender reputation. Suppress it immediately, then investigate how it got onto your list.
+- **`result: catch_all`.** The domain accepts any address. Individual mailbox existence cannot be confirmed. Treat these as unconfirmed. Consider a double opt-in step before adding them to an active send list.
+- **`role: true`.** Role accounts (info@, admin@, support@, noreply@) reach teams or distribution groups. They generate more spam complaints and convert less often than personal addresses. Segment them separately or suppress them from cold outreach.
+- **`didyoumean` not empty.** A likely domain typo was detected and a correction suggested. Review it, and where possible reach out to confirm the intended address before adding it to your list.
+
+## FAQs
+
+<AccordionGroup>
+<Accordion title="What is the difference between email validation and syntax checking?">
+Syntax checking confirms the address is formatted correctly per RFC 5321/5322. Email validation goes three steps further: it checks that the domain has MX records, that the mail server responds to SMTP connections, and that the mailbox actually exists. A syntactically valid address can still fail all three downstream checks.
+</Accordion>
+
+<Accordion title="What does a catch-all result mean?">
+A catch-all domain is configured to accept any address, whether or not the individual mailbox exists. The API cannot probe further because the server accepts every address it is asked about. Treat catch-all results as unconfirmed, and use a double opt-in process to verify intent before adding them to an active send list.
+</Accordion>
+
+<Accordion title="What is a role address and why does it matter?">
+A role address is tied to a function rather than a person: info@, support@, admin@, noreply@. These addresses often reach distribution groups, are monitored less regularly, and generate higher spam complaint rates than personal addresses. Most deliverability guides recommend suppressing role addresses from cold outreach campaigns.
+</Accordion>
+
+<Accordion title="Why would a valid-looking address come back as invalid?">
+Common causes: the domain has no MX records (the domain cannot receive mail); the mailbox no longer exists on an otherwise live domain; or the mail server rejected the SMTP handshake. Each of these looks like a valid address until you check the domain and the server response.
+</Accordion>
+
+<Accordion title="What does the free flag indicate?">
+The free flag is set to true when the address uses a free consumer provider such as Gmail, Yahoo, Outlook, or iCloud. For B2B list hygiene, free-provider addresses can indicate personal contacts rather than work accounts. They are not invalid, but useful to segment separately for personalisation and suppression decisions.
+</Accordion>
+
+<Accordion title="Where can I learn more about email address validation?">
+Read the in-depth [email address validator guide](https://docs.spotzee.com/guides/tools/email-validation/email-validation) for what each result code means, how to interpret catch-all and role flags, and how to chain this check with [MX lookup](https://spotzee.com/tools/mx-lookup/), [SPF verification](https://spotzee.com/tools/spf-lookup/), and the [spam checker](https://spotzee.com/tools/email-spam-checker/) in a multi-step list-cleaning workflow.
+</Accordion>
+</AccordionGroup>
+
+## Try it
+
+Run a check at [spotzee.com/tools/email-validation](https://spotzee.com/tools/email-validation/). For batch validation or programmatic integration, call the Extended API endpoint directly with your Spotzee API key.
