@@ -163,7 +163,8 @@
                 "pages": [
                   "guides/tools/content-analysis/email-subject-score",
                   "guides/tools/content-analysis/email-subject-suggest",
-                  "guides/tools/content-analysis/readability-scorer"
+                  "guides/tools/content-analysis/readability-scorer",
+                  "guides/tools/content-analysis/sentiment-analysis"
                 ]
               }
             ]

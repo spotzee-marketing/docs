@@ -1,0 +1,78 @@
+---
+title: "Sentiment Analysis"
+description: "Sentiment analysis tool that scores any text for emotional tone using AFINN word weighting. See which words drive positive, neutral and negative signals."
+keywords: ["sentiment analysis", "sentiment analysis tools", "free sentiment analysis tool", "sentiment analysis online", "customer sentiment analysis", "AFINN sentiment analysis", "online sentiment analysis", "free text sentiment analysis"]
+---
+
+A sentiment analysis tool scans text for sentiment-bearing words, scores each one using the AFINN lexicon, and returns an overall tone score. Values above zero signal positive sentiment; below zero, negative; exactly zero, neutral. The comparative score normalises the result by word count, so you can compare texts of different lengths on equal terms.
+
+Most sentiment analysis tools return a single label — positive, negative or neutral. But without seeing which words drove the result, you cannot act on it. This tool returns the full word breakdown: every positive word, every negative word, and the AFINN score each one contributed.
+
+<Info>
+Run this check at [spotzee.com/tools/sentiment-analysis](https://spotzee.com/tools/sentiment-analysis/).
+</Info>
+
+## Why this matters
+
+Tone is one of the hardest things to self-assess in copy you wrote yourself. When you know what you mean to say, the emotional signal feels obvious. But readers encounter the words cold and pick up cues you did not intend. Quantifying sentiment gives you an objective starting point rather than a gut check.
+
+For email marketing, tone affects open-to-read rate and spam scoring. Subject lines and preview text with strongly negative language flag more often in spam filters. Body copy that reads as anxious or adversarial loses reader trust before it makes its point. And the reverse is true too: extremely positive language in transactional emails — confirmations, receipts, statements — can feel out of place and undermine credibility. A sentiment check catches all of these in seconds.
+
+For customer feedback and social media, scoring at scale lets you triage sentiment across large volumes of responses without reading every one. A negative-trending batch of replies or reviews is a leading indicator worth acting on before it becomes a reputation issue.
+
+## How it works
+
+<Steps>
+  <Step title="Paste your text">
+    Enter any body of text — at least a sentence, ideally a full paragraph or email body, for a meaningful overall score.
+  </Step>
+  <Step title="Tokenise and match against AFINN">
+    The tool splits the text into individual tokens and looks each one up in the AFINN word-score lexicon, which assigns positive or negative integer values to over 2,400 English words.
+  </Step>
+  <Step title="Calculate the score and comparative">
+    Matched word scores are summed to produce the total sentiment score. Dividing by the total token count gives the per-word comparative score.
+  </Step>
+  <Step title="Review positive and negative word lists">
+    The tool lists every sentiment-bearing word found and separates them into positive and negative groups, so you can see exactly which words pulled the score in each direction.
+  </Step>
+</Steps>
+
+## What to watch for
+
+- **Score below zero.** Negative total scores mean the text carries more negative-weighted language than positive. Identify the specific negative words and decide whether each is intentional or can be swapped for a neutral alternative.
+- **Low positive score on a promotional email.** A positive score of 1 or 2 in a promotional email may mean the copy is technically positive but flat. Add stronger positive language — praise, confidence, enthusiasm — to lift engagement signals.
+- **Strongly positive score on a transactional email.** Very high positive scores in receipts and confirmations can read as inappropriate. Transactional copy should be neutral. A score near zero is correct for that context.
+- **Negative words you did not intend.** Common words like `broken`, `stop` or `problem` carry negative AFINN values even in neutral contexts. Review each one and decide case-by-case whether to rephrase.
+- **High total score but comparative near zero.** A large positive or negative total paired with a comparative near zero means sentiment-bearing words are spread thinly across a very long text. Short emails with the same score carry stronger tone per word. Consider tightening the copy.
+
+## FAQs
+
+<AccordionGroup>
+  <Accordion title="What does the AFINN sentiment score mean?">
+    AFINN is a lexicon of over 2,400 English words, each assigned an integer from -5 (strongly negative) to +5 (strongly positive). The tool sums every matched word's score. A total above zero is positive, below zero is negative, and exactly zero is neutral. The size of the number indicates how strongly the text leans in one direction.
+  </Accordion>
+
+  <Accordion title="What is the comparative score?">
+    The comparative score divides the total AFINN score by the number of tokens (words) in the text. It normalises sentiment by length so you can compare a short subject line against a long email body on equal terms. A comparative of 0.25 means the text is mildly positive per word, regardless of how long it is.
+  </Accordion>
+
+  <Accordion title="Which words carry sentiment scores?">
+    Only words in the AFINN lexicon affect the score. Common neutral words like `the`, `a`, `in` and `our` add nothing. The tool lists every sentiment-bearing word it found and separates them into positive and negative groups so you can inspect exactly which words drove the result.
+  </Accordion>
+
+  <Accordion title="Can I use this to check email subject lines?">
+    Yes, but keep in mind AFINN scores individual words, not phrases. Short subject lines may return a score of zero because they contain no words with strong lexicon entries. For subject line tone, combine this with the subject line scorer, which evaluates tone, spam signals and readability together.
+  </Accordion>
+
+  <Accordion title="Does a neutral score (zero) mean the text has no emotion?">
+    Not necessarily. A score of zero can mean the text is genuinely neutral, or it can mean positive and negative words are cancelling each other out. Check the positive and negative word lists. If both are empty, the text is neutral. If both have entries that cancel, the text carries mixed signals worth reviewing.
+  </Accordion>
+
+  <Accordion title="Where can I learn more about sentiment analysis?">
+    The [sentiment analysis tool](https://spotzee.com/tools/sentiment-analysis/) runs directly in your browser and returns results instantly. For API access — scoring text programmatically at scale — the Spotzee Extended API exposes the same sentiment endpoint, charged per call from your credit balance. See [spotzee.com/pricing](https://spotzee.com/pricing/) for live per-call rates.
+  </Accordion>
+</AccordionGroup>
+
+## Try it
+
+Run a sentiment check on any email body, customer feedback or campaign copy at [spotzee.com/tools/sentiment-analysis](https://spotzee.com/tools/sentiment-analysis/). Paste your text, see the AFINN score and comparative instantly, and review which specific words drove the result.
