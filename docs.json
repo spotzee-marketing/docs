@@ -157,6 +157,12 @@
                   "guides/tools/blacklist-security/malicious-url-lookup",
                   "guides/tools/blacklist-security/url-verifier"
                 ]
+              },
+              {
+                "group": "Content analysis",
+                "pages": [
+                  "guides/tools/content-analysis/email-subject-score"
+                ]
               }
             ]
           },

@@ -1,0 +1,107 @@
+---
+title: "Email Subject Line Scorer"
+description: "Email subject line scorer and email subject line tester that checks for spam words, readability, character count and sentiment across 14 criteria. Returns a 0–100 score with a per-criterion breakdown. Credit-based usage via the Spotzee Extended API."
+keywords:
+  - subject line tester
+  - email subject line tester
+  - email subject line scorer
+  - email subject line analyzer
+  - free subject line tester
+  - subject line spam checker
+  - email subject line grader
+  - free email subject line tester
+  - email subject line checker
+---
+
+An email subject line scorer evaluates a subject line against 14 criteria that influence inbox placement and open rates — character count, word count, Flesch Reading Ease, sentiment, spam trigger words, ALL CAPS usage, punctuation patterns and personalisation tokens. Each criterion scores out of 10, giving a maximum of 140 points, which the tool converts to a 0–100 percentage.
+
+<Info>
+Run a free email subject line score at [spotzee.com/tools/email-subject-score](https://spotzee.com/tools/email-subject-score).
+</Info>
+
+## Why this matters
+
+Spam filters scan subject lines for many of the same signals this scorer checks. Spam words, ALL CAPS, excessive punctuation and fake reply prefixes like "RE:" all increase the probability of junk classification. A subject line that triggers these filters never reaches the inbox, regardless of how relevant the email content is.
+
+Subject line length matters too. Most mobile email clients display 30–50 characters before truncating. A subject line that reads cleanly on desktop may cut off at the critical word on a phone screen, breaking the hook that drives an open. And sentiment matters — negative-framed subject lines consistently underperform neutral or positive alternatives across most marketing audiences.
+
+## Scoring criteria
+
+The scorer evaluates 14 signals and awards up to 10 points for each:
+
+| Criterion | What it measures |
+|---|---|
+| Character count | Total characters — penalises lines over ~50 chars |
+| Word count | Total words — penalises very short or very long lines |
+| Flesch Reading Ease | How easy the line is to scan at a glance |
+| Flesch-Kincaid grade | Reading grade level — lower is more accessible |
+| Sentiment | Positive or negative emotional valence |
+| Spam words | Count of known spam trigger words |
+| ALL CAPS words | Count of fully capitalised words |
+| Exclamation marks | Count of `!` characters |
+| Punctuation | Overall punctuation density |
+| "RE:" prefix | Fake reply thread indicator |
+| "FWD:" prefix | Fake forward indicator |
+| "Free" mentions | Count of the word "free" |
+| [FNAME] token | Presence of personalisation merge tag |
+| Emojis | Count of emoji characters |
+
+A score of 70% or above clears the main spam signals and reads well. Between 50–69% there is at least one signal worth fixing. Below 50%, multiple issues are likely to reduce deliverability or open rates.
+
+## How it works
+
+<Steps>
+  <Step title="Enter a subject line">
+    Type or paste the exact subject line you plan to send, including any personalisation tokens such as `[FNAME]` or emojis.
+  </Step>
+  <Step title="Analyse 14 criteria">
+    The scorer evaluates each of the 14 signals listed above and assigns a score out of 10 for each.
+  </Step>
+  <Step title="Calculate the score">
+    Total earned points are divided by 140 and expressed as a percentage.
+  </Step>
+  <Step title="Read the breakdown">
+    The result highlights the specific criteria that reduced the score so you know exactly what to fix.
+  </Step>
+</Steps>
+
+## What to watch for
+
+- **Spam words detected.** Remove or replace any flagged spam trigger words. Common offenders: "act now", "click here", "guaranteed", "100% free" and urgency phrases. Even one can reduce inbox placement.
+- **ALL CAPS words.** Rewrite in sentence or title case. ALL CAPS words feel aggressive and trigger spam filters.
+- **Negative sentiment.** Neutral or positive framing performs better for marketing email. If your subject line tests negative, reframe the value without changing the offer.
+- **Subject is too long.** Aim for under 50 characters — ideally 30–40 — for mobile. Long subjects truncate at the critical word.
+- **RE: or FWD: prefix.** Remove these. Faking thread history in marketing email is a spam signal that spam filters and recipients both recognise.
+- **"Free" appears in the subject.** Consider alternatives: "complimentary", "no cost", or framing what is included rather than the price.
+
+## FAQs
+
+<AccordionGroup>
+  <Accordion title="What does this subject line tester score?">
+    The subject line tester scores 14 criteria: character count, word count, Flesch Reading Ease, Flesch-Kincaid grade level, sentiment, spam trigger words, ALL CAPS word count, exclamation marks, punctuation count, "RE:" prefix, "FWD:" prefix, "free" mentions, [FNAME] personalisation tokens and emoji count. Each is worth up to 10 points, giving a maximum of 140, which converts to a 0–100 percentage.
+  </Accordion>
+
+  <Accordion title="What score should I aim for?">
+    70% or above indicates a subject line that clears the main spam signals and reads well. Between 50–69% suggests at least one signal worth fixing before sending. Below 50% means multiple issues are likely hurting deliverability or open rates — revise before scheduling.
+  </Accordion>
+
+  <Accordion title="Why does the tool flag 'free' as a problem?">
+    "Free" is one of the most abused words in spam email and is heavily weighted by spam filters. A single use does not guarantee filtering, but it raises the probability — especially when combined with other spam signals in the same subject line.
+  </Accordion>
+
+  <Accordion title="What is Flesch Reading Ease?">
+    Flesch Reading Ease scores text on a 0–100 scale based on average syllables per word and words per sentence. For subject lines, higher scores (60+) mean the subject is easy to scan at a glance, which correlates with faster open decisions. The tool uses this score to assess scannability.
+  </Accordion>
+
+  <Accordion title="Does personalisation with [FNAME] improve the score?">
+    Yes — the scorer rewards subject lines that include a `[FNAME]` personalisation token. If your email service provider uses a different merge tag format (e.g. `{{first_name}}`), the checker may not recognise it. Use the standard `[FNAME]` token when testing to get an accurate score.
+  </Accordion>
+
+  <Accordion title="Where can I find a subject line tester with suggestions?">
+    After scoring, use the [email subject line suggester](/guides/tools/content-analysis/email-subject-suggest) to generate alternative subject lines tuned to your content. Run the scorer on each suggestion to compare scores before choosing which to send.
+  </Accordion>
+</AccordionGroup>
+
+## Try it
+
+Score any subject line at [spotzee.com/tools/email-subject-score](https://spotzee.com/tools/email-subject-score). No sign-up needed for the one-shot web check. Programmatic access deducts a small per-call amount from your Spotzee credit balance — see live per-tool pricing on the [Spotzee pricing page](https://spotzee.com/pricing/).
