@@ -1,0 +1,76 @@
+---
+title: "Phone Number Validator"
+description: "Phone number validator that checks any number for E.164 format, identifies the country code and returns the formatted international number. Supports all countries."
+keywords: ["phone number validator", "phone number validator tool", "free phone number validator", "international phone number validator", "E.164 phone number validator", "online phone number validator", "validate phone number format", "phone number syntax checker"]
+---
+
+A phone number validator checks whether a phone number string is syntactically valid for any country, normalises it to E.164 format — the international standard used by SMS carriers and APIs — and identifies the country and dialling code it belongs to. E.164 format is + followed by the country code and subscriber number, with no spaces or dashes.
+
+Most phone number validator tools only return valid or invalid. This one also normalises the number to E.164 and returns the ISO country codes, so you can use the output directly in an SMS platform or database without reformatting.
+
+<Info>
+Run this check at [spotzee.com/tools/phone-validator](https://spotzee.com/tools/phone-validator/).
+</Info>
+
+## Why this matters
+
+An invalid phone number in an SMS list produces a hard failure — the message is never delivered and most platforms count it against your deliverability rate. Unlike email addresses, phone numbers have strict country-specific length and prefix rules that vary significantly. A syntax check before upload catches these before they reach the carrier.
+
+E.164 format is the universal standard that SMS carriers, marketing platforms and telephony APIs all expect. A number a user typed as `(415) 555-2671` may look correct but fail to deliver because the platform requires `+14155552671`. Validating and normalising to E.164 at the point of collection eliminates this class of failure entirely.
+
+## How it works
+
+<Steps>
+  <Step title="Enter the phone number">
+    Type any phone number — with or without the country code, spaces, dashes or brackets. The tool normalises formatting before checking.
+  </Step>
+  <Step title="Parse against E.164 rules">
+    The validator checks whether the number, once formatted, matches the valid length and prefix pattern for the identified country.
+  </Step>
+  <Step title="Identify the country">
+    If the number is valid, the tool returns the ISO 3166-1 alpha-2 and alpha-3 country codes and the international dialling prefix.
+  </Step>
+  <Step title="Return the E.164 formatted number">
+    Valid numbers are returned in E.164 format — the international standard used by SMS APIs, marketing platforms and carrier routing.
+  </Step>
+</Steps>
+
+## What to watch for
+
+- **Invalid with no country data.** The number does not match any known country's length or prefix rules. Add the correct country code prefix (e.g. `+1` for US/Canada, `+44` for UK) and re-check.
+- **E.164 output differs from the input.** The validator normalised a locally formatted number to international format — this is correct. Use the E.164 output when storing or sending, not the original input.
+- **Valid number but unexpected country shown.** If the country code is missing or ambiguous, the validator may assign the wrong country. Always include the full international dialling prefix for accurate country detection.
+- **Letters or special characters in the number.** Phone numbers may only contain digits, the leading `+`, spaces, dashes and brackets. Remove any letters or other characters before checking.
+- **Short number (shortcode) returns invalid.** SMS shortcodes (5–6 digit numbers used for two-way messaging) are not standard E.164 numbers and will return invalid. They are a separate number class handled by carriers.
+
+## FAQs
+
+<AccordionGroup>
+  <Accordion title="What is E.164 format?">
+    E.164 is the international standard for phone number formatting defined by the ITU-T. It specifies a number as `+` followed by a country code and the subscriber number, with no spaces, dashes or brackets — for example, `+14155552671` for a US number. Most SMS APIs and marketing platforms require E.164.
+  </Accordion>
+
+  <Accordion title="Do I need to include the country code?">
+    Yes — without a country code, the validator cannot determine which country's length and prefix rules apply. Include the full international dialling code (e.g. `+1` for US, `+44` for UK, `+61` for Australia) before the local number.
+  </Accordion>
+
+  <Accordion title="What do the ISO country codes mean?">
+    ISO 3166-1 alpha-2 is the two-letter country code (e.g. US, GB, AU). ISO 3166-1 alpha-3 is the three-letter equivalent (e.g. USA, GBR, AUS). The validator returns both for easy integration with databases that use either format.
+  </Accordion>
+
+  <Accordion title="Why does a number I can call come back as invalid?">
+    This validator checks E.164 syntax, not whether a line is active or reachable. A number can be syntactically valid but disconnected, or syntactically invalid but still ring on some networks. For live number verification, you need a carrier lookup rather than a syntax check.
+  </Accordion>
+
+  <Accordion title="Can I validate numbers without the + prefix?">
+    Yes — you can enter a number with the country code but without the `+` sign (e.g. `14155552671` instead of `+14155552671`) and the validator will usually parse it correctly. Including `+` makes the country code unambiguous.
+  </Accordion>
+
+  <Accordion title="Where can I learn more about phone number validation?">
+    Run the check at [spotzee.com/tools/phone-validator](https://spotzee.com/tools/phone-validator/). For programmatic access — validating phone numbers at scale during contact import or form submission — the Spotzee Extended API exposes the same endpoint, charged per call from your credit balance. See [spotzee.com/pricing](https://spotzee.com/pricing/) for live per-call rates.
+  </Accordion>
+</AccordionGroup>
+
+## Try it
+
+Validate any phone number at [spotzee.com/tools/phone-validator](https://spotzee.com/tools/phone-validator/). Enter any format — local, national or international — and get the E.164 result, country code and ISO identifiers instantly.

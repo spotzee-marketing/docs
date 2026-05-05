@@ -173,6 +173,12 @@
                   "guides/tools/smtp-testing/smtp-server-test",
                   "guides/tools/smtp-testing/smtp-email-test"
                 ]
+              },
+              {
+                "group": "Other",
+                "pages": [
+                  "guides/tools/other/phone-validator"
+                ]
               }
             ]
           },
