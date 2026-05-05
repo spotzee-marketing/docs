@@ -1,0 +1,76 @@
+---
+title: "SMTP Server Test"
+description: "SMTP server test that checks any hostname or IP for connectivity, reads the SMTP banner and reports supported features including STARTTLS and authentication methods."
+keywords: ["SMTP server test", "SMTP server test tool", "how to test SMTP server", "free SMTP server test", "SMTP server test online", "email server connectivity test", "SMTP connection test", "check SMTP server"]
+---
+
+An SMTP server test connects to a mail server on port 25, reads the SMTP banner the server returns, and reports which SMTP capabilities it advertises — including STARTTLS, authentication methods and message-size limits. It confirms the server is reachable and responding to SMTP protocol commands without sending any email.
+
+Most SMTP server test tools connect, read the banner, and stop there. This one also sends an EHLO command and captures the full capability list the server advertises, so you can see exactly which extensions are available — not just whether the server answered.
+
+<Info>
+Run this check at [spotzee.com/tools/smtp-server-test](https://spotzee.com/tools/smtp-server-test/).
+</Info>
+
+## Why this matters
+
+If your SMTP server is unreachable or returning an unexpected banner, email never leaves the queue. But the problem is often invisible — your application reports a generic send failure without identifying whether the issue is a firewall rule, a misconfigured hostname, or the server being completely offline. A direct SMTP server test isolates the infrastructure layer from the application layer.
+
+For financial services organisations, this test is part of a standard email infrastructure audit. Confirming STARTTLS is advertised verifies that your server supports opportunistic encryption for server-to-server connections — a requirement under most financial sector data protection standards. A server that does not advertise STARTTLS sends mail in cleartext between servers, which is a compliance risk. And in regulated industries, that cleartext transmission is not just a security risk — it is a documentation gap.
+
+## How it works
+
+<Steps>
+  <Step title="Enter the hostname or IP">
+    Type the SMTP server hostname (e.g. `smtp.yourprovider.com`) or an IPv4 address. The tool accepts any publicly reachable mail server.
+  </Step>
+  <Step title="Open a TCP connection on port 25">
+    The test initiates a TCP connection to the server on port 25 — the standard SMTP port for server-to-server mail transfer.
+  </Step>
+  <Step title="Read the SMTP banner">
+    A reachable server responds with a 220 greeting that identifies the software and hostname. This banner confirms the server is accepting SMTP connections.
+  </Step>
+  <Step title="Enumerate server capabilities">
+    The tool sends an EHLO command and captures the server's capability list — every SMTP extension it supports, including STARTTLS, AUTH methods and SIZE limits.
+  </Step>
+</Steps>
+
+## What to watch for
+
+- **Connection failed.** The server is either offline, port 25 is blocked by a firewall, or the hostname does not resolve. Check DNS, confirm the server is running, and verify that port 25 is open between the test source and the server.
+- **STARTTLS not advertised.** If the server does not list STARTTLS in its capabilities, it does not support opportunistic encryption for server-to-server connections. Configure STARTTLS before the next compliance review.
+- **Unexpected banner hostname.** The 220 banner includes the server's hostname. If it does not match the hostname you tested, the server may be misconfigured or behind a proxy altering the greeting. Align the banner hostname with the server's actual identity.
+- **AUTH methods exposed on port 25.** AUTH LOGIN and AUTH PLAIN on port 25 should not be present on a properly configured outbound MTA. Those authentication methods belong on port 587 (submission). If they appear, review your SMTP configuration.
+- **SIZE limit lower than expected.** The SIZE extension sets the maximum message size the server accepts. If it is lower than your typical email payload, large messages will be rejected silently. Increase the limit or reduce your average email size.
+
+## FAQs
+
+<AccordionGroup>
+  <Accordion title="What is an SMTP server test?">
+    An SMTP server test makes a direct TCP connection to a mail server on port 25, reads the SMTP banner the server returns, and records which SMTP capabilities the server advertises. It confirms the server is reachable and speaking the SMTP protocol correctly without delivering any email.
+  </Accordion>
+
+  <Accordion title="What port does the SMTP server test use?">
+    The test connects on port 25, the standard SMTP port for server-to-server (MTA-to-MTA) mail transfer. This is distinct from port 587 (submission, used by email clients) and port 465 (SMTPS). A result on port 25 confirms inbound mail transfer is working — it does not test submission from an email client.
+  </Accordion>
+
+  <Accordion title="What does STARTTLS mean in the features list?">
+    STARTTLS in the capabilities list means the server supports opportunistic TLS encryption for incoming server-to-server connections. When a sending server connects, it can issue a STARTTLS command to upgrade the connection from plaintext to encrypted before transferring the message. Absence of STARTTLS means all inbound server-to-server connections receive mail in cleartext.
+  </Accordion>
+
+  <Accordion title="Why does the test fail even though I can send email?">
+    Port 25 is often blocked on outbound connections from cloud and residential IP ranges to reduce spam. If your server is reachable by other mail servers but not by this tool, the test source IP is likely in a range your server or an upstream firewall filters. The server itself may be working correctly.
+  </Accordion>
+
+  <Accordion title="Does the test send any email to the server?">
+    No. The test opens a connection, reads the server's greeting and capabilities, then closes the connection cleanly. No message data is ever transmitted. This makes it safe to run against production servers — purely diagnostic, with no trace in mail logs beyond a connection event.
+  </Accordion>
+
+  <Accordion title="Where can I learn more about SMTP server testing?">
+    Run the test directly at [spotzee.com/tools/smtp-server-test](https://spotzee.com/tools/smtp-server-test/). For programmatic access — checking multiple servers in sequence or integrating SMTP connectivity testing into a monitoring pipeline — the Spotzee Extended API exposes the same endpoint, charged per call from your credit balance. See [spotzee.com/pricing](https://spotzee.com/pricing/) for live per-call rates.
+  </Accordion>
+</AccordionGroup>
+
+## Try it
+
+Run an SMTP server connectivity check against any hostname or IP at [spotzee.com/tools/smtp-server-test](https://spotzee.com/tools/smtp-server-test/). See the SMTP banner, port, security mode and full capability list instantly — no email sent, no credentials required.
