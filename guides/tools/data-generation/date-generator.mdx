@@ -1,0 +1,86 @@
+---
+title: "Date Generator"
+description: "Date generator that creates random dates in ISO 8601 format for testing and development. Choose anytime, recent, future, past or birthdate ranges. Safe for test databases and automated test suites."
+keywords: ["random date generator", "date generator", "test data generator", "fake date generator", "date generator free", "random date picker", "sample date generator"]
+---
+
+A date generator creates random dates in ISO 8601 format. Dates are randomly generated within the selected range — anytime, recent, future, past, or birthdate — and have no relation to real events. They are designed for seeding date fields in test databases and exercising time-based logic in automated test suites.
+
+<Info>
+Generate sample dates at [spotzee.com/tools/date-generator](https://spotzee.com/tools/date-generator/). Enter a count, choose a range method, and click Generate. Use this guide for method details and integration patterns.
+</Info>
+
+## Why this matters
+
+Hardcoded dates in test fixtures go stale. A fixture with a "future" date of 2024-12-31 silently becomes a past date, breaking tests that check time-based conditions. Generated dates anchored to relative ranges (recent, future) stay valid regardless of when the test runs.
+
+Time-based logic — expiry checks, age calculations, date range filters, loyalty promotions — needs varied input to surface bugs. A single hardcoded date covers one code path. Fifty generated dates in the right range exercise edge cases like leap years, month boundaries, and daylight-saving transitions.
+
+Each call to the Extended API version deducts a small per-call amount from your Spotzee credit balance. See the [Spotzee pricing page](https://spotzee.com/pricing/) for live figures.
+
+## How it works
+
+<Steps>
+<Step title="Send the request">
+POST to `/generic/data/generate/date` with a `count` (1-100, as a string) and a required `method` parameter. The method is a discriminator that selects the date range.
+</Step>
+<Step title="Date generation">
+The API generates random dates within the range specified by the method. Each date is independently generated.
+</Step>
+<Step title="Return the records">
+The response returns a `dates` array of ISO 8601 timestamps, plus `generated` (count), `method`, and `locale`.
+</Step>
+</Steps>
+
+## Date range methods
+
+| Method | Description |
+|---|---|
+| `anytime` | Any random date, unconstrained |
+| `recent` | Within the last 30 days |
+| `soon` | Within the next few days |
+| `future` | Within the next year |
+| `past` | Within the last year |
+| `birthdate` | A plausible birth date for an adult |
+| `month` | A random date within the current month |
+| `weekday` | A random weekday (Mon–Fri) |
+| `between` | Between two specific dates (provide `refDate` parameters) |
+| `betweens` | Multiple ranges (provide multiple `refDate` pairs) |
+
+The web tool exposes the five most common methods. For `between` and `betweens`, call the Extended API directly.
+
+## What to watch for
+
+Three patterns require attention.
+
+- **Range method not matching use case.** Use Recent for `created_at` fields. Use Future for expiry or due dates. Use Birthdate for age-gate testing. Anytime is the safest default for unconstrained date fields.
+- **ISO 8601 format compatibility.** Dates are returned as ISO 8601 timestamps (`YYYY-MM-DDThh:mm:ss.sssZ`). If your system expects a different format (MM/DD/YYYY, Unix epoch), transform the output before inserting it into your test fixture.
+- **Count outside 1–100.** For larger datasets, call the endpoint in a loop. Each call returns an independent set of random dates.
+
+## FAQs
+
+<AccordionGroup>
+<Accordion title="What format are the generated dates in?">
+Dates are returned as ISO 8601 timestamps (`YYYY-MM-DDThh:mm:ss.sssZ`). The result panel shows just the date portion (`YYYY-MM-DD`) for readability. The full timestamp is available in the Extended API response.
+</Accordion>
+
+<Accordion title="What does the Birthdate method generate?">
+Birthdate generates plausible birth dates for adult individuals, typically spanning several decades back from today. Use it when you need age-realistic birth dates for person record seeding or age-gate logic testing.
+</Accordion>
+
+<Accordion title="Can I generate dates within a specific custom range?">
+The web tool offers preset ranges. For a specific start and end date, call the Extended API directly with `method=between` and provide the date boundary parameters as documented in the API reference.
+</Accordion>
+
+<Accordion title="Why use generated dates instead of hardcoded fixtures?">
+Hardcoded dates go stale. A "future" date hardcoded in a fixture becomes a past date when the calendar catches up, silently breaking tests that check time-based conditions. Generated dates anchored to relative ranges (recent, future) remain valid whenever the test runs.
+</Accordion>
+
+<Accordion title="Where can I learn more?">
+Read the [date generator guide](https://docs.spotzee.com/guides/tools/data-generation/date-generator) for method details and ISO format specifics, then combine with the [person generator guide](https://docs.spotzee.com/guides/tools/data-generation/person-generator) and [contact generator guide](https://docs.spotzee.com/guides/tools/data-generation/contact-generator) to build complete test datasets.
+</Accordion>
+</AccordionGroup>
+
+## Try it
+
+Generate sample dates at [spotzee.com/tools/date-generator](https://spotzee.com/tools/date-generator/). For batch or programmatic use, call the Extended API endpoint directly with your Spotzee API key.
