@@ -178,6 +178,12 @@
                 ]
               },
               {
+                "group": "Data generation",
+                "pages": [
+                  "guides/tools/data-generation/person-generator"
+                ]
+              },
+              {
                 "group": "Other",
                 "pages": [
                   "guides/tools/other/phone-validator"
