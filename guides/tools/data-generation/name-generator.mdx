@@ -1,0 +1,69 @@
+---
+title: "Name Generator"
+description: "Name generator that creates realistic first and last name pairs for any locale. Supports gender filtering. Safe for test databases, prototype UIs and automated test suites without using production names."
+keywords: ["random name generator", "name generator", "test data generator", "fake name generator", "sample name generator", "name generator free", "first and last name generator"]
+---
+
+A name generator creates synthetic first and last name pairs. The names are realistic-looking but entirely fictional — no real individuals are represented. They are designed for filling prototype UIs, seeding test databases, and generating varied fixture data for automated test suites.
+
+<Info>
+Generate sample names at [spotzee.com/tools/name-generator](https://spotzee.com/tools/name-generator/). Choose a count, locale and gender filter, then click Generate. Use this guide for locale details and integration patterns.
+</Info>
+
+## Why this matters
+
+Placeholder names like "John Doe" and "Test User" make UIs look unfinished and fail to exercise real edge cases. Generated names with varied lengths, characters, and cultural styles reveal layout bugs, truncation issues, and sorting errors that uniform placeholders never surface.
+
+And using real names from production lists in test environments creates GDPR and CCPA exposure. Synthetic names eliminate the risk without losing the realism that makes UI reviews and integration tests meaningful.
+
+Each call to the Extended API version deducts a small per-call amount from your Spotzee credit balance. See the [Spotzee pricing page](https://spotzee.com/pricing/) for live figures.
+
+## How it works
+
+<Steps>
+<Step title="Send the request">
+POST to `/generic/data/generate/name` with a `count` (1-100, as a string), an optional `locale` (default `en`), and an optional `gender` (`male` or `female` — omit for any).
+</Step>
+<Step title="Name generation">
+The API generates first and last names appropriate for the selected locale. The gender parameter filters first names to gender-typical forms; last names are always gender-neutral.
+</Step>
+<Step title="Return the records">
+The response always returns an array. Each record contains `firstName`, `lastName`, and `fullName`.
+</Step>
+</Steps>
+
+## What to watch for
+
+Three patterns require attention when integrating generated names.
+
+- **Long names and layout overflow.** Generated names vary in length. Test that UI containers, table columns, and labels handle long names without truncating critical information or breaking alignment.
+- **Character set support.** Non-English locales produce names with diacritics (é, ñ, ü, etc.). Confirm your database columns, search indexes, and sort logic handle Unicode correctly.
+- **Count outside 1–100.** For larger datasets, call the endpoint in a loop. Each call returns an independent set of random names.
+
+## FAQs
+
+<AccordionGroup>
+<Accordion title="Are the generated names real people?">
+No. Names are synthetically generated and do not correspond to any real individual. They are safe to use in test and development environments without GDPR or CCPA exposure.
+</Accordion>
+
+<Accordion title="Can I filter by gender?">
+Yes. Pass `gender=male` or `gender=female` to restrict generated first names to gender-typical forms for the selected locale. Omit the parameter for a mix. The gender filter affects first names only — last names are gender-neutral across locales.
+</Accordion>
+
+<Accordion title="Which locales are supported?">
+The web tool offers English, Spanish, French, and German. The Extended API also accepts `pt_BR` (Brazilian Portuguese) and `zh_CN` (Simplified Chinese). Unsupported locale codes fall back to `en`.
+</Accordion>
+
+<Accordion title="How do I generate more than 100 names?">
+Call the endpoint multiple times in a loop. Each call returns an independent random set of names with no pagination or cursor needed.
+</Accordion>
+
+<Accordion title="Where can I learn more?">
+Read the [name generator guide](https://docs.spotzee.com/guides/tools/data-generation/name-generator) for locale and character set details, then combine with the [person generator guide](https://docs.spotzee.com/guides/tools/data-generation/person-generator) and [contact generator guide](https://docs.spotzee.com/guides/tools/data-generation/contact-generator) to build complete test datasets.
+</Accordion>
+</AccordionGroup>
+
+## Try it
+
+Generate sample names at [spotzee.com/tools/name-generator](https://spotzee.com/tools/name-generator/). For batch or programmatic use, call the Extended API endpoint directly with your Spotzee API key.
