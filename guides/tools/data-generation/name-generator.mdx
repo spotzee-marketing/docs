@@ -1,69 +1,103 @@
 ---
-title: "Name Generator"
-description: "Name generator that creates realistic first and last name pairs for any locale. Supports gender filtering. Safe for test databases, prototype UIs and automated test suites without using production names."
-keywords: ["random name generator", "name generator", "test data generator", "fake name generator", "sample name generator", "name generator free", "first and last name generator"]
+title: "Synthetic Name Data Generator"
+description: "Synthetic name data generator that creates first, middle, last, full, prefix and suffix values with locale, gender, type and seed controls for tests."
+keywords:
+  [
+    "name generator",
+    "random name generator",
+    "test data generator",
+    "free name generator",
+    "name generator online",
+    "synthetic name data generator",
+    "test name generator",
+    "first and last name generator",
+    "sample name generator",
+    "best free name generator",
+  ]
 ---
 
-A name generator creates synthetic first and last name pairs. The names are realistic-looking but entirely fictional — no real individuals are represented. They are designed for filling prototype UIs, seeding test databases, and generating varied fixture data for automated test suites.
+A synthetic name data generator creates fictional names for product screens, QA fixtures, CRM demos and automated tests. It returns realistic first, middle, last, full, prefix and suffix values without using production contact lists or real customer records, so you can test name handling without exposing personal data.
 
 <Info>
-Generate sample names at [spotzee.com/tools/name-generator](https://spotzee.com/tools/name-generator/). Choose a count, locale and gender filter, then click Generate. Use this guide for locale details and integration patterns.
+  Run this generator at
+  [/tools/name-generator](https://spotzee.com/tools/name-generator/).
 </Info>
 
 ## Why this matters
 
-Placeholder names like "John Doe" and "Test User" make UIs look unfinished and fail to exercise real edge cases. Generated names with varied lengths, characters, and cultural styles reveal layout bugs, truncation issues, and sorting errors that uniform placeholders never surface.
+Placeholder names like "John Doe" and "Test User" hide the cases that break interfaces. Long names. Short names. Prefixes, suffixes and middle names that don't fit neat two-column assumptions.
 
-And using real names from production lists in test environments creates GDPR and CCPA exposure. Synthetic names eliminate the risk without losing the realism that makes UI reviews and integration tests meaningful.
+Synthetic name data gives teams useful fixture values without copying customer records into staging, screenshots or automated test logs. And seeded output makes a failed test easier to debug because the same count, locale, gender and type can return the same dataset again.
 
-Each call to the Extended API version deducts a small per-call amount from your Spotzee credit balance. See the [Spotzee pricing page](https://spotzee.com/pricing/) for live figures.
+Each Extended API call deducts a small per-call amount from your Spotzee credit balance. See live per-tool pricing on the [Spotzee pricing page](https://spotzee.com/pricing/).
 
 ## How it works
 
 <Steps>
-<Step title="Send the request">
-POST to `/generic/data/generate/name` with a `count` (1-100, as a string), an optional `locale` (default `en`), and an optional `gender` (`male` or `female` — omit for any).
-</Step>
-<Step title="Name generation">
-The API generates first and last names appropriate for the selected locale. The gender parameter filters first names to gender-typical forms; last names are always gender-neutral.
-</Step>
-<Step title="Return the records">
-The response always returns an array. Each record contains `firstName`, `lastName`, and `fullName`.
-</Step>
+  <Step title="Send the request">
+    POST to `/generic/data/generate/name` with a `count` from `1` to `100`, plus
+    optional `locale`, `gender`, `type`, `seed`, `includeMiddleName` and
+    `includePrefixSuffix` fields.
+  </Step>
+  <Step title="Choose the output type">
+    Set `type` to `full`, `first`, `middle`, `last`, `prefix` or `suffix`
+    depending on the field your test needs.
+  </Step>
+  <Step title="Add optional fields">
+    Use `includeMiddleName=true` and `includePrefixSuffix=true` with `type=full`
+    when you need expanded full-name records.
+  </Step>
+  <Step title="Read the records">
+    The response returns `data.names[]` plus `generated`, `locale` and optional
+    `seed` metadata.
+  </Step>
 </Steps>
 
 ## What to watch for
 
-Three patterns require attention when integrating generated names.
-
-- **Long names and layout overflow.** Generated names vary in length. Test that UI containers, table columns, and labels handle long names without truncating critical information or breaking alignment.
-- **Character set support.** Non-English locales produce names with diacritics (é, ñ, ü, etc.). Confirm your database columns, search indexes, and sort logic handle Unicode correctly.
-- **Count outside 1–100.** For larger datasets, call the endpoint in a loop. Each call returns an independent set of random names.
+- **Count outside `1` to `100`.** The endpoint accepts up to 100 records per request. For larger fixture sets, call it multiple times.
+- **Type-specific fields.** `type=first` returns first-name fields, while `type=prefix` returns prefix fields. Don't expect every field on every method.
+- **Middle name output.** `includeMiddleName=true` only affects full-name output, so keep `type=full` when you need middle names.
+- **Prefix and suffix output.** `includePrefixSuffix=true` only adds prefix and suffix fields when full-name output is selected.
+- **Invalid seed values.** Seeds must be whole numbers. Leave the field blank for random output.
+- **Locale assumptions.** The schema accepts locale strings such as `en`, `es`, `fr`, `de`, `pt_BR` and `zh_CN`. Test your storage and search paths with the locales you plan to use.
 
 ## FAQs
 
 <AccordionGroup>
-<Accordion title="Are the generated names real people?">
-No. Names are synthetically generated and do not correspond to any real individual. They are safe to use in test and development environments without GDPR or CCPA exposure.
+<Accordion title="Are generated names real people?">
+No. Generated names are synthetic sample data, not real people. Use them for product demos, QA fixtures and test databases instead of copying names from production systems.
 </Accordion>
 
-<Accordion title="Can I filter by gender?">
-Yes. Pass `gender=male` or `gender=female` to restrict generated first names to gender-typical forms for the selected locale. Omit the parameter for a mix. The gender filter affects first names only — last names are gender-neutral across locales.
+<Accordion title="What fields can a synthetic name data generator return?">
+  A synthetic name data generator can return `firstName`, `middleName`,
+  `lastName`, `fullName`, `prefix`, `suffix` and optional `gender` fields. The
+  fields depend on the selected `type` and option toggles.
 </Accordion>
 
-<Accordion title="Which locales are supported?">
-The web tool offers English, Spanish, French, and German. The Extended API also accepts `pt_BR` (Brazilian Portuguese) and `zh_CN` (Simplified Chinese). Unsupported locale codes fall back to `en`.
+<Accordion title="Can I make random name generator output repeatable?">
+  Yes. Send a numeric `seed` to reproduce output for the same count, locale,
+  gender, type and option set. Leave the seed blank when you want exploratory
+  random name generator output.
+</Accordion>
+
+<Accordion title="Can I generate only first names or prefixes?">
+  Yes. Set `type=first`, `type=middle`, `type=last`, `type=prefix` or
+  `type=suffix` when you only need one field. Use `type=full` for first and last
+  name generator output.
 </Accordion>
 
 <Accordion title="How do I generate more than 100 names?">
-Call the endpoint multiple times in a loop. Each call returns an independent random set of names with no pagination or cursor needed.
+  Call the endpoint multiple times. Each request accepts a count from `1` to
+  `100`, and you can change the seed per batch when you need deterministic
+  output.
 </Accordion>
 
-<Accordion title="Where can I learn more?">
-Read the [name generator guide](https://docs.spotzee.com/guides/tools/data-generation/name-generator) for locale and character set details, then combine with the [person generator guide](https://docs.spotzee.com/guides/tools/data-generation/person-generator) and [contact generator guide](https://docs.spotzee.com/guides/tools/data-generation/contact-generator) to build complete test datasets.
+<Accordion title="Where can I learn more about name generation?">
+This page is the canonical name generator guide for endpoint options, response fields and integration patterns. Pair it with the [person data generator guide](https://docs.spotzee.com/guides/tools/data-generation/person-generator) and [contact data generator guide](https://docs.spotzee.com/guides/tools/data-generation/contact-generator) when you need fuller test datasets.
 </Accordion>
 </AccordionGroup>
 
 ## Try it
 
-Generate sample names at [spotzee.com/tools/name-generator](https://spotzee.com/tools/name-generator/). For batch or programmatic use, call the Extended API endpoint directly with your Spotzee API key.
+Generate synthetic names at [spotzee.com/tools/name-generator](https://spotzee.com/tools/name-generator/). For batch or programmatic use, call the Extended API endpoint directly with your Spotzee API key.
