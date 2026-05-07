@@ -183,7 +183,8 @@
                   "guides/tools/data-generation/person-generator",
                   "guides/tools/data-generation/contact-generator",
                   "guides/tools/data-generation/name-generator",
-                  "guides/tools/data-generation/date-generator"
+                  "guides/tools/data-generation/date-generator",
+                  "guides/tools/data-generation/phone-generator"
                 ]
               },
               {

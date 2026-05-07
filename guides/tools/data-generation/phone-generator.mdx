@@ -1,0 +1,102 @@
+---
+title: "Synthetic Phone Data Generator"
+description: "Phone data generator that creates synthetic phone numbers and IMEI fixtures with count, locale, style, method and seed controls for repeatable QA fixtures."
+keywords:
+  [
+    "phone number generator",
+    "random phone number generator",
+    "test data generator",
+    "free phone number generator",
+    "phone number generator online",
+    "synthetic phone data generator",
+    "test phone number generator",
+    "IMEI generator",
+    "best free phone number generator",
+  ]
+---
+
+A synthetic phone data generator creates phone number and device identifier fixture values for software tests, messaging workflows and product demos. Spotzee can return phone numbers in human, national or international style, or IMEI fixture values when you need device-identifier shaped test data.
+
+<Info>
+  Generate sample phone data at
+  [spotzee.com/tools/phone-generator](https://spotzee.com/tools/phone-generator/).
+</Info>
+
+## Why this matters
+
+Production phone numbers don't belong in development databases, screenshots, demos or automated test logs. A phone number generator online tool gives teams realistic-looking sample values without exposing customer contact data in lower-control environments.
+
+Phone fields fail in ordinary ways. Extensions can overflow compact table cells. National formats differ from international formats. Device workflows may need IMEI-shaped values rather than phone numbers. And seeded output helps you reproduce a failing test instead of chasing a one-off random value.
+
+Each Extended API call deducts a small per-call amount from your Spotzee credit balance. See the [Spotzee pricing page](https://spotzee.com/pricing/) for live per-tool pricing.
+
+## How it works
+
+<Steps>
+  <Step title="Send the request">
+    POST to `/generic/data/generate/phone` with `count`. The count is a string
+    from `1` to `100`.
+  </Step>
+  <Step title="Choose a method">
+    Use `method=number` for phone-number output or `method=imei` for device
+    identifier fixture output.
+  </Step>
+  <Step title="Set phone options">
+    Send `locale`, optional numeric `seed`, and `style` when generating phone
+    numbers. Supported styles are `human`, `national` and `international`.
+  </Step>
+  <Step title="Read the response">
+    The response returns `data.phones[]`, `generated`, `locale`, optional
+    `seed`, and the resolved `method`. Phone-number records include
+    `phoneNumber`; IMEI records include `imei`.
+  </Step>
+</Steps>
+
+## Method reference
+
+| Method   | Output                         | Main parameters                    |
+| -------- | ------------------------------ | ---------------------------------- |
+| `number` | Phone-number fixture values    | `count`, `locale`, `style`, `seed` |
+| `imei`   | Device identifier fixture data | `count`, `locale`, `seed`          |
+
+`style` only affects phone-number output. IMEI records return `imei` and `value` fields without a style.
+
+## What to watch for
+
+- **Count outside `1` to `100`.** One request generates up to 100 phone records. For more rows, call the endpoint again and vary the seed when you need a different batch.
+- **Wrong method for the fixture.** Use `number` for phone fields and `imei` for device identifier fixture fields.
+- **Style on IMEI output.** `style` is accepted by the request schema, but the returned IMEI record does not include a style field.
+- **Invalid seed.** Seeds must be whole numbers. Leave the seed blank for random output, or reuse the same seed for repeatable fixtures.
+- **Generation versus validation.** This endpoint creates synthetic data. Use the [phone number validator](https://docs.spotzee.com/guides/tools/other/phone-validator) when you need to check a submitted number.
+
+## FAQs
+
+<AccordionGroup>
+<Accordion title="Are generated phone numbers real phone numbers?">
+No. Generated phone values are synthetic sample data for tests, prototypes and fixture files. Do not use them for real messaging, identity checks or customer outreach.
+</Accordion>
+
+<Accordion title="What can a synthetic phone data generator return?">
+A synthetic phone data generator can return phone-number records with `phoneNumber`, `value`, `method` and `style` fields. It can also return IMEI fixture records with `imei`, `value` and `method` fields. The exact fields depend on the selected method.
+</Accordion>
+
+<Accordion title="Which phone styles does the phone number generator support?">
+The phone number generator supports `human`, `national` and `international` styles. Human output may include spacing, punctuation or extension-style formatting, national output follows local display formatting, and international output includes the international dialling prefix.
+</Accordion>
+
+<Accordion title="Can I reproduce random phone number generator output?">
+Yes. Set a numeric seed to reproduce output for the same count, locale, method and style. Leave the seed blank when you want a fresh random batch for exploratory testing.
+</Accordion>
+
+<Accordion title="Is this the same as phone number validation?">
+No. Phone generation creates synthetic test data, while phone validation checks an existing number for valid syntax and normalised output. Use the phone number validator when you need to inspect a submitted number.
+</Accordion>
+
+<Accordion title="Where can I learn more about phone data generation?">
+Use this phone data generator guide for endpoint details, then combine phone data with the [contact generator guide](https://docs.spotzee.com/guides/tools/data-generation/contact-generator), [person generator guide](https://docs.spotzee.com/guides/tools/data-generation/person-generator) and [name generator guide](https://docs.spotzee.com/guides/tools/data-generation/name-generator) to build fuller test datasets.
+</Accordion>
+</AccordionGroup>
+
+## Try it
+
+Generate sample phone data at [spotzee.com/tools/phone-generator](https://spotzee.com/tools/phone-generator/). For batch or programmatic use, call the Extended API endpoint with your Spotzee API key.
