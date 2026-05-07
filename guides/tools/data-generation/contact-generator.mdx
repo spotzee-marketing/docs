@@ -1,71 +1,76 @@
 ---
-title: "Contact Data Generator"
-description: "Contact data generator that creates synthetic email addresses and website URLs for testing. Locale-aware output. Safe for CRM tests, form validation and API integration without using production contact data."
-keywords: ["contact data generator", "fake email address generator", "test data generator", "sample contact data", "random email generator", "test email generator", "contact data generator free"]
+title: "Synthetic Contact Data Generator"
+description: "Contact data generator that creates synthetic email, website, phone, account and social fields for CRM tests with locale, seed and domain controls, fast."
+keywords: ["contact data generator", "synthetic contact data generator", "test data generator", "free contact data generator", "contact generator online", "sample contact data", "CRM test data generator", "random email generator", "best free contact data generator"]
 ---
 
-A contact data generator creates synthetic contact records containing an email address and a website URL. The records are realistic-looking but entirely fictional — no real individuals or organisations are represented. They are designed for testing email validation flows, CRM integrations, and form handling without using production contact data.
+A synthetic contact data generator creates contact records for software testing, CRM fixtures and product demos. Spotzee returns email addresses and website URLs, with optional phone numbers, username fields, display names and social profile URLs when you enable those fields.
 
 <Info>
-Generate sample contact records at [spotzee.com/tools/contact-generator](https://spotzee.com/tools/contact-generator/). Enter a count and locale, then click Generate. Use this guide for integration patterns and testing workflows.
+Run this generator at [/tools/contact-generator](https://spotzee.com/tools/contact-generator/).
 </Info>
 
 ## Why this matters
 
-Running email validation tests, CRM import flows, or form submission tests with real email addresses risks sending unexpected messages or exposing production contact lists. Synthetic contact data eliminates this risk.
+Production records do not belong in development databases, demo screens or automated test fixtures. Synthetic contact data gives you realistic email, website, phone and account shapes without copying customer records into lower-control environments.
 
-Generated email addresses follow real provider patterns (gmail.com, hotmail.com, etc.) so they exercise the same parsing and validation logic that production addresses trigger, without reaching real inboxes. The domains have valid MX records, so domain-level checks pass while the individual mailboxes do not exist.
+Optional fields are where contact workflows often break. And a contact data generator with toggles for phone numbers, social URLs, account fields, reserved example domains, custom domains and deterministic seeds lets you test missing-field and long-field paths before users find them.
 
-Each call to the Extended API version deducts a small per-call amount from your Spotzee credit balance. See the [Spotzee pricing page](https://spotzee.com/pricing/) for live figures.
+Each Extended API call deducts a small per-call amount from your Spotzee credit balance. See live per-tool pricing on the [Spotzee pricing page](https://spotzee.com/pricing/).
 
 ## How it works
 
 <Steps>
 <Step title="Send the request">
-POST to `/generic/data/generate/contact` with a `count` (1-100, as a string) and an optional `locale` (default `en`).
+POST to `/generic/data/generate/contact` with a `count` from `1` to `100`, plus optional `locale`, `seed`, include flags, `phoneStyle` and `emailDomain`.
 </Step>
-<Step title="Email generation">
-The API generates email addresses using name-style local-parts appropriate for the selected locale, combined with common consumer provider domains.
+<Step title="Choose optional fields">
+Set `includePhone`, `includeSocial` or `includeAccount` to `true` when you need phone, social profile, username or display-name output.
 </Step>
-<Step title="Website generation">
-Each contact record also includes a synthetically generated website URL with a realistic hostname and TLD.
+<Step title="Control email output">
+Use `useExampleEmail=true` for reserved example-domain output, or pass `emailDomain` to generate addresses on one domain. Do not combine those options.
 </Step>
 <Step title="Return the records">
-The response returns a single object (count=1) or an array (count>1). Each record contains `email` and `website`.
+The response returns `data.contacts[]`. Each record contains `email` and `website`, plus `phone`, `username`, `displayName` and `social` only when requested.
 </Step>
 </Steps>
 
 ## What to watch for
 
-Two patterns require attention when integrating generated contact data.
-
-- **Count outside 1–100.** The API caps at 100 records per request. For larger datasets, call the endpoint in a loop. Each call returns an independent set of records.
-- **Email format for strict validators.** Generated emails follow RFC 5321 format and use real provider domains that pass MX checks. An SMTP-level check confirms the individual mailbox does not exist — which is the expected and correct result for synthetic data.
+- **Count outside `1` to `100`.** The API accepts up to 100 contact records per request. For larger datasets, call the endpoint multiple times.
+- **Reserved and custom domains together.** Do not combine `useExampleEmail=true` with `emailDomain`; choose reserved example-domain output or one custom domain.
+- **Invalid custom domain.** Use a single domain such as `example.org`; blank labels, invalid characters and subdomain-style values are rejected.
+- **Missing optional fields.** `phone`, `username`, `displayName` and `social` only appear when their matching include option is enabled.
+- **Invalid seed.** Seeds must be whole numbers. Leave the field blank for random output, or reuse a numeric seed for repeatable fixtures.
 
 ## FAQs
 
 <AccordionGroup>
-<Accordion title="Are the generated email addresses real?">
-No. Email addresses are synthetically generated. They use real provider domains (gmail.com, hotmail.com, etc.) but with randomly generated local-parts. Do not send email to them — the mailboxes do not exist.
+<Accordion title="Is synthetic contact data real customer data?">
+No. Synthetic contact data is generated sample data, not customer data. Use it in development databases, product demos and automated tests instead of copying production records.
 </Accordion>
 
-<Accordion title="Will generated addresses pass an MX lookup?">
-The domains have valid MX records, so an email provider check or MX lookup will confirm the domain can receive mail. But an SMTP-level validation or full email address validation will show the individual mailbox does not exist. This is expected for synthetic addresses.
+<Accordion title="What fields can a synthetic contact data generator return?">
+The contact data generator always returns `email` and `website`. It can also return `phone`, `username`, `displayName` and `social` fields containing `twitter`, `linkedin` and `github` URLs when you request those options.
 </Accordion>
 
-<Accordion title="Can I use generated addresses to test email deliverability?">
-No. Generated addresses are not real mailboxes and cannot receive email. For deliverability testing, use the [email spam checker](https://spotzee.com/tools/email-spam-checker/) or the [SMTP email test](https://spotzee.com/tools/smtp-email-test/) tool with real credentials.
+<Accordion title="Can I use a custom email domain?">
+Yes. Enter a domain such as `example.org` in the email domain field to generate all contact emails on that domain. Do not enable reserved example-domain output at the same time, because the API rejects that combination.
 </Accordion>
 
-<Accordion title="How do I generate more than 100 records?">
-Call the endpoint multiple times in a loop. Each call returns an independent random set of records with no pagination or cursor needed.
+<Accordion title="Can I make contact generator online output repeatable?">
+Yes. Enter a numeric seed to reproduce output for the same count, locale and option set. Leave the seed blank when you want random sample contact data for exploratory testing.
 </Accordion>
 
-<Accordion title="Where can I learn more?">
-Read the [contact data generator guide](https://docs.spotzee.com/guides/tools/data-generation/contact-generator) for integration patterns, then combine with the [person generator guide](https://docs.spotzee.com/guides/tools/data-generation/person-generator) and [name generator guide](https://docs.spotzee.com/guides/tools/data-generation/name-generator) to build richer test datasets.
+<Accordion title="Can I use generated contacts to test email deliverability?">
+No. Generated contacts are test fixtures, not deliverability test inboxes. Use the [email spam checker](https://spotzee.com/tools/email-spam-checker/) or [SMTP email test](https://spotzee.com/tools/smtp-email-test/) when you need to test a real message path.
+</Accordion>
+
+<Accordion title="Where can I learn more about contact data generation?">
+This page covers the contact endpoint. For adjacent workflows, read the [person generator guide](https://docs.spotzee.com/guides/tools/data-generation/person-generator), [name generator guide](https://docs.spotzee.com/guides/tools/data-generation/name-generator), and [date generator guide](https://docs.spotzee.com/guides/tools/data-generation/date-generator).
 </Accordion>
 </AccordionGroup>
 
 ## Try it
 
-Generate sample contact records at [spotzee.com/tools/contact-generator](https://spotzee.com/tools/contact-generator/). For batch or programmatic use, call the Extended API endpoint directly with your Spotzee API key.
+Generate sample contact records at [spotzee.com/tools/contact-generator](https://spotzee.com/tools/contact-generator/). Use the page as a sample contact data generator for one-off checks, or call the Extended API endpoint directly with your Spotzee API key.
