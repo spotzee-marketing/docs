@@ -1,72 +1,76 @@
 ---
-title: "Person Data Generator"
-description: "Person data generator that creates synthetic person records with name, gender, birth date and age. Locale-aware output. Safe for test databases, prototypes and automated test suites."
-keywords: ["person data generator", "fake person data generator", "test data generator", "synthetic data generator", "random person generator", "sample person data", "person data generator free"]
+title: "Synthetic Person Data Generator"
+description: "Person data generator that creates localised synthetic profiles with optional job, biography and personal fields for safe tests, prototypes and seed data."
+keywords: ["person data generator", "random person generator", "synthetic person data generator", "free person data generator", "person generator online", "test person data generator", "sample person data generator", "synthetic data generator", "best free random person generator"]
 ---
 
-A person data generator creates synthetic person records containing a name, gender, birth date and age. The records are realistic-looking but entirely fictional — no real individuals are represented. They are designed for test databases, prototype UIs, and automated test suites where production data cannot be used.
+A synthetic person data generator creates fictional person profiles for software testing, QA and product demos. Spotzee returns localised names, gender, birth dates and ages, with optional middle names, prefixes, suffixes, job details, biographies, gender identity and zodiac signs when you choose those fields.
 
 <Info>
-Generate sample person records at [spotzee.com/tools/person-generator](https://spotzee.com/tools/person-generator/). Enter a count and locale, then click Generate. Use this guide for integration patterns and locale details.
+Run this generator at [/tools/person-generator](https://spotzee.com/tools/person-generator/).
 </Info>
 
 ## Why this matters
 
-Using production person data in development and test environments creates compliance exposure under GDPR, CCPA, and similar regulations. Synthetic data that looks realistic eliminates the risk without sacrificing the realism needed for UI and integration testing.
+Production records do not belong in development databases, demo screens or automated test fixtures. Synthetic person data gives your team realistic profiles without copying customer names, dates of birth or profile attributes into places where they are harder to control.
 
-Test suites that rely on hardcoded names like "John Doe" or "Test User" are fragile. They break when code checks for specific formats or lengths. Generated data with varied names, birth dates, and ages exercises edge cases that uniform placeholders miss.
+Hardcoded names like "John Doe" hide layout, sorting and validation problems. As a synthetic data generator endpoint, localised records with optional middle names, prefixes, suffixes and profile fields create better fixtures because they exercise longer strings, diacritics, optional fields and deterministic test runs.
 
-Each call to the Extended API version deducts a small per-call amount from your Spotzee credit balance. See the [Spotzee pricing page](https://spotzee.com/pricing/) for live figures.
+Each Extended API call deducts a small per-call amount from your Spotzee credit balance. See live per-tool pricing on the [Spotzee pricing page](https://spotzee.com/pricing/).
 
 ## How it works
 
 <Steps>
 <Step title="Send the request">
-POST to `/generic/data/generate/person` with a `count` (1-100, as a string) and an optional `locale` (default `en`).
+POST to `/generic/data/generate/person` with a `count` from `1` to `100`, plus optional `locale`, `seed`, `gender` and include flags.
 </Step>
-<Step title="Name generation">
-The API generates first and last names appropriate for the selected locale. English produces Anglo-Saxon names; Spanish, French, and German produce locale-appropriate equivalents.
+<Step title="Choose generation options">
+Use `locale` for name style, `gender` for male or female name selection, and `seed` when you need deterministic output. Common locale values include `en`, `es`, `fr`, `de`, `pt_BR` and `zh_CN`.
 </Step>
-<Step title="Demographic data">
-Gender is randomly assigned. A birth date is randomly selected, and the corresponding age is calculated at the time of generation.
+<Step title="Add optional fields">
+Set `includeJobTitle`, `includeJobDetails`, `includeBiography`, `includeMiddleName`, `includePrefixSuffix` or `includePersonalDetails` to `true` when your fixture needs those fields.
 </Step>
-<Step title="Return the records">
-The response returns a single object (count=1) or an array (count>1). Each record contains `firstName`, `lastName`, `fullName`, `gender`, `birthDate`, and `age`.
+<Step title="Read the records">
+Use the response as test person data generator output. It returns `data.persons[]`, with each record containing `firstName`, `lastName`, `fullName`, `gender`, `birthDate` and `age`, plus any optional fields you requested.
 </Step>
 </Steps>
 
 ## What to watch for
 
-Three patterns require attention when integrating generated person data.
-
-- **Count outside 1–100.** The API accepts between 1 and 100 records per request. For larger datasets, call the endpoint multiple times. Each call returns independent random records.
-- **Locale not matching expected character set.** The English locale produces Latin-script names. If your test environment needs to exercise Unicode handling, select a locale with appropriate character coverage.
-- **Age and birth date consistency.** Age is calculated at generation time. If a test relies on a specific age range, filter the results client-side or use the date generator with the `birthdate` method for more control.
+- **Count outside `1` to `100`.** The API accepts up to 100 records per request. For larger datasets, call the endpoint multiple times.
+- **Blank locale.** A blank locale defaults to `en`. Enter a locale code when you need language-specific names or character coverage.
+- **Missing optional fields.** Job details, biographies, middle names, prefixes, suffixes, gender identity and zodiac signs only appear when their matching include option is set to `true`.
+- **Invalid seed.** Seeds must be whole numbers. Leave the field blank for random output, or reuse the same seed for repeatable fixtures.
+- **Strict age ranges.** The person endpoint returns generated birth dates and ages. If a test needs a specific age band, combine this tool with the date generator's birthdate methods.
 
 ## FAQs
 
 <AccordionGroup>
-<Accordion title="Is the generated person data real?">
-No. All records are synthetically generated and do not correspond to any real individual. The data is safe to use in test environments without GDPR or CCPA exposure.
+<Accordion title="Is generated person data real?">
+No. Generated person data is synthetic sample data and does not represent real people. Use it in development databases, product demos and automated tests instead of copying production records.
+</Accordion>
+
+<Accordion title="What fields can a person data generator return?">
+The person data generator always returns name, gender, birth date and age fields. You can also request middle names, prefixes, suffixes, job titles, job details, biographies, gender identity and zodiac signs. Optional fields only appear when you request them.
+</Accordion>
+
+<Accordion title="Can I use the person generator online for repeatable fixtures?">
+Yes. Enter a numeric seed to reproduce the same generated output for the same count, locale and option set. Use it as a random person generator by leaving the seed blank when you want exploratory records.
 </Accordion>
 
 <Accordion title="Can I generate person data with email addresses?">
-The person generator returns name, gender, birth date and age. For email addresses and website URLs, use the [contact generator](https://spotzee.com/tools/contact-generator/). Combine both generators to build richer test person records.
+The person data generator focuses on profile fields, not email addresses. Use the [contact generator](https://spotzee.com/tools/contact-generator/) for synthetic email addresses, websites, usernames and social profile fields. Combine both tools when you need CRM-style test records.
 </Accordion>
 
-<Accordion title="How do I generate more than 100 records?">
-The web tool and API both cap at 100 records per request. For larger datasets, call the endpoint in a loop. Each call returns a fresh, independent set of records — no pagination or cursor is needed.
+<Accordion title="How do I generate more than 100 person records?">
+Call the Extended API endpoint in a loop. Each request accepts up to 100 records and can reuse the same options. Change the seed between requests when you need deterministic batches that do not repeat.
 </Accordion>
 
-<Accordion title="Which locales are supported?">
-The `locale` parameter accepts IETF locale codes: `en` (English), `es` (Spanish), `fr` (French), `de` (German), `pt_BR` (Brazilian Portuguese), `zh_CN` (Simplified Chinese), and others. Unsupported locales fall back to `en`.
-</Accordion>
-
-<Accordion title="Where can I learn more about generating test data?">
-Read this guide for person-specific patterns, then explore the [contact generator guide](https://docs.spotzee.com/guides/tools/data-generation/contact-generator), [name generator guide](https://docs.spotzee.com/guides/tools/data-generation/name-generator), and [date generator guide](https://docs.spotzee.com/guides/tools/data-generation/date-generator) to combine all four into a complete test dataset.
+<Accordion title="Where can I learn more about person data generation?">
+This page covers the person endpoint. For adjacent workflows, read the [contact generator guide](https://docs.spotzee.com/guides/tools/data-generation/contact-generator), [name generator guide](https://docs.spotzee.com/guides/tools/data-generation/name-generator), and [date generator guide](https://docs.spotzee.com/guides/tools/data-generation/date-generator).
 </Accordion>
 </AccordionGroup>
 
 ## Try it
 
-Generate sample person records at [spotzee.com/tools/person-generator](https://spotzee.com/tools/person-generator/). For batch or programmatic use, call the Extended API endpoint directly with your Spotzee API key.
+Generate sample person records at [spotzee.com/tools/person-generator](https://spotzee.com/tools/person-generator/). Use the page as a sample person data generator for one-off checks, or call the Extended API endpoint directly with your Spotzee API key.

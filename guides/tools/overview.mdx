@@ -1,13 +1,13 @@
 ---
 title: "Tools"
-description: "Email validation, DNS, deliverability, blacklist, and content tools that wrap the Spotzee Extended API. Free to try in the browser; credit-based when called via the API at scale."
+description: "Email validation, DNS, deliverability, blacklist, content and data-generation tools that wrap the Spotzee Extended API with credit-based usage."
 keywords: ["email validation tools", "deliverability tools", "dns lookup tools", "blacklist monitoring", "spotzee tools", "extended api tools"]
 ---
 
 Spotzee runs a set of tools that wrap the same checks the platform runs on every campaign. Each tool has two surfaces: a one-shot web version at [spotzee.com/tools](https://spotzee.com/tools/) (paste a value, get an answer, no signup) and a programmatic version exposed through the Spotzee Extended API. The guides in this section are written for the API audience, where calls are billed against your Spotzee credit balance.
 
 <Info>
-**Two ways to use the tools.** The web versions at [spotzee.com/tools](https://spotzee.com/tools/) are free for any visitor — no signup, no daily limit, no API key. The Extended API versions documented here run on credit-based pricing: every Spotzee account starts with $1 of free credit, then each call deducts a small per-call amount from that balance (figures vary by tool, see the [Spotzee pricing page](https://spotzee.com/pricing/) for live numbers). Pick the web version for one-off checks, the API for batch or automated workflows.
+**Two ways to use the tools.** The web versions at [spotzee.com/tools](https://spotzee.com/tools/) support one-off browser checks. The Extended API versions documented here run on credit-based pricing: every Spotzee account starts with $1 starter credit, then each call deducts a small per-call amount from that balance (figures vary by tool, see the [Spotzee pricing page](https://spotzee.com/pricing/) for live numbers). Pick the web version for one-off checks, the API for batch or automated workflows.
 </Info>
 
 <Info>
@@ -44,7 +44,7 @@ Use the tool when you need a single answer fast. Read the guide when you need to
 | Test whether an SMTP server is reachable and check its capabilities | [SMTP server test](/guides/tools/smtp-testing/smtp-server-test) |
 | Send a real test email to verify SMTP credentials and delivery | [SMTP email test](/guides/tools/smtp-testing/smtp-email-test) |
 | Check a phone number for E.164 format and identify its country | [Phone number validator](/guides/tools/other/phone-validator) |
-| Generate synthetic person records for test databases and prototypes | [Person data generator](/guides/tools/data-generation/person-generator) |
+| Generate localised person profiles with optional job and biography fields | [Person data generator](/guides/tools/data-generation/person-generator) |
 | Generate synthetic email addresses and website URLs for testing | [Contact data generator](/guides/tools/data-generation/contact-generator) |
 | Generate realistic first and last names for prototypes and test fixtures | [Name generator](/guides/tools/data-generation/name-generator) |
 | Generate random dates in ISO format anchored to anytime, recent, future or past | [Date generator](/guides/tools/data-generation/date-generator) |
@@ -198,7 +198,7 @@ Tools that generate synthetic test data — names, contacts, dates and more — 
 
 <CardGroup cols={2}>
   <Card title="Person data generator" href="/guides/tools/data-generation/person-generator">
-    Generate synthetic person records with name, gender, birth date and age for test databases and prototypes.
+    Create localised person profiles with optional job, biography and personal fields for tests and prototypes.
   </Card>
   <Card title="Contact data generator" href="/guides/tools/data-generation/contact-generator">
     Generate synthetic email addresses and website URLs for CRM tests, form validation and API integration.
