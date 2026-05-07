@@ -185,7 +185,8 @@
                   "guides/tools/data-generation/name-generator",
                   "guides/tools/data-generation/date-generator",
                   "guides/tools/data-generation/phone-generator",
-                  "guides/tools/data-generation/company-generator"
+                  "guides/tools/data-generation/company-generator",
+                  "guides/tools/data-generation/commerce-generator"
                 ]
               },
               {

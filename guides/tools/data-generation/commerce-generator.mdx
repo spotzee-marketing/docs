@@ -1,0 +1,110 @@
+---
+title: "Synthetic Commerce Data Generator"
+description: "Commerce data generator and product data generator for synthetic price, department and ISBN fixtures with locale, seed and method controls for QA tests."
+keywords:
+  [
+    "commerce data generator",
+    "product data generator",
+    "free commerce data generator",
+    "commerce data generator online",
+    "ecommerce test data generator",
+    "test product data generator",
+    "product price generator",
+    "ISBN generator",
+    "best free product data generator",
+  ]
+---
+
+A synthetic commerce data generator creates sample product, department, price and ISBN data for catalogue tests, checkout flows, merchandising screens and search indexes. It gives teams repeatable commerce-shaped fixtures without copying production product records into lower-control environments.
+
+<Info>
+  Generate sample commerce data at
+  [spotzee.com/tools/commerce-generator](https://spotzee.com/tools/commerce-generator/).
+</Info>
+
+## Why this matters
+
+Production catalogue records don't belong in development databases, screenshots, demos or automated test logs. A commerce data generator gives teams realistic sample values without exposing real store data in places that don't need it.
+
+Commerce fields fail in ordinary ways. Long product names wrap in cards. Price symbols and decimal places can break formatting. ISBN separators affect validation. And seeded output helps you reproduce a failing test instead of chasing a one-off random value.
+
+Each Extended API call deducts a small per-call amount from your Spotzee credit balance. See the [Spotzee pricing page](https://spotzee.com/pricing/) for live per-tool pricing.
+
+## How it works
+
+<Steps>
+  <Step title="Send the request">
+    POST to `/generic/data/generate/commerce` with `count`. The count is a
+    string from `1` to `100`.
+  </Step>
+  <Step title="Choose a method">
+    Use `method=profile` for expanded commerce records, or choose one field
+    method such as `productName`, `price`, `isbn` or `department`.
+  </Step>
+  <Step title="Set commerce options">
+    Send `locale`, optional numeric `seed`, price controls, `isbnVariant` and
+    `isbnSeparator` when those values matter to your fixture.
+  </Step>
+  <Step title="Read the response">
+    The response returns `data.commerce[]`, `generated`, `locale`, optional
+    `seed`, and the resolved `method`. Profile records can include product,
+    department, price and ISBN fields.
+  </Step>
+</Steps>
+
+## Method reference
+
+| Method               | Output                                      | Main parameters                                                |
+| -------------------- | ------------------------------------------- | -------------------------------------------------------------- |
+| `profile`            | Product, department, price and ISBN fields  | `count`, `locale`, `seed`, price controls, ISBN controls       |
+| `department`         | Shop department or product category         | `count`, `locale`, `seed`                                      |
+| `isbn`               | ISBN fixture                                | `count`, `locale`, `seed`, `isbnVariant`, `isbnSeparator`      |
+| `price`              | Price fixture                               | `count`, `locale`, `seed`, `priceMin`, `priceMax`, decimals    |
+| `product`            | Short product name                          | `count`, `locale`, `seed`                                      |
+| `productAdjective`   | Product adjective                           | `count`, `locale`, `seed`                                      |
+| `productDescription` | Product description                         | `count`, `locale`, `seed`                                      |
+| `productMaterial`    | Product material                            | `count`, `locale`, `seed`                                      |
+| `productName`        | Descriptive product name                    | `count`, `locale`, `seed`                                      |
+
+Use `profile` when you need fuller ecommerce test data. Use a field method when your form, table, import job or search index only needs one value type.
+
+## What to watch for
+
+- **Count outside `1` to `100`.** One request generates up to 100 commerce records. For more rows, call the endpoint again and vary the seed when you need a different batch.
+- **Wrong method for the fixture.** Use `profile` for fuller product records, or a field method for one value type.
+- **Invalid price range.** `priceMin` and `priceMax` must be numeric values. The minimum must be less than or equal to the maximum.
+- **Invalid ISBN separator.** `isbnSeparator` must be printable ASCII and no more than three characters.
+- **Expecting live products.** Generated commerce values are synthetic sample data. Don't use them as verified product names, real prices or catalogue records.
+- **Invalid seed.** Seeds must be whole numbers. Leave the seed blank for random output, or reuse the same seed for repeatable fixtures.
+
+## FAQs
+
+<AccordionGroup>
+<Accordion title="What can a commerce data generator return?">
+A commerce data generator can return `commerce[]` records with `method` and `value` fields. Profile output can also include `productName`, `product`, `productAdjective`, `productDescription`, `productMaterial`, `department`, `price` and `isbn` fields. The exact fields depend on the selected method.
+</Accordion>
+
+<Accordion title="Is this a product data generator for real stores?">
+No. This product data generator creates synthetic sample values for tests, prototypes and fixture files. Do not treat generated product names, prices or ISBN values as real catalogue records.
+</Accordion>
+
+<Accordion title="Can I reproduce commerce data generator output?">
+Yes. Set a numeric seed to reproduce output for the same count, locale, method and option values. Leave the seed blank when you want a fresh random batch for exploratory testing.
+</Accordion>
+
+<Accordion title="Which method should I choose for ecommerce test data?">
+Choose `profile` when you need fuller ecommerce test data with product, department, price and ISBN fields together. Choose `productName`, `price`, `isbn`, `department` or another field method when a form, table or import job only needs one field type.
+</Accordion>
+
+<Accordion title="What is the best product data generator for QA fixtures?">
+The best product data generator for QA fixtures is the one that gives you repeatable, typed output without production data. Spotzee is built for that workflow: send a count, choose the method and reuse a numeric seed when you need stable fixtures.
+</Accordion>
+
+<Accordion title="Where can I learn more about commerce data generation?">
+Use this commerce data generator guide for endpoint details, then combine commerce data with the [company data generator guide](https://docs.spotzee.com/guides/tools/data-generation/company-generator), [contact generator guide](https://docs.spotzee.com/guides/tools/data-generation/contact-generator), [phone data generator guide](https://docs.spotzee.com/guides/tools/data-generation/phone-generator) and [date generator guide](https://docs.spotzee.com/guides/tools/data-generation/date-generator) to build fuller test datasets.
+</Accordion>
+</AccordionGroup>
+
+## Try it
+
+Generate sample commerce data at [spotzee.com/tools/commerce-generator](https://spotzee.com/tools/commerce-generator/). For batch or programmatic use, call the Extended API endpoint with your Spotzee API key.
