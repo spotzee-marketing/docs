@@ -1,0 +1,110 @@
+---
+title: "Synthetic Company Data Generator"
+description: "Company data generator that creates synthetic company names, catch phrases, buzz phrases and business vocabulary for repeatable test fixtures."
+keywords:
+  [
+    "company name generator",
+    "company data generator",
+    "synthetic company data generator",
+    "free company data generator",
+    "company data generator online",
+    "test company data generator",
+    "CRM test data generator",
+    "company catch phrase generator",
+    "best free company data generator",
+  ]
+---
+
+A synthetic company data generator creates sample organisation data such as company names, catch phrases, buzz phrases and business vocabulary for CRM tests, enrichment flows, search indexes and onboarding screens. It gives teams repeatable account-like fixtures without copying production records into lower-control environments.
+
+<Info>
+  Generate sample company data at
+  [spotzee.com/tools/company-generator](https://spotzee.com/tools/company-generator/).
+</Info>
+
+## Why this matters
+
+Production account records don't belong in development databases, screenshots, demos or automated test logs. A company data generator gives teams realistic-looking sample values without exposing real organisations in places that don't need real data.
+
+Company fields fail in ordinary ways. Long names wrap in tables. Catch phrases overflow cards. Search snippets need more than a title. And seeded output helps you reproduce a failing test instead of chasing a one-off random value.
+
+Each Extended API call deducts a small per-call amount from your Spotzee credit balance. See the [Spotzee pricing page](https://spotzee.com/pricing/) for live per-tool pricing.
+
+## How it works
+
+<Steps>
+  <Step title="Send the request">
+    POST to `/generic/data/generate/company` with `count`. The count is a string
+    from `1` to `100`.
+  </Step>
+  <Step title="Choose a method">
+    Use `method=profile` for expanded company records, or choose one field
+    method such as `name`, `catchPhrase`, `buzzPhrase` or `buzzNoun`.
+  </Step>
+  <Step title="Set repeatability options">
+    Send `locale` and an optional numeric `seed` when you need localised,
+    repeatable sample data.
+  </Step>
+  <Step title="Read the response">
+    The response returns `data.companies[]`, `generated`, `locale`, optional
+    `seed`, and the resolved `method`. Profile records can include name, catch
+    phrase, buzz phrase and token fields.
+  </Step>
+</Steps>
+
+## Method reference
+
+| Method                    | Output                                     | Main parameters           |
+| ------------------------- | ------------------------------------------ | ------------------------- |
+| `profile`                 | Company name, phrases and vocabulary tokens | `count`, `locale`, `seed` |
+| `name`                    | Company name                               | `count`, `locale`, `seed` |
+| `catchPhrase`             | Catch phrase                               | `count`, `locale`, `seed` |
+| `buzzPhrase`              | Buzz phrase                                | `count`, `locale`, `seed` |
+| `catchPhraseAdjective`    | Catch phrase adjective                     | `count`, `locale`, `seed` |
+| `catchPhraseDescriptor`   | Catch phrase descriptor                    | `count`, `locale`, `seed` |
+| `catchPhraseNoun`         | Catch phrase noun                          | `count`, `locale`, `seed` |
+| `buzzAdjective`           | Buzz adjective                             | `count`, `locale`, `seed` |
+| `buzzVerb`                | Buzz verb                                  | `count`, `locale`, `seed` |
+| `buzzNoun`                | Buzz noun                                  | `count`, `locale`, `seed` |
+
+Use `profile` when you need fuller CRM test data. Use a field method when your form, table or search index only needs one column.
+
+## What to watch for
+
+- **Count outside `1` to `100`.** One request generates up to 100 company records. For more rows, call the endpoint again and vary the seed when you need a different batch.
+- **Wrong method for the fixture.** Use `profile` for fuller account-like records, or a token method for one field type.
+- **Expecting legal entities.** Generated names are synthetic sample values. Don't use them as verified suppliers, customers or trademark-safe brand names.
+- **Invalid seed.** Seeds must be whole numbers. Leave the seed blank for random output, or reuse the same seed for repeatable fixtures.
+- **Generation versus enrichment.** This endpoint creates sample data. Use enrichment or CRM data sources when you need real account attributes.
+
+## FAQs
+
+<AccordionGroup>
+<Accordion title="What can a synthetic company data generator return?">
+A synthetic company data generator can return `companies[]` records with `method` and `value` fields. Profile output can also include `name`, `catchPhrase`, `buzzPhrase`, catch phrase tokens and buzz phrase tokens. The exact fields depend on the selected method.
+</Accordion>
+
+<Accordion title="Is this a company name generator for real brands?">
+No. This company name generator creates sample values for tests, prototypes and fixture files. Do not treat generated names as trademark-safe, available or verified business names.
+</Accordion>
+
+<Accordion title="Can I reproduce company data generator output?">
+Yes. Set a numeric seed to reproduce output for the same count, locale and method. Leave the seed blank when you want a fresh random batch for exploratory testing.
+</Accordion>
+
+<Accordion title="Which method should I choose for CRM test data?">
+Choose `profile` when you need fuller CRM test data with a company name, catch phrase, buzz phrase and supporting tokens. Choose `name` or another token method when a form, table or search index only needs one field type.
+</Accordion>
+
+<Accordion title="What is the best company data generator for QA fixtures?">
+The best company data generator for QA fixtures is the one that gives you repeatable, typed output without production data. Spotzee is built for that workflow: send a count, choose the method and reuse a numeric seed when you need stable fixtures.
+</Accordion>
+
+<Accordion title="Where can I learn more about company data generation?">
+Use this company data generator guide for endpoint details, then combine company data with the [contact generator guide](https://docs.spotzee.com/guides/tools/data-generation/contact-generator), [person generator guide](https://docs.spotzee.com/guides/tools/data-generation/person-generator), [name generator guide](https://docs.spotzee.com/guides/tools/data-generation/name-generator) and [phone data generator guide](https://docs.spotzee.com/guides/tools/data-generation/phone-generator) to build fuller test datasets.
+</Accordion>
+</AccordionGroup>
+
+## Try it
+
+Generate sample company data at [spotzee.com/tools/company-generator](https://spotzee.com/tools/company-generator/). For batch or programmatic use, call the Extended API endpoint with your Spotzee API key.
