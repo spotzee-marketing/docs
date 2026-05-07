@@ -1,86 +1,119 @@
 ---
-title: "Date Generator"
-description: "Date generator that creates random dates in ISO 8601 format for testing and development. Choose anytime, recent, future, past or birthdate ranges. Safe for test databases and automated test suites."
-keywords: ["random date generator", "date generator", "test data generator", "fake date generator", "date generator free", "random date picker", "sample date generator"]
+title: "Date and Time Data Generator"
+description: "Date and time data generator that creates ISO dates, month names, weekdays and time zones with range, locale and seed controls for fixtures."
+keywords:
+  [
+    "date generator",
+    "random date generator",
+    "test data generator",
+    "free date generator",
+    "date generator online",
+    "date and time data generator",
+    "ISO date generator",
+    "date range generator",
+    "best free date generator",
+  ]
 ---
 
-A date generator creates random dates in ISO 8601 format. Dates are randomly generated within the selected range — anytime, recent, future, past, or birthdate — and have no relation to real events. They are designed for seeding date fields in test databases and exercising time-based logic in automated test suites.
+A date and time data generator creates synthetic calendar values for tests, prototypes and fixture data. It returns ISO 8601 date-time strings, month names, weekday names and IANA time-zone identifiers, so development teams can test scheduling, filtering, expiry and localisation logic without using production records.
 
 <Info>
-Generate sample dates at [spotzee.com/tools/date-generator](https://spotzee.com/tools/date-generator/). Enter a count, choose a range method, and click Generate. Use this guide for method details and integration patterns.
+  Generate sample dates at
+  [spotzee.com/tools/date-generator](https://spotzee.com/tools/date-generator/).
 </Info>
 
 ## Why this matters
 
-Hardcoded dates in test fixtures go stale. A fixture with a "future" date of 2024-12-31 silently becomes a past date, breaking tests that check time-based conditions. Generated dates anchored to relative ranges (recent, future) stay valid regardless of when the test runs.
+Hardcoded dates go stale. A fixture value that was safely in the future can become a past date and break renewal, expiry or scheduling tests. Date generator output can stay relative, seeded or bounded without hand-editing fixture files.
 
-Time-based logic — expiry checks, age calculations, date range filters, loyalty promotions — needs varied input to surface bugs. A single hardcoded date covers one code path. Fifty generated dates in the right range exercise edge cases like leap years, month boundaries, and daylight-saving transitions.
+Calendar logic also fails in quiet ways. Month labels overflow small UI cells. Date-only inputs get rejected by APIs that require a time-zone offset. And time-zone identifiers need to be valid IANA strings if they feed scheduling settings.
 
-Each call to the Extended API version deducts a small per-call amount from your Spotzee credit balance. See the [Spotzee pricing page](https://spotzee.com/pricing/) for live figures.
+Each Extended API call deducts a small per-call amount from your Spotzee credit balance. See the [Spotzee pricing page](https://spotzee.com/pricing/) for live per-tool pricing.
 
 ## How it works
 
 <Steps>
-<Step title="Send the request">
-POST to `/generic/data/generate/date` with a `count` (1-100, as a string) and a required `method` parameter. The method is a discriminator that selects the date range.
-</Step>
-<Step title="Date generation">
-The API generates random dates within the range specified by the method. Each date is independently generated.
-</Step>
-<Step title="Return the records">
-The response returns a `dates` array of ISO 8601 timestamps, plus `generated` (count), `method`, and `locale`.
-</Step>
+  <Step title="Send the request">
+    POST to `/generic/data/generate/date` with `count` and a required `method`
+    parameter. The count is a string from `1` to `100`.
+  </Step>
+  <Step title="Choose a method">
+    Use one of 11 methods: `anytime`, `between`, `betweens`, `birthdate`,
+    `future`, `past`, `recent`, `soon`, `month`, `weekday` or `timeZone`.
+  </Step>
+  <Step title="Set scoped parameters">
+    Send date boundaries, reference dates, age or year ranges, day or year
+    windows, locale, abbreviation mode, context and seed values when the
+    selected method uses them.
+  </Step>
+  <Step title="Read the response">
+    Date methods return `data.dates[]`. Month, weekday and time-zone methods
+    return `data.values[]`, alongside `generated`, `locale`, `method` and
+    optional `seed`.
+  </Step>
 </Steps>
 
-## Date range methods
+## Method reference
 
-| Method | Description |
-|---|---|
-| `anytime` | Any random date, unconstrained |
-| `recent` | Within the last 30 days |
-| `soon` | Within the next few days |
-| `future` | Within the next year |
-| `past` | Within the last year |
-| `birthdate` | A plausible birth date for an adult |
-| `month` | A random date within the current month |
-| `weekday` | A random weekday (Mon–Fri) |
-| `between` | Between two specific dates (provide `refDate` parameters) |
-| `betweens` | Multiple ranges (provide multiple `refDate` pairs) |
+| Method      | Output                     | Main parameters                          |
+| ----------- | -------------------------- | ---------------------------------------- |
+| `anytime`   | ISO date-time strings      | Optional `refDate`                       |
+| `between`   | ISO date-time strings      | `from`, `to`                             |
+| `betweens`  | ISO date-time strings      | `from`, `to`                             |
+| `birthdate` | ISO date-time strings      | `mode`, `min`, `max`, optional `refDate` |
+| `future`    | ISO date-time strings      | `years`, optional `refDate`              |
+| `past`      | ISO date-time strings      | `years`, optional `refDate`              |
+| `recent`    | ISO date-time strings      | `days`, optional `refDate`               |
+| `soon`      | ISO date-time strings      | `days`, optional `refDate`               |
+| `month`     | Month names                | `locale`, `abbreviated`, `context`       |
+| `weekday`   | Weekday names              | `locale`, `abbreviated`, `context`       |
+| `timeZone`  | IANA time-zone identifiers | `count`, `seed`                          |
 
-The web tool exposes the five most common methods. For `between` and `betweens`, call the Extended API directly.
+Boundary fields such as `from`, `to` and `refDate` must be ISO 8601 date-time strings with a time-zone offset. `2024-01-01T00:00:00.000Z` is valid. `2024-01-01` is rejected.
 
 ## What to watch for
 
-Three patterns require attention.
-
-- **Range method not matching use case.** Use Recent for `created_at` fields. Use Future for expiry or due dates. Use Birthdate for age-gate testing. Anytime is the safest default for unconstrained date fields.
-- **ISO 8601 format compatibility.** Dates are returned as ISO 8601 timestamps (`YYYY-MM-DDThh:mm:ss.sssZ`). If your system expects a different format (MM/DD/YYYY, Unix epoch), transform the output before inserting it into your test fixture.
-- **Count outside 1–100.** For larger datasets, call the endpoint in a loop. Each call returns an independent set of random dates.
+- **Date-only boundary values.** Use full ISO date-time strings with an offset for `from`, `to` and `refDate`.
+- **Wrong method for the fixture.** Use `recent` for activity fields, `future` or `soon` for due dates, `birthdate` for age paths and `timeZone` for scheduling preferences.
+- **String output.** `month`, `weekday` and `timeZone` return `values[]`, not `dates[]`.
+- **Birthdate ranges.** With `mode=age`, `min` and `max` are ages. With `mode=year`, they are years.
+- **Large batches.** One request generates `1` to `100` values. For more rows, call the endpoint again and vary the seed when you need a different batch.
 
 ## FAQs
 
 <AccordionGroup>
-<Accordion title="What format are the generated dates in?">
-Dates are returned as ISO 8601 timestamps (`YYYY-MM-DDThh:mm:ss.sssZ`). The result panel shows just the date portion (`YYYY-MM-DD`) for readability. The full timestamp is available in the Extended API response.
+<Accordion title="What format are generated dates in?">
+Generated date methods return ISO 8601 date-time strings in UTC. Boundary inputs also need a date, time and time-zone offset. Month, weekday and time-zone methods return strings instead.
 </Accordion>
 
-<Accordion title="What does the Birthdate method generate?">
-Birthdate generates plausible birth dates for adult individuals, typically spanning several decades back from today. Use it when you need age-realistic birth dates for person record seeding or age-gate logic testing.
+<Accordion title="What methods does the date generator support?">
+  The date generator supports 11 methods: `anytime`, `between`, `betweens`,
+  `birthdate`, `future`, `past`, `recent`, `soon`, `month`, `weekday` and
+  `timeZone`. Use the date methods for timestamps and the utility methods for
+  calendar labels or IANA time-zone identifiers.
 </Accordion>
 
-<Accordion title="Can I generate dates within a specific custom range?">
-The web tool offers preset ranges. For a specific start and end date, call the Extended API directly with `method=between` and provide the date boundary parameters as documented in the API reference.
+<Accordion title="Can I generate dates within a custom range?">
+  Yes. Use `method=between` or `method=betweens` with `from` and `to` values.
+  Both values must include a date, time and time-zone offset.
 </Accordion>
 
-<Accordion title="Why use generated dates instead of hardcoded fixtures?">
-Hardcoded dates go stale. A "future" date hardcoded in a fixture becomes a past date when the calendar catches up, silently breaking tests that check time-based conditions. Generated dates anchored to relative ranges (recent, future) remain valid whenever the test runs.
+<Accordion title="Can I reproduce random date generator output?">
+  Yes. Set a numeric seed to reproduce the same random date generator output for
+  the same option set. Leave the seed blank when you want a fresh random batch.
 </Accordion>
 
-<Accordion title="Where can I learn more?">
-Read the [date generator guide](https://docs.spotzee.com/guides/tools/data-generation/date-generator) for method details and ISO format specifics, then combine with the [person generator guide](https://docs.spotzee.com/guides/tools/data-generation/person-generator) and [contact generator guide](https://docs.spotzee.com/guides/tools/data-generation/contact-generator) to build complete test datasets.
+<Accordion title="Is this useful for calendar UI test data?">
+  Yes. It works as a test data generator for calendar UI because it returns
+  timestamps, month names, weekday names and time-zone strings. Use locale and
+  abbreviation controls to check translated labels and compact layouts.
+</Accordion>
+
+<Accordion title="Where can I learn more about date generation?">
+Use this date generator guide for method details, then combine date data with the [person generator guide](https://docs.spotzee.com/guides/tools/data-generation/person-generator), [contact generator guide](https://docs.spotzee.com/guides/tools/data-generation/contact-generator) and [name generator guide](https://docs.spotzee.com/guides/tools/data-generation/name-generator) to build full test datasets.
 </Accordion>
 </AccordionGroup>
 
 ## Try it
 
-Generate sample dates at [spotzee.com/tools/date-generator](https://spotzee.com/tools/date-generator/). For batch or programmatic use, call the Extended API endpoint directly with your Spotzee API key.
+Generate sample dates at [spotzee.com/tools/date-generator](https://spotzee.com/tools/date-generator/). For batch or programmatic use, call the Extended API endpoint with your Spotzee API key.
