@@ -1,0 +1,138 @@
+---
+title: "Synthetic Finance Data Generator"
+description: "Finance data generator for synthetic account, payment, currency, card and IBAN fixtures with locale, seed and method controls for QA datasets."
+keywords:
+  [
+    "finance data generator",
+    "financial test data generator",
+    "free finance data generator",
+    "finance data generator online",
+    "financial fixture data generator",
+    "credit card test data generator",
+    "IBAN generator",
+    "test credit card number generator",
+    "best free finance data generator",
+  ]
+---
+
+A synthetic finance data generator creates sample account, payment, currency, card, IBAN and transaction data for tests, demos and fixture files. It gives teams repeatable finance-shaped values without copying production payment records or customer financial data into lower-control environments.
+
+<Info>
+  Generate sample finance data at
+  [spotzee.com/tools/finance-generator](https://spotzee.com/tools/finance-generator/).
+</Info>
+
+## Why this matters
+
+Real account numbers, card fields, payment records and transaction text don't belong in development databases, screenshots, support tickets or automated test logs. A finance data generator gives teams structured sample values while keeping production financial data out of places that don't need it.
+
+Finance fields fail in ordinary ways. Amounts need symbols and decimal coverage. IBAN output can be formatted or plain. Masked numbers need suffix rules. And transaction descriptions can be long enough to expose table and export issues.
+
+Generated values are test fixtures only and are not usable financial credentials. Each Extended API call deducts a small per-call amount from your Spotzee credit balance. See the [Spotzee pricing page](https://spotzee.com/pricing/) for live per-tool pricing.
+
+## How it works
+
+<Steps>
+  <Step title="Send the request">
+    POST to `/generic/data/generate/finance` with `count`. The count is a
+    string from `1` to `100`.
+  </Step>
+  <Step title="Choose a method">
+    Use `method=profile` for expanded finance records, or choose one field
+    method such as `amount`, `iban`, `creditCardNumber`, `currency` or
+    `transactionDescription`.
+  </Step>
+  <Step title="Set finance options">
+    Send `locale`, optional numeric `seed`, account length, amount controls,
+    BIC branch settings, Bitcoin address settings, card issuer, IBAN settings,
+    masked-number settings and PIN length when those values matter.
+  </Step>
+  <Step title="Read the response">
+    The response returns `data.finance[]`, `generated`, `locale`, optional
+    `seed`, and the resolved `method`. Profile records can include account,
+    amount, currency, BIC, IBAN, routing, masked-number and transaction fields.
+  </Step>
+</Steps>
+
+## Method reference
+
+| Method                   | Output                                      | Main parameters                                             |
+| ------------------------ | ------------------------------------------- | ----------------------------------------------------------- |
+| `profile`                | Account, amount, currency and transaction fields | `count`, `locale`, `seed`, account, amount, IBAN and mask options |
+| `accountName`            | Account name fixture                         | `count`, `locale`, `seed`                                  |
+| `accountNumber`          | Account number fixture                       | `count`, `locale`, `seed`, `accountNumberLength`           |
+| `amount`                 | Amount fixture                               | `count`, `locale`, `seed`, amount controls                 |
+| `bic`                    | BIC fixture                                  | `count`, `locale`, `seed`, `bicIncludeBranchCode`          |
+| `bitcoinAddress`         | Bitcoin address fixture                      | `count`, `locale`, `seed`, address type and network        |
+| `creditCardCVV`          | Card verification fixture                    | `count`, `locale`, `seed`                                  |
+| `creditCardIssuer`       | Card issuer fixture                          | `count`, `locale`, `seed`, `creditCardIssuer`              |
+| `creditCardNumber`       | Card-number fixture for validation testing   | `count`, `locale`, `seed`, `creditCardIssuer`              |
+| `currency`               | Currency object                              | `count`, `locale`, `seed`                                  |
+| `currencyCode`           | Currency code                                | `count`, `locale`, `seed`                                  |
+| `currencyName`           | Currency name                                | `count`, `locale`, `seed`                                  |
+| `currencyNumericCode`    | Numeric currency code                        | `count`, `locale`, `seed`                                  |
+| `currencySymbol`         | Currency symbol                              | `count`, `locale`, `seed`                                  |
+| `ethereumAddress`        | Ethereum address fixture                     | `count`, `locale`, `seed`                                  |
+| `iban`                   | IBAN fixture                                 | `count`, `locale`, `seed`, `ibanFormatted`, `ibanCountryCode` |
+| `litecoinAddress`        | Litecoin address fixture                     | `count`, `locale`, `seed`                                  |
+| `maskedNumber`           | Masked number fixture                        | `count`, `locale`, `seed`, masked-number options           |
+| `pin`                    | PIN fixture                                  | `count`, `locale`, `seed`, `pinLength`                     |
+| `routingNumber`          | Routing number fixture                       | `count`, `locale`, `seed`                                  |
+| `transactionDescription` | Transaction description fixture              | `count`, `locale`, `seed`                                  |
+| `transactionType`        | Transaction type fixture                     | `count`, `locale`, `seed`                                  |
+
+Use `profile` when you need fuller finance test data. Use a field method when your form, import job, table or export only needs one value type.
+
+## What to watch for
+
+- **Count outside `1` to `100`.** One request generates up to 100 finance records. For more rows, call the endpoint again and vary the seed when you need a different batch.
+- **Wrong method for the fixture.** Use `profile` for fuller finance records, or a field method for one value type.
+- **Invalid amount range.** `amountMin` and `amountMax` must be numeric values from `0` to `1000000`. The minimum must be less than or equal to the maximum.
+- **Invalid length option.** `accountNumberLength`, `maskedNumberLength` and `pinLength` must be whole numbers within their documented ranges.
+- **Invalid IBAN country.** `ibanCountryCode` must be a two-letter uppercase country code, such as `DE`, or left blank.
+- **Expecting live credentials.** Generated finance values are synthetic sample data. Don't use them as live bank details, usable cards, customer accounts or payment credentials.
+
+## FAQs
+
+<AccordionGroup>
+  <Accordion title="What can a finance data generator return?">
+    A finance data generator can return `finance[]` records with `method` and
+    `value` fields. Profile output can also include account names, account
+    numbers, amounts, currency fields, BIC, IBAN, routing numbers, masked
+    numbers and transaction text. The exact fields depend on the selected
+    method.
+  </Accordion>
+  <Accordion title="Is this financial test data generator safe for real payments?">
+    No. This financial test data generator creates synthetic sample values for
+    tests, prototypes and fixture files. Generated values are test fixtures only
+    and are not usable financial credentials.
+  </Accordion>
+  <Accordion title="Can I reproduce finance data generator output?">
+    Yes. Set a numeric seed to reproduce output for the same count, locale,
+    method and option values. Leave the seed blank when you want a fresh random
+    batch for exploratory testing.
+  </Accordion>
+  <Accordion title="Which method should I choose for account and card tests?">
+    Choose `profile` when you need fuller account, amount, currency and
+    transaction fields together. Choose `accountNumber`, `iban`,
+    `creditCardNumber`, `creditCardCVV` or another field method when a form,
+    table or import job only needs one value type.
+  </Accordion>
+  <Accordion title="Can I use it as a test credit card number generator?">
+    Yes, use `method=creditCardNumber` when you need card-number-shaped test
+    fields, and use `creditCardIssuer` when you want to request an issuer or
+    fixture format. These are synthetic fixtures for validation testing, not
+    usable cards.
+  </Accordion>
+  <Accordion title="Where can I learn more about finance data generation?">
+    Read the
+    [finance data generator guide](https://docs.spotzee.com/guides/tools/data-generation/finance-generator)
+    for endpoint options, response fields and integration patterns. The guide
+    also shows where finance data fits beside commerce, company, contact and
+    phone generators.
+  </Accordion>
+</AccordionGroup>
+
+## Try it
+
+Generate sample finance data in the browser at [spotzee.com/tools/finance-generator](https://spotzee.com/tools/finance-generator/), or call the Extended API when you need finance fixtures inside automated tests and seed scripts.
