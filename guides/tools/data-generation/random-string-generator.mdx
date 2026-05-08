@@ -1,0 +1,130 @@
+---
+title: "Random String Generator"
+description: "Generate UUID, Nano ID, ULID, hexadecimal, numeric and custom string fixtures for QA, imports, validation flows and seed scripts with repeatable seeds."
+keywords:
+  [
+    "random string generator",
+    "uuid generator",
+    "random uuid generator",
+    "uuid generator online",
+    "random string generator with special characters",
+    "ulid generator",
+    "java random string generator",
+    "random string generator python",
+    "random string generator javascript",
+  ]
+---
+
+A random string generator creates synthetic identifier, token and code-like values for test data, validation flows and import fixtures. It can return UUID, ULID, Nano ID style, alphabetic, alphanumeric, binary, hexadecimal, numeric, octal, symbol and custom-character output from one endpoint.
+
+<Info>
+  Generate sample string data at
+  [spotzee.com/tools/random-string-generator](https://spotzee.com/tools/random-string-generator/).
+</Info>
+
+## Why this matters
+
+String fixtures look simple until a validator, parser or import job sees a value it did not expect. One hand-written ID will not test length limits, casing rules, prefixes, base-number strings, symbol handling or custom character sets.
+
+Synthetic string data gives you controlled variation. And a numeric seed lets you reproduce the same records after a failure without pinning hand-written IDs in fixture files forever.
+
+Generated strings are test data only. They are not credentials, secrets or production identifiers. Each Extended API call deducts a small per-call amount from your Spotzee credit balance. See the [Spotzee pricing page](https://spotzee.com/pricing/) for live per-tool pricing.
+
+## How it works
+
+<Steps>
+  <Step title="Send the request">
+    POST to `/generic/data/generate/string` with `count`. The count is a string
+    from `1` to `100`.
+  </Step>
+  <Step title="Choose a method">
+    Use `method=profile` for expanded string records, or choose one field
+    method: `alpha`, `alphanumeric`, `binary`, `fromCharacters`, `hexadecimal`,
+    `nanoid`, `numeric`, `octal`, `sample`, `symbol`, `ulid` or `uuid`.
+  </Step>
+  <Step title="Set string controls">
+    Send length, casing, prefix, character-source, exclusion, leading-zero and
+    reference-date parameters only when the selected method supports them.
+  </Step>
+  <Step title="Set repeatability">
+    Send `locale` where supported and an optional numeric `seed` when the same
+    output needs to repeat in tests.
+  </Step>
+  <Step title="Read the response">
+    The response returns `data.strings[]`, `generated`, `locale`, optional
+    `seed`, and the resolved `method`.
+  </Step>
+</Steps>
+
+## Method reference
+
+| Method           | Output                          | Main parameters                                                                                                         |
+| ---------------- | ------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| `profile`        | Expanded string record          | `count`, `locale`, `seed`, length controls, `casing`, `prefix`, `characters`, `exclude`, `allowLeadingZeros`, `refDate` |
+| `alpha`          | Alphabetic string               | `count`, `locale`, `seed`, length controls, `casing`, `exclude`                                                         |
+| `alphanumeric`   | Letter and number string        | `count`, `locale`, `seed`, length controls, `casing`, `exclude`                                                         |
+| `binary`         | Binary string                   | `count`, `locale`, `seed`, length controls, `prefix`                                                                    |
+| `fromCharacters` | String from supplied characters | `count`, `locale`, `seed`, length controls, `characters`                                                                |
+| `hexadecimal`    | Hexadecimal string              | `count`, `locale`, `seed`, length controls, `casing`, `prefix`                                                          |
+| `nanoid`         | Nano ID style identifier        | `count`, `locale`, `seed`, length controls                                                                              |
+| `numeric`        | Numeric string                  | `count`, `locale`, `seed`, length controls, `exclude`, `allowLeadingZeros`                                              |
+| `octal`          | Octal string                    | `count`, `locale`, `seed`, length controls, `prefix`                                                                    |
+| `sample`         | Sampled ASCII string            | `count`, `locale`, `seed`, length controls                                                                              |
+| `symbol`         | Symbol string                   | `count`, `locale`, `seed`, length controls                                                                              |
+| `ulid`           | Sortable identifier             | `count`, `locale`, `seed`, `refDate`                                                                                    |
+| `uuid`           | UUID value                      | `count`, `locale`, `seed`                                                                                               |
+
+Use `profile` when you need many string fields together. Use a field method when your form, parser or import job only expects one string shape.
+
+## What to watch for
+
+- **Count outside `1` to `100`.** One request generates up to 100 string records. For more rows, call the endpoint again and vary the seed when you need a different batch.
+- **Exact length mixed with range.** Use either exact length or a minimum/maximum length range. Do not send both.
+- **Length on UUID or ULID output.** Length controls work with random, base, custom, Nano ID and `profile` output, not `uuid` or `ulid`.
+- **Missing custom characters.** `method=fromCharacters` requires a `characters` value.
+- **Prefix on the wrong method.** Send `prefix` only with `binary`, `hexadecimal`, `octal` or `profile`.
+- **Reference date on the wrong method.** Send `refDate` only with `ulid` or `profile`, and use an ISO 8601 date-time with a time-zone offset.
+
+## FAQs
+
+<AccordionGroup>
+  <Accordion title="What is a random string generator?">
+    It creates synthetic string values for tests, fixtures and validation
+    workflows. Spotzee can return UUID, ULID, Nano ID style, alphabetic,
+    alphanumeric, binary, hexadecimal, numeric, octal, symbol and
+    custom-character output.
+  </Accordion>
+  <Accordion title="Can I use this as a UUID generator?">
+    Yes. Choose `method=uuid` to generate UUID values, or choose `method=ulid`
+    and `method=nanoid` when sortable or compact identifiers fit the test
+    better. The same endpoint works as a ULID generator and also supports
+    expanded profile records.
+  </Accordion>
+  <Accordion title="Can I generate strings with special characters?">
+    Yes. Use `method=symbol` for symbol-only values, or use
+    `method=fromCharacters` with your own character source. This makes the
+    endpoint useful as a random string generator with special characters for
+    validation and parser tests.
+  </Accordion>
+  <Accordion title="Can I reproduce generated string output?">
+    Yes. Set a numeric seed to reproduce output for the same count, locale,
+    method and option values. Leave the seed blank when you want a fresh random
+    batch for exploratory QA.
+  </Accordion>
+  <Accordion title="Can I use this for Java, Python and JavaScript fixtures?">
+    Yes. The generated values are plain strings, so they can be pasted into
+    Java, Python, JavaScript or any test fixture format. Use seeded output when
+    a failing test needs repeatable IDs or tokens.
+  </Accordion>
+  <Accordion title="Where can I learn more about random string generation?">
+    Read the [random string generator
+    guide](https://docs.spotzee.com/guides/tools/data-generation/random-string-generator)
+    for endpoint options, response fields and integration patterns. The guide
+    also shows where string fixture data fits beside developer fixture, word,
+    lorem ipsum and git generators.
+  </Accordion>
+</AccordionGroup>
+
+## Try it
+
+Generate sample string data in the browser at [spotzee.com/tools/random-string-generator](https://spotzee.com/tools/random-string-generator/), or call the Extended API when you need identifier, token and validation fixtures inside automated tests, import jobs and seed scripts.
