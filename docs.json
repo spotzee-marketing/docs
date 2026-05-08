@@ -191,7 +191,8 @@
                   "guides/tools/data-generation/food-generator",
                   "guides/tools/data-generation/git-generator",
                   "guides/tools/data-generation/animal-generator",
-                  "guides/tools/data-generation/book-generator"
+                  "guides/tools/data-generation/book-generator",
+                  "guides/tools/data-generation/vehicle-generator"
                 ]
               },
               {

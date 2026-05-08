@@ -1,0 +1,119 @@
+---
+title: "Synthetic Vehicle Data Generator"
+description: "Generate vehicle manufacturer, model, VIN, VRM, fuel, colour, type and bicycle fixtures with count, locale, seed and method controls for repeatable QA."
+keywords:
+  [
+    "vehicle data generator",
+    "random vehicle generator",
+    "free vehicle data generator",
+    "vehicle data generator online",
+    "synthetic vehicle data generator",
+    "vehicle test data generator",
+    "vehicle fixture generator",
+    "vin generator for test data",
+    "vehicle manufacturer generator",
+  ]
+---
+
+A synthetic vehicle data generator creates sample data for vehicle names, manufacturers, models, types, fuel values, colours, VINs, VRMs and bicycle fields. It gives product, fleet, logistics and QA teams repeatable vehicle-shaped data for catalogues, forms, imports and sample datasets without copying customer or asset records.
+
+<Info>
+  Generate sample vehicle data at
+  [spotzee.com/tools/vehicle-generator](https://spotzee.com/tools/vehicle-generator/).
+</Info>
+
+## Why this matters
+
+Vehicle-shaped data appears in fleet dashboards, marketplace listings, insurance forms, logistics tools, warranty flows and import templates. Those surfaces need varied values that exercise layout, sorting, validation and parser behaviour.
+
+Static vehicle lists are easy to start with. But they become a hidden dependency once every fixture uses the same few manufacturers, models and identifiers.
+
+Generated vehicle data is test fixture data only. It is not a verified registration source, real asset register or production inventory. Each Extended API call deducts a small per-call amount from your Spotzee credit balance. See the [Spotzee pricing page](https://spotzee.com/pricing/) for live per-tool pricing.
+
+## How it works
+
+<Steps>
+  <Step title="Send the request">
+    POST to `/generic/data/generate/vehicle` with `count`. The count is a
+    string from `1` to `100`.
+  </Step>
+  <Step title="Choose a method">
+    Use `method=profile` for expanded vehicle records, or choose one field
+    method such as `vehicle`, `manufacturer`, `model`, `type`, `fuel`, `color`,
+    `vin`, `vrm` or `bicycle`.
+  </Step>
+  <Step title="Set repeatability">
+    Send `locale` where supported and an optional numeric `seed` when the same
+    vehicle data generator output needs to repeat in tests.
+  </Step>
+  <Step title="Read the response">
+    The response returns `data.vehicles[]`, `generated`, `locale`, optional
+    `seed`, and the resolved `method`. Profile records can include vehicle,
+    manufacturer, model, type, fuel, colour, VIN, VRM and bicycle fields.
+  </Step>
+</Steps>
+
+## Method reference
+
+| Method | Output | Main parameters |
+|---|---|---|
+| `profile` | Expanded vehicle record | `count`, `locale`, `seed` |
+| `vehicle` | Vehicle name fixture | `count`, `locale`, `seed` |
+| `manufacturer` | Manufacturer fixture | `count`, `locale`, `seed` |
+| `model` | Model fixture | `count`, `locale`, `seed` |
+| `type` | Vehicle type fixture | `count`, `locale`, `seed` |
+| `fuel` | Fuel fixture | `count`, `locale`, `seed` |
+| `color` | Colour fixture | `count`, `locale`, `seed` |
+| `vin` | VIN fixture | `count`, `locale`, `seed` |
+| `vrm` | VRM fixture | `count`, `locale`, `seed` |
+| `bicycle` | Bicycle fixture | `count`, `locale`, `seed` |
+
+Use `profile` when you need fuller vehicle test data. Use a field method when your form, table, parser or import job only needs one value type.
+
+## What to watch for
+
+- **Count outside `1` to `100`.** One request generates up to 100 vehicle records. For more rows, call the endpoint again and vary the seed when you need a different batch.
+- **Wrong method for the fixture.** Use `profile` for many vehicle fields together, or a field method when the consuming test only expects one scalar value.
+- **Seed not repeating.** The seed must be numeric. Keep the same count, locale, method and seed when tests need stable fixture values.
+- **Unexpected profile fields.** `profile` can return vehicle name, manufacturer, model, type, fuel, colour, VIN, VRM and bicycle values together. Use a field method when one column or form field is under test.
+- **Assuming real vehicle data.** Generated vehicle values are synthetic sample data. Do not treat them as verified registrations, real assets or production inventory.
+
+## FAQs
+
+<AccordionGroup>
+  <Accordion title="What can a vehicle data generator return?">
+    A vehicle data generator can return `vehicles[]` records with `method` and
+    `value` fields. Profile output can also include `vehicle`, `manufacturer`,
+    `model`, `type`, `fuel`, `color`, `vin`, `vrm` and `bicycle` fields.
+  </Accordion>
+  <Accordion title="Can I use this as a random vehicle generator?">
+    Yes. Choose a method and count, then generate one or more synthetic vehicle
+    values. Add a numeric seed when the same random vehicle generator output
+    must repeat in tests.
+  </Accordion>
+  <Accordion title="Can I generate only VIN values?">
+    Yes. Use `method=vin` when a form, import column or parser only needs
+    VIN-shaped sample values. Use `profile` when a fixture needs manufacturer,
+    model and supporting fields together.
+  </Accordion>
+  <Accordion title="Can I reproduce vehicle data generator output?">
+    Yes. Set a numeric seed to reproduce output for the same count, locale and
+    method values. Leave the seed blank when you want a fresh random batch for
+    exploratory QA.
+  </Accordion>
+  <Accordion title="Can I use it as a vehicle manufacturer generator?">
+    Yes. Use `method=manufacturer` when tests need manufacturer-shaped sample
+    values without full vehicle profiles. Use a seed when a fixture must stay
+    stable across repeated test runs.
+  </Accordion>
+  <Accordion title="Where can I learn more about vehicle data generation?">
+    Read the [vehicle data generator guide](https://docs.spotzee.com/guides/tools/data-generation/vehicle-generator)
+    for endpoint options, response fields and integration patterns. The guide
+    also shows where vehicle fixture data fits beside commerce, finance, company
+    and phone generators.
+  </Accordion>
+</AccordionGroup>
+
+## Try it
+
+Generate sample vehicle data in the browser at [spotzee.com/tools/vehicle-generator](https://spotzee.com/tools/vehicle-generator/), or call the Extended API when you need vehicle fixtures inside automated tests and seed scripts.
