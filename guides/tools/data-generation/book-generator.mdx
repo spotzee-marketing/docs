@@ -1,0 +1,115 @@
+---
+title: "Synthetic Book Data Generator"
+description: "Generate book title, author, genre, publisher, series and format fixtures with count, locale, seed and method controls for repeatable QA and content tests."
+keywords:
+  [
+    "book data generator",
+    "random book generator",
+    "free book data generator",
+    "book data generator online",
+    "synthetic book data generator",
+    "book test data generator",
+    "book fixture generator",
+    "book title generator for test data",
+    "book author generator",
+  ]
+---
+
+A synthetic book data generator creates sample data for titles, authors, genres, publishers, series and format fields. It gives product, content and QA teams repeatable book-shaped data for catalogues, publishing workflows, CMS previews and sample datasets without copying customer or operational records.
+
+<Info>
+  Generate sample book data at
+  [spotzee.com/tools/book-generator](https://spotzee.com/tools/book-generator/).
+</Info>
+
+## Why this matters
+
+Book-shaped data appears in catalogue pages, editorial workflows, search facets, recommendation demos and import tests. Those surfaces need varied values that exercise layout, sorting, filtering and validation behaviour.
+
+Static title lists are easy to start with. But they become a hidden test dependency once every fixture uses the same few authors, genres and publishers.
+
+Generated book data is test fixture data only. It is not a verified bibliography, licensed content source or production catalogue. Each Extended API call deducts a small per-call amount from your Spotzee credit balance. See the [Spotzee pricing page](https://spotzee.com/pricing/) for live per-tool pricing.
+
+## How it works
+
+<Steps>
+  <Step title="Send the request">
+    POST to `/generic/data/generate/book` with `count`. The count is a string
+    from `1` to `100`.
+  </Step>
+  <Step title="Choose a method">
+    Use `method=profile` for expanded book records, or choose one field method
+    such as `title`, `author`, `genre`, `publisher`, `series` or `format`.
+  </Step>
+  <Step title="Set repeatability">
+    Send `locale` where supported and an optional numeric `seed` when the same
+    book data generator output needs to repeat in tests.
+  </Step>
+  <Step title="Read the response">
+    The response returns `data.books[]`, `generated`, `locale`, optional `seed`,
+    and the resolved `method`. Profile records can include title, author, genre,
+    publisher, series and format fields.
+  </Step>
+</Steps>
+
+## Method reference
+
+| Method | Output | Main parameters |
+|---|---|---|
+| `profile` | Expanded book record | `count`, `locale`, `seed` |
+| `title` | Book title fixture | `count`, `locale`, `seed` |
+| `author` | Author fixture | `count`, `locale`, `seed` |
+| `genre` | Genre fixture | `count`, `locale`, `seed` |
+| `publisher` | Publisher fixture | `count`, `locale`, `seed` |
+| `series` | Series fixture | `count`, `locale`, `seed` |
+| `format` | Format fixture | `count`, `locale`, `seed` |
+
+Use `profile` when you need fuller book test data. Use a field method when your form, table, parser or import job only needs one value type.
+
+## What to watch for
+
+- **Count outside `1` to `100`.** One request generates up to 100 book records. For more rows, call the endpoint again and vary the seed when you need a different batch.
+- **Wrong method for the fixture.** Use `profile` for many book fields together, or a field method when the consuming test only expects one scalar value.
+- **Seed not repeating.** The seed must be numeric. Keep the same count, locale, method and seed when tests need stable fixture values.
+- **Unexpected profile fields.** `profile` can return title, author, genre, publisher, series and format together. Use a field method when one column or form field is under test.
+- **Assuming real catalogue data.** Generated book values are synthetic sample data. Do not treat them as verified bibliographic records, licensed content or production catalogue entries.
+
+## FAQs
+
+<AccordionGroup>
+  <Accordion title="What can a book data generator return?">
+    A book data generator can return `books[]` records with `method` and
+    `value` fields. Profile output can also include `title`, `author`, `genre`,
+    `publisher`, `series` and `format` fields.
+  </Accordion>
+  <Accordion title="Can I use this as a random book generator?">
+    Yes. Choose a method and count, then generate one or more synthetic book
+    values. Add a numeric seed when the same random book generator output must
+    repeat in tests.
+  </Accordion>
+  <Accordion title="Can I generate only book titles?">
+    Yes. Use `method=title` when a form, search result, card component or parser
+    only needs title-shaped sample values. Use `profile` when a fixture needs
+    title, author and supporting fields together.
+  </Accordion>
+  <Accordion title="Can I reproduce book data generator output?">
+    Yes. Set a numeric seed to reproduce output for the same count, locale and
+    method values. Leave the seed blank when you want a fresh random batch for
+    exploratory QA.
+  </Accordion>
+  <Accordion title="Can I use it as a book author generator?">
+    Yes. Use `method=author` when tests need author-shaped sample values without
+    full book profiles. Use a seed when a fixture must stay stable across
+    repeated test runs.
+  </Accordion>
+  <Accordion title="Where can I learn more about book data generation?">
+    Read the [book data generator guide](https://docs.spotzee.com/guides/tools/data-generation/book-generator)
+    for endpoint options, response fields and integration patterns. The guide
+    also shows where book fixture data fits beside commerce, food, animal and
+    company generators.
+  </Accordion>
+</AccordionGroup>
+
+## Try it
+
+Generate sample book data in the browser at [spotzee.com/tools/book-generator](https://spotzee.com/tools/book-generator/), or call the Extended API when you need book fixtures inside automated tests and seed scripts.
