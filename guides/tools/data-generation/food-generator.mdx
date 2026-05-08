@@ -1,0 +1,122 @@
+---
+title: "Synthetic Food Data Generator"
+description: "Food data generator for synthetic dish, cuisine, ingredient, meat, spice, fruit and vegetable fixtures with locale, seed and method controls for QA datasets."
+keywords:
+  [
+    "food data generator",
+    "synthetic food data generator",
+    "random food generator",
+    "free food data generator",
+    "food data generator online",
+    "food test data generator",
+    "menu data generator",
+    "ingredient generator",
+    "dish name generator",
+  ]
+---
+
+A synthetic food data generator creates sample dish, cuisine, ingredient, meat, spice, fruit and vegetable values for tests, demos and fixture files. It gives teams repeatable food-shaped data without copying production menus, recipe records or catalogue content into lower-control environments.
+
+<Info>
+  Generate sample food data at
+  [spotzee.com/tools/food-generator](https://spotzee.com/tools/food-generator/).
+</Info>
+
+## Why this matters
+
+Recipe apps, restaurant demos, food catalogues and content workflows need values that feel realistic enough to exercise UI states. Real menus and product records don't belong in seed files, support screenshots or automated test logs.
+
+Food fields expose common product issues. Dish names wrap, descriptions run long, cuisine filters need varied labels, and ingredient fields need enough variety to test search and validation. But static fixture lists get stale quickly.
+
+Generated values are test fixtures only. They do not include verified nutrition facts, allergens, calories or recipe instructions. Each Extended API call deducts a small per-call amount from your Spotzee credit balance. See the [Spotzee pricing page](https://spotzee.com/pricing/) for live per-tool pricing.
+
+## How it works
+
+<Steps>
+  <Step title="Send the request">
+    POST to `/generic/data/generate/food` with `count`. The count is a string
+    from `1` to `100`.
+  </Step>
+  <Step title="Choose a method">
+    Use `method=profile` for expanded food records, or choose one field method
+    such as `dish`, `ingredient`, `spice`, `fruit` or `vegetable`.
+  </Step>
+  <Step title="Set locale and seed">
+    Send `locale` when regional output matters and an optional numeric `seed`
+    when you need repeatable fixtures.
+  </Step>
+  <Step title="Read the response">
+    The response returns `data.foods[]`, `generated`, `locale`, optional
+    `seed`, and the resolved `method`. Profile records can include dish,
+    description, cuisine, adjective, ingredient, meat, fruit, vegetable and
+    spice fields.
+  </Step>
+</Steps>
+
+## Method reference
+
+| Method            | Output                         | Main parameters          |
+| ----------------- | ------------------------------ | ------------------------ |
+| `profile`         | Expanded food profile          | `count`, `locale`, `seed` |
+| `adjective`       | Food adjective fixture         | `count`, `locale`, `seed` |
+| `description`     | Food description fixture       | `count`, `locale`, `seed` |
+| `dish`            | Dish-name fixture              | `count`, `locale`, `seed` |
+| `ethnicCategory`  | Cuisine or regional category   | `count`, `locale`, `seed` |
+| `fruit`           | Fruit-name fixture             | `count`, `locale`, `seed` |
+| `ingredient`      | Ingredient-name fixture        | `count`, `locale`, `seed` |
+| `meat`            | Meat or protein fixture        | `count`, `locale`, `seed` |
+| `spice`           | Spice-name fixture             | `count`, `locale`, `seed` |
+| `vegetable`       | Vegetable-name fixture         | `count`, `locale`, `seed` |
+
+Use `profile` when you need fuller food test data. Use a field method when your form, table, search index or import job only needs one value type.
+
+## What to watch for
+
+- **Count outside `1` to `100`.** One request generates up to 100 food records. For more rows, call the endpoint again and vary the seed when you need a different batch.
+- **Wrong method for the fixture.** Use `profile` for fuller food records, or a field method for one value type.
+- **Invalid seed.** Seeds must be whole numbers. Leave the field blank for random output, or reuse a numeric seed for repeatable fixtures.
+- **Expecting nutrition data.** Generated food values are synthetic sample text. They do not include nutrition facts, allergens, calories or verified recipe instructions.
+- **Assuming cuisine accuracy.** `ethnicCategory` is a generated cuisine or regional label for fixture coverage, not a verified culinary classification.
+
+## FAQs
+
+<AccordionGroup>
+  <Accordion title="What can a food data generator return?">
+    A synthetic food data generator can return `foods[]` records with `method`
+    and `value` fields. Profile output can also include `dish`, `description`,
+    `ethnicCategory`, `adjective`, `ingredient`, `meat`, `fruit`, `vegetable`
+    and `spice` fields. The exact fields depend on the selected method.
+  </Accordion>
+  <Accordion title="Is this random food generator for meal planning?">
+    This random food generator is built for test data, not personal meal
+    planning. It creates synthetic dish, ingredient and menu values for QA
+    datasets, prototypes and fixture files.
+  </Accordion>
+  <Accordion title="Can I reproduce food data generator output?">
+    Yes. Set a numeric seed to reproduce output for the same count, locale and
+    method values. Leave the seed blank when you want a fresh random batch for
+    exploratory testing.
+  </Accordion>
+  <Accordion title="Which method should I choose for menu data?">
+    Choose `profile` when you need fuller menu data with dish, description,
+    cuisine and ingredient fields together. Choose `dish`, `ingredient`,
+    `spice`, `fruit`, `vegetable` or another field method when a form, table or
+    import job only needs one value type.
+  </Accordion>
+  <Accordion title="Can I use it as a dish name generator?">
+    Yes, use `method=dish` when you need dish-name fixtures, or `method=profile`
+    when you want dish names alongside descriptions, cuisines and ingredients.
+    The values are synthetic sample data for tests and prototypes.
+  </Accordion>
+  <Accordion title="Where can I learn more about food data generation?">
+    Read the
+    [food data generator guide](https://docs.spotzee.com/guides/tools/data-generation/food-generator)
+    for endpoint options, response fields and integration patterns. The guide
+    also shows where food data fits beside commerce, company, person and date
+    generators.
+  </Accordion>
+</AccordionGroup>
+
+## Try it
+
+Generate sample food data in the browser at [spotzee.com/tools/food-generator](https://spotzee.com/tools/food-generator/), or call the Extended API when you need food fixtures inside automated tests and seed scripts.

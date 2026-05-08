@@ -187,7 +187,8 @@
                   "guides/tools/data-generation/phone-generator",
                   "guides/tools/data-generation/company-generator",
                   "guides/tools/data-generation/commerce-generator",
-                  "guides/tools/data-generation/finance-generator"
+                  "guides/tools/data-generation/finance-generator",
+                  "guides/tools/data-generation/food-generator"
                 ]
               },
               {
