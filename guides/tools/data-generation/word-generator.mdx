@@ -1,0 +1,125 @@
+---
+title: "Synthetic Word Data Generator"
+description: "Generate synthetic adjectives, nouns, verbs and word-list fixtures for QA, taxonomy, search and content-editing workflows with repeatable seeds."
+keywords:
+  [
+    "word generator",
+    "free word generator",
+    "noun generator",
+    "verb generator",
+    "random noun generator",
+    "random verb generator",
+    "random adjective generator",
+    "word generator for test data",
+    "word generator 2026",
+  ]
+---
+
+A synthetic word data generator creates sample words, parts of speech and word lists for QA, taxonomy, search, NLP and content-editing tests. It can return adjectives, adverbs, conjunctions, interjections, nouns, prepositions, sampled words, verbs, joined words or expanded profile records.
+
+<Info>
+  Generate sample word data at
+  [spotzee.com/tools/word-generator](https://spotzee.com/tools/word-generator/).
+</Info>
+
+## Why this matters
+
+Word fixtures seem small until they sit inside search boxes, tag pickers, content editors, taxonomy imports and parser code. A single hard-coded noun will not test wrapping, sorting, stemming, filtering or validation paths well enough.
+
+Synthetic word data gives you controlled variation. And a numeric seed lets you reproduce the same records after a failure without pinning hand-written fixture files forever.
+
+Generated words are test data only. They are not approved product labels, legal text or customer vocabulary. Each Extended API call deducts a small per-call amount from your Spotzee credit balance. See the [Spotzee pricing page](https://spotzee.com/pricing/) for live per-tool pricing.
+
+## How it works
+
+<Steps>
+  <Step title="Send the request">
+    POST to `/generic/data/generate/word` with `count`. The count is a string
+    from `1` to `100`.
+  </Step>
+  <Step title="Choose a method">
+    Use `method=profile` for expanded word records, or choose one field method:
+    `adjective`, `adverb`, `conjunction`, `interjection`, `noun`,
+    `preposition`, `sample`, `verb` or `words`.
+  </Step>
+  <Step title="Set length controls">
+    Send `length`, `lengthMin`, `lengthMax` and `strategy` only when the method
+    returns a single-word value or an expanded profile record.
+  </Step>
+  <Step title="Set word-list controls">
+    Send `wordCount`, `wordCountMin` and `wordCountMax` when `method=words` or
+    `method=profile` should return a specific number of words.
+  </Step>
+  <Step title="Read the response">
+    The response returns `data.words[]`, `generated`, `locale`, optional `seed`,
+    and the resolved `method`.
+  </Step>
+</Steps>
+
+## Method reference
+
+| Method          | Output                 | Main parameters                                                |
+| --------------- | ---------------------- | -------------------------------------------------------------- |
+| `profile`       | Expanded word record   | `count`, `locale`, `seed`, length controls, `strategy`, word-count controls |
+| `adjective`     | One adjective          | `count`, `locale`, `seed`, length controls, `strategy`         |
+| `adverb`        | One adverb             | `count`, `locale`, `seed`, length controls, `strategy`         |
+| `conjunction`   | One conjunction        | `count`, `locale`, `seed`, length controls, `strategy`         |
+| `interjection`  | One interjection       | `count`, `locale`, `seed`, length controls, `strategy`         |
+| `noun`          | One noun               | `count`, `locale`, `seed`, length controls, `strategy`         |
+| `preposition`   | One preposition        | `count`, `locale`, `seed`, length controls, `strategy`         |
+| `sample`        | One sampled word       | `count`, `locale`, `seed`, length controls, `strategy`         |
+| `verb`          | One verb               | `count`, `locale`, `seed`, length controls, `strategy`         |
+| `words`         | Space-separated words  | `count`, `locale`, `seed`, word-count controls                 |
+
+Use `profile` when you need multiple word fields together. Use a field method when your form, parser or import job only expects one word shape.
+
+## What to watch for
+
+- **Count outside `1` to `100`.** One request generates up to 100 word records. For more rows, call the endpoint again and vary the seed when you need a different batch.
+- **Exact value mixed with range.** Use either an exact length or a minimum/maximum length range. Do not send both.
+- **Unpaired range controls.** Minimum and maximum controls must be provided together.
+- **Length on word-list output.** Length controls work with single-word methods and `profile`, not `words`.
+- **Word count on single-word output.** Word-count controls work with `words` and `profile`, not noun, verb, adjective or sampled-word methods.
+- **Seed not repeating.** Keep the same count, locale, method and option values when the same output must repeat.
+
+## FAQs
+
+<AccordionGroup>
+  <Accordion title="What is a word generator?">
+    A word generator creates sample word values for tests, prototypes and
+    content tools. Spotzee can return adjectives, adverbs, conjunctions,
+    interjections, nouns, prepositions, sampled words, verbs, word lists or
+    expanded profile records.
+  </Accordion>
+  <Accordion title="Can I use this as a noun generator or verb generator?">
+    Yes. Choose `method=noun` for noun generator output or `method=verb` for
+    verb generator output. You can also generate adjectives, adverbs,
+    conjunctions, interjections and prepositions.
+  </Accordion>
+  <Accordion title="Can I generate word lists?">
+    Yes. Choose `method=words` and set an optional exact word count or
+    minimum/maximum word-count range. The response returns a space-separated
+    word list in the `words` field and primary `value` field.
+  </Accordion>
+  <Accordion title="Can I reproduce word generator output?">
+    Yes. Set a numeric seed to reproduce output for the same count, locale,
+    method and option values. Leave the seed blank when you want a fresh random
+    batch for exploratory QA.
+  </Accordion>
+  <Accordion title="What makes a word generator useful for test data?">
+    A useful word generator for test data gives you method controls, length
+    controls, repeatable seeds and output that stays separate from production
+    copy. That matters for search, taxonomy, parser and content-editor tests.
+  </Accordion>
+  <Accordion title="Where can I learn more about word generation?">
+    Read the [word generator
+    guide](https://docs.spotzee.com/guides/tools/data-generation/word-generator)
+    for endpoint options, response fields and integration patterns. The guide
+    also shows where word fixture data fits beside lorem ipsum, developer
+    fixture, book and git generators.
+  </Accordion>
+</AccordionGroup>
+
+## Try it
+
+Generate sample word data in the browser at [spotzee.com/tools/word-generator](https://spotzee.com/tools/word-generator/), or call the Extended API when you need word fixtures inside automated tests, search checks and seed scripts.
