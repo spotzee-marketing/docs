@@ -194,7 +194,8 @@
                   "guides/tools/data-generation/book-generator",
                   "guides/tools/data-generation/vehicle-generator",
                   "guides/tools/data-generation/dev-fixture-generator",
-                  "guides/tools/data-generation/color-generator"
+                  "guides/tools/data-generation/color-generator",
+                  "guides/tools/data-generation/lorem-ipsum-generator"
                 ]
               },
               {

@@ -1,0 +1,129 @@
+---
+title: "Lorem Ipsum Generator"
+description: "Generate words, sentences, paragraphs, slugs and lines with count, locale, seed, method and text-size controls for repeatable layout, CMS and parser QA."
+keywords:
+  [
+    "lorem ipsum generator",
+    "dummy text generator",
+    "free lorem ipsum generator",
+    "lorem ipsum generator online",
+    "lorem ipsum words generator",
+    "lorem ipsum generator sentences",
+    "lorem ipsum generator for developers",
+    "best free lorem ipsum generator",
+    "what is a lorem ipsum generator",
+  ]
+---
+
+A lorem ipsum generator creates synthetic placeholder text for layouts, CMS workflows, form previews, search fixtures and parser tests. It can return words, sentences, paragraphs, slugs, lines or expanded text records when you need repeatable sample copy without using production content.
+
+<Info>
+  Generate sample lorem ipsum text at
+  [spotzee.com/tools/lorem-ipsum-generator](https://spotzee.com/tools/lorem-ipsum-generator/).
+</Info>
+
+## Why this matters
+
+Placeholder text looks harmless until it hides a layout or parser problem. A single short sentence will not test wrapping, truncation, search snippets, route slugs, import validation or rich text previews well enough.
+
+Lorem ipsum output gives you varied text lengths and shapes for fixture data. And a numeric seed lets you reproduce the same records after a failure without pinning a hand-written fixture forever.
+
+Generated lorem ipsum is test data only. It is not production copy, legal copy or approved brand language. Each Extended API call deducts a small per-call amount from your Spotzee credit balance. See the [Spotzee pricing page](https://spotzee.com/pricing/) for live per-tool pricing.
+
+## How it works
+
+<Steps>
+  <Step title="Send the request">
+    POST to `/generic/data/generate/lorem` with `count`. The count is a string
+    from `1` to `100`.
+  </Step>
+  <Step title="Choose a method">
+    Use `method=profile` for expanded lorem records, or choose one field method:
+    `lines`, `paragraph`, `paragraphs`, `sentence`, `sentences`, `slug`, `text`,
+    `word` or `words`.
+  </Step>
+  <Step title="Set text-size controls">
+    Send line, sentence, paragraph, word-count, word-length, separator and
+    strategy parameters only when the selected method supports them.
+  </Step>
+  <Step title="Set repeatability">
+    Send `locale` where supported and an optional numeric `seed` when the same
+    lorem ipsum generator output needs to repeat in tests.
+  </Step>
+  <Step title="Read the response">
+    The response returns `data.lorem[]`, `generated`, `locale`, optional `seed`,
+    and the resolved `method`.
+  </Step>
+</Steps>
+
+## Method reference
+
+| Method       | Output                 | Main parameters                                                                                                                   |
+| ------------ | ---------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| `profile`    | Expanded text record   | `count`, `locale`, `seed`, line counts, sentence counts, paragraph counts, word counts, word lengths, `strategy`, `separator`     |
+| `lines`      | Joined line text       | `count`, `locale`, `seed`, `lineCount`, `lineCountMin`, `lineCountMax`                                                            |
+| `paragraph`  | One paragraph          | `count`, `locale`, `seed`, `sentenceCount`, `sentenceCountMin`, `sentenceCountMax`                                                |
+| `paragraphs` | Joined paragraphs      | `count`, `locale`, `seed`, `paragraphCount`, `paragraphCountMin`, `paragraphCountMax`, `separator`                                |
+| `sentence`   | One sentence           | `count`, `locale`, `seed`, `wordCount`, `wordCountMin`, `wordCountMax`                                                            |
+| `sentences`  | Joined sentences       | `count`, `locale`, `seed`, `sentenceCount`, `sentenceCountMin`, `sentenceCountMax`, `separator`                                   |
+| `slug`       | Slug text              | `count`, `locale`, `seed`, `wordCount`, `wordCountMin`, `wordCountMax`                                                            |
+| `text`       | General text           | `count`, `locale`, `seed`                                                                                                         |
+| `word`       | One word               | `count`, `locale`, `seed`, `wordLength`, `wordLengthMin`, `wordLengthMax`, `strategy`                                             |
+| `words`      | Joined word text       | `count`, `locale`, `seed`, `wordCount`, `wordCountMin`, `wordCountMax`                                                            |
+
+Use `profile` when you need many text fields together. Use a field method when your form, parser or import job only expects one text shape.
+
+## What to watch for
+
+- **Count outside `1` to `100`.** One request generates up to 100 lorem records. For more rows, call the endpoint again and vary the seed when you need a different batch.
+- **Exact count mixed with range.** Use either an exact value or a minimum/maximum range for a text-size family. Do not send both.
+- **Unpaired range controls.** Minimum and maximum controls must be provided together.
+- **Wrong method for the option.** Line controls work with `lines` and `profile`; paragraph controls work with `paragraphs` and `profile`; word-length controls work with `word` and `profile`.
+- **Separator on the wrong method.** Send `separator` only with `paragraphs`, `sentences` or `profile`.
+- **Seed not repeating.** Keep the same count, locale, method and option values when the same output must repeat.
+
+## FAQs
+
+<AccordionGroup>
+  <Accordion title="What is a lorem ipsum generator?">
+    A lorem ipsum generator creates synthetic placeholder text for designs,
+    content systems and tests. Spotzee can return words, sentences, paragraphs,
+    slugs, lines or expanded profile records from the same endpoint.
+  </Accordion>
+  <Accordion title="Can I use this as a dummy text generator?">
+    Yes. Choose a method, count and optional seed to generate dummy text
+    generator output for layouts, CMS fixtures and parser tests. The generated
+    text is sample data, not production copy.
+  </Accordion>
+  <Accordion title="Can I generate lorem ipsum sentences?">
+    Yes. Use `method=sentence` for one sentence or `method=sentences` for joined
+    sentences. You can use exact, minimum and maximum sentence controls when the
+    selected method supports them.
+  </Accordion>
+  <Accordion title="Can I reproduce lorem ipsum generator output?">
+    Yes. Set a numeric seed to reproduce output for the same count, locale,
+    method and option values. Leave the seed blank when you want a fresh random
+    batch for exploratory QA.
+  </Accordion>
+  <Accordion title="Can I use this lorem ipsum generator for developers?">
+    Yes. Developers can generate repeatable lorem ipsum records for UI, parser,
+    route, search and import tests. Set a numeric seed when the same output must
+    repeat across local runs.
+  </Accordion>
+  <Accordion title="What makes a lorem ipsum generator useful for QA?">
+    A useful lorem ipsum generator gives you method controls, repeatable seeds
+    and output shapes that match real fixture needs. Spotzee supports count,
+    locale, seed, line, paragraph, sentence, word, slug and separator controls.
+  </Accordion>
+  <Accordion title="Where can I learn more about lorem ipsum generation?">
+    Read the [lorem ipsum generator
+    guide](https://docs.spotzee.com/guides/tools/data-generation/lorem-ipsum-generator)
+    for endpoint options, response fields and integration patterns. The guide
+    also shows where text fixture data fits beside developer fixture, git, book
+    and colour generators.
+  </Accordion>
+</AccordionGroup>
+
+## Try it
+
+Generate sample lorem ipsum text in the browser at [spotzee.com/tools/lorem-ipsum-generator](https://spotzee.com/tools/lorem-ipsum-generator/), or call the Extended API when you need text fixtures inside automated tests, CMS checks and seed scripts.
