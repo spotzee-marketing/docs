@@ -1,0 +1,129 @@
+---
+title: "Dev Fixture Generator"
+description: "Generate file names, paths, MIME types, cron expressions, network-interface names and semver values with count, locale, seed and method controls."
+keywords:
+  [
+    "cron generator",
+    "cron expression generator",
+    "test data generator",
+    "random data generator",
+    "file name generator",
+    "random file name generator",
+    "dev fixture generator",
+    "dev fixture generator online",
+    "free dev fixture generator",
+  ]
+---
+
+A dev fixture generator creates synthetic file names, file paths, MIME types, cron expressions, network-interface names and semantic-version values for tests. It helps developers and QA teams build repeatable sample records for parser tests, import jobs, scheduler flows and infrastructure screens without copying production settings.
+
+<Info>
+  Generate developer fixture data at
+  [spotzee.com/tools/dev-fixture-generator](https://spotzee.com/tools/dev-fixture-generator/).
+</Info>
+
+## Why this matters
+
+Small fixture sets age badly. A parser that only sees one file path, one MIME type or one cron expression can pass tests while still failing on real input shapes.
+
+Developer fixture data gives you varied values for upload handling, MIME routing, scheduler parsing, network-interface display and semantic-version comparison. And seeds make failures easier to reproduce because the same inputs can return the same output.
+
+Generated dev fixture data is test data only. It is not a verified infrastructure inventory, scheduler source of truth or production configuration. Each Extended API call deducts a small per-call amount from your Spotzee credit balance. See the [Spotzee pricing page](https://spotzee.com/pricing/) for live per-tool pricing.
+
+## How it works
+
+<Steps>
+  <Step title="Send the request">
+    POST to `/generic/data/generate/system` with `count`. The count is a
+    string from `1` to `100`.
+  </Step>
+  <Step title="Choose a method">
+    Use `method=profile` for expanded records, or choose one field method:
+    `commonFileExt`, `commonFileName`, `commonFileType`, `cron`,
+    `directoryPath`, `fileExt`, `fileName`, `filePath`, `fileType`, `mimeType`,
+    `networkInterface` or `semver`.
+  </Step>
+  <Step title="Set method options">
+    Send `extension`, `mimeType`, extension-count fields, interface fields, and
+    cron flags when the selected method needs those controls.
+  </Step>
+  <Step title="Set repeatability">
+    Send `locale` where supported and an optional numeric `seed` when the same
+    dev fixture generator output needs to repeat in tests.
+  </Step>
+  <Step title="Read the response">
+    The response returns `data.systems[]`, `generated`, `locale`, optional
+    `seed`, and the resolved `method`.
+  </Step>
+</Steps>
+
+## Method reference
+
+| Method | Output | Main parameters |
+|---|---|---|
+| `profile` | Expanded system fixture record | `count`, `locale`, `seed`, file, cron and network options |
+| `commonFileExt` | Common file extension | `count`, `locale`, `seed` |
+| `commonFileName` | Common file name | `count`, `locale`, `seed`, `extension` |
+| `commonFileType` | Common file type | `count`, `locale`, `seed` |
+| `cron` | Cron expression | `count`, `locale`, `seed`, `includeYear`, `includeNonStandard` |
+| `directoryPath` | Directory path | `count`, `locale`, `seed` |
+| `fileExt` | File extension | `count`, `locale`, `seed`, `mimeType` |
+| `fileName` | File name | `count`, `locale`, `seed`, extension-count fields |
+| `filePath` | File path | `count`, `locale`, `seed` |
+| `fileType` | File type | `count`, `locale`, `seed` |
+| `mimeType` | MIME type | `count`, `locale`, `seed` |
+| `networkInterface` | Network-interface name | `count`, `locale`, `seed`, `interfaceType`, `interfaceSchema` |
+| `semver` | Semantic version | `count`, `locale`, `seed` |
+
+Use `profile` when you need many developer fixture fields together. Use a field method when your form, parser or import job only needs one value type.
+
+## What to watch for
+
+- **Count outside `1` to `100`.** One request generates up to 100 system records. For more rows, call the endpoint again and vary the seed when you need a different batch.
+- **Leading dot in extension.** Send `txt`, not `.txt`, when `commonFileName` should use a specific extension.
+- **Invalid MIME type input.** Use `type/subtype` format such as `application/json` when `fileExt` should resolve from a MIME type.
+- **Conflicting extension counts.** Use either `extensionCount` or `extensionCountMin` / `extensionCountMax`. Do not send both shapes together.
+- **Range values in the wrong order.** `extensionCountMin` must be less than or equal to `extensionCountMax`.
+- **Assuming production validity.** Generated values are synthetic sample data. Do not treat them as real infrastructure records.
+
+## FAQs
+
+<AccordionGroup>
+  <Accordion title="What can a dev fixture generator return?">
+    A dev fixture generator can return `systems[]` records with `method` and
+    `value` fields. Profile output can also include file extensions, file
+    names, file paths, MIME types, cron expressions, network-interface names
+    and semver values.
+  </Accordion>
+  <Accordion title="Can I use this as a cron generator?">
+    Yes. Set `method=cron` when a scheduler test needs cron expression values.
+    The same method also works as a cron expression generator when display and
+    parsing paths need coverage.
+  </Accordion>
+  <Accordion title="Can I use this as a file name generator?">
+    Yes. Use `method=fileName` for generated file-name values or
+    `method=commonFileName` for common file names. Use it as a random file name
+    generator with `extension` and extension-count fields when your test needs
+    those shapes.
+  </Accordion>
+  <Accordion title="Can I reproduce dev fixture generator output?">
+    Yes. Set a numeric seed to reproduce output for the same count, locale,
+    method and option values. Leave the seed blank when you want fresh random
+    data generator output for exploratory QA.
+  </Accordion>
+  <Accordion title="Is this a test data generator for production records?">
+    No. It generates synthetic sample data for tests, seed scripts and demos.
+    Do not treat returned paths, network-interface names or cron expressions as
+    production configuration.
+  </Accordion>
+  <Accordion title="Where can I learn more about developer fixture generation?">
+    Read the [dev fixture generator guide](https://docs.spotzee.com/guides/tools/data-generation/dev-fixture-generator)
+    for endpoint options, response fields and integration patterns. The guide
+    also shows where developer fixture data fits beside git, date, company and
+    phone generators.
+  </Accordion>
+</AccordionGroup>
+
+## Try it
+
+Generate developer fixture data in the browser at [spotzee.com/tools/dev-fixture-generator](https://spotzee.com/tools/dev-fixture-generator/), or call the Extended API when you need file, MIME, cron, network-interface and semver fixtures inside automated tests and seed scripts.
