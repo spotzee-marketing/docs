@@ -26,7 +26,7 @@ The flow is two API calls separated by a real send from your sending infrastruct
 
 <Steps>
 <Step title="Generate a test inbox">
-Call `GET /generic/email/email-tester`. The API returns `{ test_email, uniqueCode }`. The address looks like `<uniqueCode>@spotzee.marketing` and is valid for one captured message. Cloudflare Email Routing routes any inbound message at that address to the analysis worker.
+Call `GET /generic/email/email-tester`. The API returns `{ test_email, uniqueCode }`. The address looks like `<uniqueCode>@spotzee.marketing` and is valid for one captured message. The Spotzee API captures the inbound message at that address for analysis.
 </Step>
 <Step title="Send your draft from real infrastructure">
 Send any campaign, transactional message or cold-email draft to the test address from your production ESP, SMTP relay or mail client. The score reflects what receivers actually see, so the send must come from the same setup you use in production. Sending from a personal Gmail when production traffic flows through SendGrid will give you a different score for both.

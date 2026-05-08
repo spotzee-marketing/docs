@@ -1,0 +1,125 @@
+---
+title: "Synthetic Colour Data Generator"
+description: "Generate RGB, HSL, HWB, CMYK, LAB, LCH and CSS colour fixtures with count, locale, seed, method and format controls for repeatable design-system and parser QA."
+keywords:
+  [
+    "color generator",
+    "random color generator",
+    "hex color generator",
+    "rgb color generator",
+    "random hex color generator",
+    "cmyk color generator",
+    "hsl color generator",
+    "lab color generator",
+    "css color value generator",
+  ]
+---
+
+A synthetic colour data generator creates sample values for RGB, HSL, HWB, CMYK, LAB, LCH, CSS colour-space and human-readable colour fields. It helps developers, designers and QA teams test design systems, form inputs, visualisation tools and sample datasets without copying production brand tokens.
+
+<Info>
+  Generate sample colour data at
+  [spotzee.com/tools/color-generator](https://spotzee.com/tools/color-generator/).
+</Info>
+
+## Why this matters
+
+Colour fields appear in token tables, swatches, previews, import files, chart legends, theme builders and CSS parsers. A fixture set that only contains one hex value can miss formatting, wrapping, parsing and display problems.
+
+Generated colour data gives you varied channel, CSS and perceptual colour values for tests. And a numeric seed lets you reproduce the same output after a failure without freezing the fixture set by hand.
+
+Generated colour values are test fixture data only. They are not accessibility-checked, brand-approved or production palette recommendations. Each Extended API call deducts a small per-call amount from your Spotzee credit balance. See the [Spotzee pricing page](https://spotzee.com/pricing/) for live per-tool pricing.
+
+## How it works
+
+<Steps>
+  <Step title="Send the request">
+    POST to `/generic/data/generate/color` with `count`. The count is a string
+    from `1` to `100`.
+  </Step>
+  <Step title="Choose a method">
+    Use `method=profile` for expanded colour records, or choose one field
+    method: `rgb`, `hsl`, `hwb`, `cmyk`, `lab`, `lch`, `colorByCSSColorSpace`,
+    `cssSupportedFunction`, `cssSupportedSpace`, `human` or `space`.
+  </Step>
+  <Step title="Set method options">
+    Send `format`, `includeAlpha`, `casing`, `prefix` and `cssColorSpace` when
+    the selected method supports those controls.
+  </Step>
+  <Step title="Set repeatability">
+    Send `locale` where supported and an optional numeric `seed` when the same
+    colour data generator output needs to repeat in tests.
+  </Step>
+  <Step title="Read the response">
+    The response returns `data.colors[]`, `generated`, `locale`, optional
+    `seed`, and the resolved `method`.
+  </Step>
+</Steps>
+
+## Method reference
+
+| Method                 | Output                        | Main parameters                                                                          |
+| ---------------------- | ----------------------------- | ---------------------------------------------------------------------------------------- |
+| `profile`              | Expanded colour record        | `count`, `locale`, `seed`, `format`, `includeAlpha`, `casing`, `prefix`, `cssColorSpace` |
+| `rgb`                  | RGB colour value              | `count`, `locale`, `seed`, `format`, `includeAlpha`, `casing`, `prefix`                  |
+| `hsl`                  | HSL colour value              | `count`, `locale`, `seed`, `format`, `includeAlpha`                                      |
+| `hwb`                  | HWB colour value              | `count`, `locale`, `seed`, `format`                                                      |
+| `cmyk`                 | CMYK colour value             | `count`, `locale`, `seed`, `format`                                                      |
+| `lab`                  | LAB colour value              | `count`, `locale`, `seed`, `format`                                                      |
+| `lch`                  | LCH colour value              | `count`, `locale`, `seed`, `format`                                                      |
+| `colorByCSSColorSpace` | CSS colour-space value        | `count`, `locale`, `seed`, `format`, `cssColorSpace`                                     |
+| `cssSupportedFunction` | CSS-supported colour function | `count`, `locale`, `seed`, `format`                                                      |
+| `cssSupportedSpace`    | CSS-supported colour space    | `count`, `locale`, `seed`, `format`                                                      |
+| `human`                | Human-readable colour name    | `count`, `locale`, `seed`, `format`                                                      |
+| `space`                | Colour-space name             | `count`, `locale`, `seed`, `format`                                                      |
+
+Use `profile` when you need many colour fields together. Use a field method when your form, parser or import job only expects one value type.
+
+## What to watch for
+
+- **Count outside `1` to `100`.** One request generates up to 100 colour records. For more rows, call the endpoint again and vary the seed when you need a different batch.
+- **Hex format on the wrong method.** Use `format=hex` only with `rgb` or `profile`. Other methods should use `css`, `decimal` or `binary`.
+- **Alpha on unsupported fields.** `includeAlpha` is supported only by `rgb`, `hsl` and `profile`.
+- **Prefix on unsupported fields.** `prefix` is supported only by `rgb` and `profile`, and can contain up to four letters, numbers or `#` characters.
+- **Wrong CSS colour space.** Send `cssColorSpace` only with `colorByCSSColorSpace` or `profile`.
+- **Assuming brand suitability.** Generated values are synthetic sample data. Do not treat them as approved palette choices or accessibility-reviewed colours.
+
+## FAQs
+
+<AccordionGroup>
+  <Accordion title="What can a colour data generator return?">
+    A colour data generator can return `colors[]` records with `method` and
+    `value` fields. Profile output can also include RGB, CMYK, CSS colour-space,
+    HSL, HWB, LAB, LCH, human-readable colour and colour-space fields.
+  </Accordion>
+  <Accordion title="Can I generate only RGB values?">
+    Yes. Use `method=rgb` when a form, parser or import column only needs RGB
+    sample values. You can also set `format`, `includeAlpha`, `casing` and
+    `prefix` for RGB output.
+  </Accordion>
+  <Accordion title="Can I generate hex colour values?">
+    Yes. Use `method=rgb` or `method=profile`, then set `format=hex`. Hex output
+    supports casing and prefix controls when your test needs those exact shapes.
+  </Accordion>
+  <Accordion title="Can I reproduce colour data generator output?">
+    Yes. Set a numeric seed to reproduce output for the same count, locale,
+    method and option values. Leave the seed blank when you want a fresh random
+    batch for exploratory QA.
+  </Accordion>
+  <Accordion title="Can I generate CSS colour-space values?">
+    Yes. Use `method=colorByCSSColorSpace`, then set `cssColorSpace` to `sRGB`,
+    `display-p3`, `rec2020`, `a98-rgb` or `prophoto-rgb`. Use `profile` when a
+    fixture also needs RGB, CMYK, HSL, HWB, LAB and LCH fields.
+  </Accordion>
+  <Accordion title="Where can I learn more about colour data generation?">
+    Read the [colour data generator
+    guide](https://docs.spotzee.com/guides/tools/data-generation/color-generator)
+    for endpoint options, response fields and integration patterns. The guide
+    also shows where colour fixture data fits beside developer fixture,
+    commerce, company and git generators.
+  </Accordion>
+</AccordionGroup>
+
+## Try it
+
+Generate sample colour data in the browser at [spotzee.com/tools/color-generator](https://spotzee.com/tools/color-generator/), or call the Extended API when you need colour fixtures inside automated tests, design-system checks and seed scripts.
