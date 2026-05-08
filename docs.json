@@ -197,7 +197,8 @@
                   "guides/tools/data-generation/color-generator",
                   "guides/tools/data-generation/lorem-ipsum-generator",
                   "guides/tools/data-generation/word-generator",
-                  "guides/tools/data-generation/random-string-generator"
+                  "guides/tools/data-generation/random-string-generator",
+                  "guides/tools/data-generation/random-number-generator"
                 ]
               },
               {

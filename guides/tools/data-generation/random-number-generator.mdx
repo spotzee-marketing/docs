@@ -1,0 +1,123 @@
+---
+title: "Random Number Generator"
+description: "Generate integer, float, BigInt, binary, hexadecimal, octal and roman numeral fixtures for QA teams, import jobs, parser tests and repeatable seed scripts."
+keywords:
+  [
+    "random number generator",
+    "random number generator online",
+    "random number generator api",
+    "excel random number generator",
+    "hex number generator",
+    "binary number generator",
+    "how to make a random number generator in python",
+    "how to make a random number generator in java",
+    "best free random number generator",
+  ]
+---
+
+A random number generator creates synthetic numeric values for test data, validation workflows and parser QA. It can return expanded number profiles, integers, floats, BigInt-compatible strings, binary values, hexadecimal values, octal values and roman numerals from one endpoint.
+
+<Info>
+  Generate sample number data at
+  [spotzee.com/tools/random-number-generator](https://spotzee.com/tools/random-number-generator/).
+</Info>
+
+## Why this matters
+
+Numeric fixtures look harmless until a parser, validator or import job sees a value outside the path you tested. One hand-written number will not cover ranges, decimal precision, base-number conversion, BigInt serialisation or roman numeral display states.
+
+Synthetic number data gives you controlled variation. Use it as an Excel random number generator for spreadsheet QA, a hex number generator for parser checks or a binary number generator for conversion tests. And a numeric seed lets you reproduce the same records after a failure without keeping throwaway numbers in fixture files forever.
+
+Generated numbers are test data only. They are not real balances, scores, limits or production metrics. Each Extended API call deducts a small per-call amount from your Spotzee credit balance. See the [Spotzee pricing page](https://spotzee.com/pricing/) for live per-tool pricing.
+
+## How it works
+
+<Steps>
+  <Step title="Send the request">
+    POST to `/generic/data/generate/number` with `count`. The count is a string
+    from `1` to `100`.
+  </Step>
+  <Step title="Choose a method">
+    Use `method=profile` for expanded number records, or choose one scalar
+    method: `int`, `float`, `bigInt`, `binary`, `hex`, `octal` or
+    `romanNumeral`.
+  </Step>
+  <Step title="Set numeric controls">
+    Send range, multiple, decimal-place and BigInt parameters only when the
+    selected method supports them.
+  </Step>
+  <Step title="Set repeatability">
+    Send `locale` where supported and an optional numeric `seed` when the same
+    output needs to repeat in tests.
+  </Step>
+  <Step title="Read the response">
+    The response returns `data.numbers[]`, `generated`, `locale`, optional
+    `seed`, and the resolved `method`.
+  </Step>
+</Steps>
+
+## Method reference
+
+| Method         | Output                         | Main parameters                                                                 |
+| -------------- | ------------------------------ | ------------------------------------------------------------------------------- |
+| `profile`      | Expanded number record         | `count`, `locale`, `seed`                                                       |
+| `int`          | Integer                        | `count`, `locale`, `seed`, `min`, `max`, `multipleOf`                           |
+| `float`        | Floating-point number          | `count`, `locale`, `seed`, `min`, `max`, `multipleOf`, `fractionDigits`         |
+| `bigInt`       | BigInt-compatible string       | `count`, `locale`, `seed`, `bigIntMin`, `bigIntMax`, `bigIntMultipleOf`         |
+| `binary`       | Binary number string           | `count`, `locale`, `seed`, `min`, `max`                                         |
+| `hex`          | Lowercase hexadecimal string   | `count`, `locale`, `seed`, `min`, `max`                                         |
+| `octal`        | Octal number string            | `count`, `locale`, `seed`, `min`, `max`                                         |
+| `romanNumeral` | Roman numeral string           | `count`, `locale`, `seed`, `min`, `max`                                         |
+
+Use `profile` when you need many numeric fields together. Use a scalar method when your form, parser or import job only expects one number shape.
+
+## What to watch for
+
+- **Count outside `1` to `100`.** One request generates up to 100 number records. For more rows, call the endpoint again and vary the seed when you need a different batch.
+- **Range on profile output.** Minimum and maximum controls are for scalar methods only. Do not send them with `method=profile`.
+- **Only one range bound set.** Send both `min` and `max`, or leave both blank.
+- **Multiple on the wrong method.** Send `multipleOf` only with `int` or `float`.
+- **Decimal places on non-float output.** Send `fractionDigits` only with `method=float`, and keep it between `0` and `10`.
+- **BigInt options on scalar methods.** Send `bigIntMin`, `bigIntMax` and `bigIntMultipleOf` only with `method=bigInt`.
+
+## FAQs
+
+<AccordionGroup>
+  <Accordion title="What is a random number generator?">
+    A random number generator creates numeric values within the method and
+    option set you choose. Spotzee returns synthetic integers, floats, BigInt
+    strings, binary, hexadecimal, octal and roman numeral output for test data
+    and fixture workflows.
+  </Accordion>
+  <Accordion title="Can I use this random number generator online for test data?">
+    Yes. Enter a count, choose a method and generate sample numeric data in the
+    browser. Use the same numeric seed when the same random number generator
+    online output must repeat across test runs.
+  </Accordion>
+  <Accordion title="Can I generate integers and floats in a range?">
+    Yes. Choose `method=int` or `method=float`, then set `min` and `max`.
+    Integer output also supports a positive integer `multipleOf`, while float
+    output supports decimal places and positive numeric multiples.
+  </Accordion>
+  <Accordion title="Can I generate BigInt values?">
+    Yes. Choose `method=bigInt` to generate BigInt-compatible values serialised
+    as strings for JSON compatibility. You can also set `bigIntMin`,
+    `bigIntMax` and `bigIntMultipleOf`.
+  </Accordion>
+  <Accordion title="Can I generate hexadecimal, binary and octal numbers?">
+    Yes. Choose `method=hex`, `method=binary` or `method=octal` to generate
+    base-number strings for parser and conversion tests. Use optional minimum
+    and maximum controls when you need a bounded range.
+  </Accordion>
+  <Accordion title="Where can I learn more about random number generation?">
+    Read the [random number generator
+    guide](https://docs.spotzee.com/guides/tools/data-generation/random-number-generator)
+    for endpoint options, response fields and integration patterns. The guide
+    also shows where number fixture data fits beside string, developer fixture,
+    finance and word generators.
+  </Accordion>
+</AccordionGroup>
+
+## Try it
+
+Generate sample number data in the browser at [spotzee.com/tools/random-number-generator](https://spotzee.com/tools/random-number-generator/), or call the random number generator API when you need numeric fixtures inside automated tests, import jobs and seed scripts.
