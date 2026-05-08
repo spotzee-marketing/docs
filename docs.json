@@ -189,7 +189,8 @@
                   "guides/tools/data-generation/commerce-generator",
                   "guides/tools/data-generation/finance-generator",
                   "guides/tools/data-generation/food-generator",
-                  "guides/tools/data-generation/git-generator"
+                  "guides/tools/data-generation/git-generator",
+                  "guides/tools/data-generation/animal-generator"
                 ]
               },
               {

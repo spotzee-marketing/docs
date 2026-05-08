@@ -1,0 +1,114 @@
+---
+title: "Synthetic Animal Data Generator"
+description: "Generate animal type, pet-name, species and breed fixtures with count, locale, seed and method controls for repeatable QA datasets, catalogues and API tests."
+keywords:
+  [
+    "animal data generator",
+    "random animal generator",
+    "free animal data generator",
+    "animal data generator online",
+    "synthetic animal data generator",
+    "animal test data generator",
+    "animal fixture generator",
+    "pet name generator for test data",
+    "animal breed generator",
+  ]
+---
+
+A synthetic animal data generator creates sample data for animal types, pet names, species and breed-style fields. It gives product, content and QA teams repeatable animal-shaped data for catalogues, forms, filters and sample datasets without copying real customer or operational records.
+
+<Info>
+  Generate sample animal data at
+  [spotzee.com/tools/animal-generator](https://spotzee.com/tools/animal-generator/).
+</Info>
+
+## Why this matters
+
+Animal data turns up in catalogue pages, adoption flows, demo records, content workflows and import tests. Those surfaces need values that look varied enough to exercise layout, sorting, filtering and validation behaviour.
+
+Static lists are easy to start with. But they become a hidden test dependency once every fixture uses the same few values.
+
+Generated animal data is test fixture data only. It is not a verified taxonomy, a production record set or evidence of real inventory. Each Extended API call deducts a small per-call amount from your Spotzee credit balance. See the [Spotzee pricing page](https://spotzee.com/pricing/) for live per-tool pricing.
+
+## How it works
+
+<Steps>
+  <Step title="Send the request">
+    POST to `/generic/data/generate/animal` with `count`. The count is a string
+    from `1` to `100`.
+  </Step>
+  <Step title="Choose a method">
+    Use `method=profile` for expanded animal records, or choose one field
+    method such as `dog`, `cat`, `bird`, `petName`, `snake` or `type`.
+  </Step>
+  <Step title="Set repeatability">
+    Send `locale` where supported and an optional numeric `seed` when the same
+    animal data generator output needs to repeat in tests.
+  </Step>
+  <Step title="Read the response">
+    The response returns `data.animals[]`, `generated`, `locale`, optional
+    `seed`, and the resolved `method`. Profile records can include animal type,
+    pet name, common animal fields and wild-animal fields.
+  </Step>
+</Steps>
+
+## Method reference
+
+| Method | Output | Main parameters |
+|---|---|---|
+| `profile` | Expanded animal record | `count`, `locale`, `seed` |
+| `petName` | Pet-name fixture | `count`, `locale`, `seed` |
+| `type` | General animal type | `count`, `locale`, `seed` |
+| `dog`, `cat`, `bird`, `fish`, `horse`, `rabbit`, `cow` | Common species or breed-style values | `count`, `locale`, `seed` |
+| `bear`, `cetacean`, `crocodilia`, `insect`, `lion`, `rodent`, `snake` | Wild-animal species or breed-style values | `count`, `locale`, `seed` |
+
+Use `profile` when you need fuller animal test data. Use a field method when your form, table, parser or import job only needs one value type.
+
+## What to watch for
+
+- **Count outside `1` to `100`.** One request generates up to 100 animal records. For more rows, call the endpoint again and vary the seed when you need a different batch.
+- **Wrong method group.** Use `profile` for many animal fields together, a common or wild method for a species or breed-style value, or `petName` / `type` for a single scalar field.
+- **Seed not repeating.** The seed must be numeric. Keep the same count, locale, method and seed when tests need stable fixture values.
+- **Unexpected profile fields.** `profile` can return many animal fields together. Use a field method when the consuming test expects one scalar value.
+- **Assuming real records.** Generated animal values are synthetic sample data. Do not treat them as verified species taxonomies, customer records or operational records.
+
+## FAQs
+
+<AccordionGroup>
+  <Accordion title="What can an animal data generator return?">
+    An animal data generator can return `animals[]` records with `method` and
+    `value` fields. Profile output can also include `type`, `petName`, `dog`,
+    `cat`, `bird`, `fish`, `horse`, `rabbit`, `bear`, `lion`, `cetacean`,
+    `cow`, `crocodilia`, `insect`, `rodent` and `snake` fields.
+  </Accordion>
+  <Accordion title="Can I use this as a random animal generator?">
+    Yes. Choose a method and count, then generate one or more synthetic animal
+    values. Add a numeric seed when the same random animal generator output
+    must repeat in tests.
+  </Accordion>
+  <Accordion title="Can I reproduce animal data generator output?">
+    Yes. Set a numeric seed to reproduce output for the same count, locale and
+    method values. Leave the seed blank when you want a fresh random batch for
+    exploratory QA.
+  </Accordion>
+  <Accordion title="Can I use it as an animal breed generator?">
+    Yes. Choose a species or breed-style method such as `dog`, `cat`, `horse`,
+    `rabbit`, `cow` or one of the wild-animal methods. Choose `profile` when
+    you want several animal fields together.
+  </Accordion>
+  <Accordion title="Can I use it as a pet name generator for test data?">
+    Yes. Use `method=petName` when forms, onboarding flows, demos or validation
+    tests need pet-name-shaped sample values. Use a seed when a fixture must
+    stay stable across repeated test runs.
+  </Accordion>
+  <Accordion title="Where can I learn more about animal data generation?">
+    Read the [animal data generator guide](https://docs.spotzee.com/guides/tools/data-generation/animal-generator)
+    for endpoint options, response fields and integration patterns. The guide
+    also shows where animal fixture data fits beside food, commerce, person and
+    contact generators.
+  </Accordion>
+</AccordionGroup>
+
+## Try it
+
+Generate sample animal data in the browser at [spotzee.com/tools/animal-generator](https://spotzee.com/tools/animal-generator/), or call the Extended API when you need animal fixtures inside automated tests and seed scripts.
