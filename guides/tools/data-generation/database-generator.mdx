@@ -1,0 +1,114 @@
+---
+title: "Database Generator"
+description: "Generate database column, collation, engine, MongoDB ObjectId and type fixtures for schema tests, migration examples, import jobs and seed scripts."
+keywords:
+  [
+    "database generator",
+    "fake data generator",
+    "database test data generator",
+    "free database generator",
+    "database generator online",
+    "mongodb objectid generator",
+    "database column generator",
+    "dummy data generator",
+    "best free database generator",
+  ]
+---
+
+A database generator creates synthetic schema-adjacent values for tests, demos and sample datasets. Spotzee can return expanded profiles or single-field records for collations, columns, engines, MongoDB ObjectId-compatible strings and database column types.
+
+<Info>
+  Generate sample database data at
+  [spotzee.com/tools/database-generator](https://spotzee.com/tools/database-generator/).
+</Info>
+
+## Why this matters
+
+Database fixtures show up in docs, parser tests, seed scripts, import previews and developer tools. Real table names and identifiers often reveal too much about production systems, even when the values look harmless.
+
+Synthetic database data gives you controlled variation without copying production schema details into public docs, support tickets or lower-control test environments. It also helps QA teams test one value shape at a time: a column name, a database type, an engine name, a collation or an ObjectId-compatible string.
+
+But generated database records are test data only. They are not live database records, verified schema names or stored identifiers. Each Extended API call deducts a small per-call amount from your Spotzee credit balance. See the [Spotzee pricing page](https://spotzee.com/pricing/) for live per-tool pricing.
+
+## How it works
+
+<Steps>
+  <Step title="Send the request">
+    POST to `/generic/data/generate/database` with `count`. The count is a
+    string from `1` to `100`.
+  </Step>
+  <Step title="Choose a method">
+    Use `method=profile` for expanded records, or choose one field method:
+    `collation`, `column`, `engine`, `mongodbObjectId` or `type`.
+  </Step>
+  <Step title="Set repeatability">
+    Send `locale` where supported and an optional numeric `seed` when the same
+    output needs to repeat in tests.
+  </Step>
+  <Step title="Read the response">
+    The response returns `data.databases[]`, `generated`, `locale`, optional
+    `seed`, and the resolved `method`.
+  </Step>
+</Steps>
+
+## Method reference
+
+| Method            | Output                         | Main parameters           |
+| ----------------- | ------------------------------ | ------------------------- |
+| `profile`         | Expanded database record       | `count`, `locale`, `seed` |
+| `collation`       | Database collation             | `count`, `locale`, `seed` |
+| `column`          | Database column name           | `count`, `locale`, `seed` |
+| `engine`          | Database engine name           | `count`, `locale`, `seed` |
+| `mongodbObjectId` | MongoDB ObjectId-compatible ID | `count`, `locale`, `seed` |
+| `type`            | Database column type           | `count`, `locale`, `seed` |
+
+Use `profile` when an example needs related fields together. Use a field method when a parser, import job or mapping screen expects one database value shape.
+
+## What to watch for
+
+- **Count outside `1` to `100`.** One request generates up to 100 database records. For more rows, call the endpoint again and vary the seed when you need a different batch.
+- **Wrong method for the field under test.** Use `profile` for related fields, or choose a specific method when you only need one value shape.
+- **Production schema leakage.** Replace real table, column and identifier examples before sharing docs, tickets or seed files.
+- **ObjectId assumptions.** Generated MongoDB ObjectId values are fixture strings. Do not treat them as records that exist in a live database.
+- **Unseeded snapshots.** Send a numeric `seed` when tests assert exact strings or snapshot output.
+
+## FAQs
+
+<AccordionGroup>
+  <Accordion title="What is a database generator?">
+    A database generator creates synthetic database fixture values for tests,
+    examples and seed scripts. Spotzee can return collation, column, engine,
+    MongoDB ObjectId and type fields from one endpoint.
+  </Accordion>
+  <Accordion title="Can I use this database generator online for QA?">
+    Yes. Enter a count, choose a method and generate sample database data in the
+    browser. Use a numeric seed when the same database generator output must
+    repeat across test runs.
+  </Accordion>
+  <Accordion title="Can I generate MongoDB ObjectId values?">
+    Yes. Choose `mongodbObjectId` to create ObjectId-compatible strings for
+    parser and validator tests. The output is synthetic and should not be
+    treated as a real database record.
+  </Accordion>
+  <Accordion title="Can I generate column names and database types?">
+    Yes. Choose `column` for a database column name, or choose `type` for a
+    database column type. Profile output can return both fields together with
+    collation, engine and ObjectId fields.
+  </Accordion>
+  <Accordion title="Are generated database records real schema data?">
+    No. Generated database records are synthetic sample data for software
+    testing, fixture files and prototypes. Do not use them as verified schema
+    names, stored identifiers or production records.
+  </Accordion>
+  <Accordion title="Where can I learn more about database data generation?">
+    Read the [database generator
+    guide](https://docs.spotzee.com/guides/tools/data-generation/database-generator)
+    for endpoint options, response fields and integration patterns. The guide
+    also shows where database fixture data fits beside developer fixture,
+    string, number and company generators.
+  </Accordion>
+</AccordionGroup>
+
+## Try it
+
+Generate sample database data in the browser at [spotzee.com/tools/database-generator](https://spotzee.com/tools/database-generator/), or call the Extended API when you need database fixtures inside migration tests, docs, import previews and seed scripts.

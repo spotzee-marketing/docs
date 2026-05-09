@@ -199,7 +199,8 @@
                   "guides/tools/data-generation/word-generator",
                   "guides/tools/data-generation/random-string-generator",
                   "guides/tools/data-generation/random-number-generator",
-                  "guides/tools/data-generation/airline-generator"
+                  "guides/tools/data-generation/airline-generator",
+                  "guides/tools/data-generation/database-generator"
                 ]
               },
               {
