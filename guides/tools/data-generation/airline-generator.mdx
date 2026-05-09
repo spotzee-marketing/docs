@@ -1,0 +1,124 @@
+---
+title: "Airline Data Generator"
+description: "Generate airline, airport, aircraft, flight-number, record-locator and seat fixtures for travel QA, booking tests, import jobs and repeatable seed scripts."
+keywords:
+  [
+    "flight number",
+    "airport code",
+    "airline data generator",
+    "free airline data generator",
+    "airline data generator online",
+    "flight number generator",
+    "record locator generator",
+    "aircraft type generator",
+    "best free airline data generator",
+  ]
+---
+
+An airline data generator creates synthetic travel fixture values for tests, demos and sample datasets. Spotzee can return expanded profiles or single-field records for airlines, airplanes, airports, aircraft types, flight numbers, record locators and seats.
+
+<Info>
+  Generate sample airline data at
+  [spotzee.com/tools/airline-generator](https://spotzee.com/tools/airline-generator/).
+</Info>
+
+## Why this matters
+
+Travel workflows fail in small, specific ways. Flight numbers need bounded digit lengths. Record locators may block numerals or visually similar characters. Airport codes need compact displays, while airport names can stretch a table cell.
+
+Synthetic airline data gives you controlled variation without copying live passenger bookings, operational schedules or customer travel records into lower-control environments. That matters for booking flows, itinerary previews, import jobs, CSV samples and validation tests.
+
+But generated airline records are test data only. They are not live flight schedules, passenger data or verified airline records. Each Extended API call deducts a small per-call amount from your Spotzee credit balance. See the [Spotzee pricing page](https://spotzee.com/pricing/) for live per-tool pricing.
+
+## How it works
+
+<Steps>
+  <Step title="Send the request">
+    POST to `/generic/data/generate/airline` with `count`. The count is a
+    string from `1` to `100`.
+  </Step>
+  <Step title="Choose a method">
+    Use `method=profile` for expanded records, or choose one field method:
+    `aircraftType`, `airline`, `airplane`, `airport`, `flightNumber`,
+    `recordLocator` or `seat`.
+  </Step>
+  <Step title="Set scoped options">
+    Use record-locator options only with `recordLocator` or `profile`,
+    aircraft type only with `seat` or `profile`, and flight-number length
+    controls only with `flightNumber` or `profile`.
+  </Step>
+  <Step title="Set repeatability">
+    Send `locale` where supported and an optional numeric `seed` when the same
+    output needs to repeat in tests.
+  </Step>
+  <Step title="Read the response">
+    The response returns `data.airlines[]`, `generated`, `locale`, optional
+    `seed`, and the resolved `method`.
+  </Step>
+</Steps>
+
+## Method reference
+
+| Method          | Output                         | Main parameters                                                                 |
+| --------------- | ------------------------------ | ------------------------------------------------------------------------------- |
+| `profile`       | Expanded airline record        | `count`, `locale`, `seed`, record-locator options, aircraft type, length controls |
+| `airline`       | Airline name and IATA code     | `count`, `locale`, `seed`                                                       |
+| `airplane`      | Airplane name and type code    | `count`, `locale`, `seed`                                                       |
+| `airport`       | Airport name and IATA code     | `count`, `locale`, `seed`                                                       |
+| `aircraftType`  | Aircraft type                  | `count`, `locale`, `seed`                                                       |
+| `flightNumber`  | One-to-four digit flight number | `count`, `locale`, `seed`, `addLeadingZeros`, `length`, `lengthMin`, `lengthMax` |
+| `recordLocator` | Booking reference value        | `count`, `locale`, `seed`, `allowNumerics`, `allowVisuallySimilarCharacters`    |
+| `seat`          | Seat value                     | `count`, `locale`, `seed`, `aircraftType`                                       |
+
+Use `profile` when a booking screen needs related fields together. Use a field method when a parser, form or import job expects one travel value shape.
+
+## What to watch for
+
+- **Count outside `1` to `100`.** One request generates up to 100 airline records. For more rows, call the endpoint again and vary the seed when you need a different batch.
+- **Record-locator options on another method.** Send `allowNumerics` and `allowVisuallySimilarCharacters` only with `recordLocator` or `profile`.
+- **Aircraft type on another method.** Send `aircraftType` only with `seat` or `profile`.
+- **Exact length mixed with range.** Use either `length` or `lengthMin` plus `lengthMax`, not both.
+- **Only one length bound set.** Send both `lengthMin` and `lengthMax`, or leave both blank.
+- **Treating fixtures as live data.** Generated airline values are synthetic sample data. Don't use them as operational schedules, passenger bookings or verified airline records.
+
+## FAQs
+
+<AccordionGroup>
+  <Accordion title="What is an airline data generator?">
+    An airline data generator creates synthetic travel fixture values for
+    tests, demos and seed scripts. Spotzee can return airline, airplane,
+    airport, aircraft-type, flight-number, record-locator and seat fields from
+    one endpoint.
+  </Accordion>
+  <Accordion title="Can I use this airline data generator online for QA?">
+    Yes. Enter a count, choose a method and generate sample airline data in the
+    browser. Use a numeric seed when the same airline data generator online
+    output must repeat across test runs.
+  </Accordion>
+  <Accordion title="Can I generate flight numbers and airport codes?">
+    Yes. Choose `flightNumber` for one-to-four digit flight-number output, or
+    choose `airport` for airport name and three-character airport code fields.
+    Profile output can return both fields together.
+  </Accordion>
+  <Accordion title="Can I generate booking reference values?">
+    Yes. Choose `recordLocator` to generate booking reference values. You can
+    allow numeric characters and visually similar characters when your
+    validation rules need those branches covered.
+  </Accordion>
+  <Accordion title="Are generated airline records real travel data?">
+    No. Generated airline records are synthetic sample data for software
+    testing, fixture files and prototypes. Do not use them as real flight
+    schedules, booking records, passenger data or operational airline data.
+  </Accordion>
+  <Accordion title="Where can I learn more about airline data generation?">
+    Read the [airline data generator
+    guide](https://docs.spotzee.com/guides/tools/data-generation/airline-generator)
+    for endpoint options, response fields and integration patterns. The guide
+    also shows where airline fixture data fits beside developer fixture,
+    vehicle, string and company generators.
+  </Accordion>
+</AccordionGroup>
+
+## Try it
+
+Generate sample airline data in the browser at [spotzee.com/tools/airline-generator](https://spotzee.com/tools/airline-generator/), or call the Extended API when you need travel fixtures inside booking tests, itinerary previews, import jobs and seed scripts.
