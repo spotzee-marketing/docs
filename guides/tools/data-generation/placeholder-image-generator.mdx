@@ -1,0 +1,118 @@
+---
+title: "Placeholder Image Generator"
+description: "Generate placeholder image URLs and SVG data URIs from one endpoint. Picsum, LoremFlickr, GitHub avatars and Faker portraits with optional size, category, blur and colour controls."
+keywords:
+  [
+    "placeholder image generator",
+    "dummy image url",
+    "random image url",
+    "free placeholder image",
+    "picsum alternative",
+    "avatar generator url",
+    "placeholder image url",
+    "free image url generator",
+    "best free placeholder image generator",
+  ]
+---
+
+A placeholder image generator returns synthetic image URLs and SVG data URIs for tests, prototypes and design fixtures. Spotzee bundles Picsum, LoremFlickr, GitHub avatar, Faker portrait and SVG data URI output in one endpoint with optional size, category, blur and colour controls.
+
+<Info>
+  Generate placeholder image URLs at
+  [spotzee.com/tools/placeholder-image-generator](https://spotzee.com/tools/placeholder-image-generator/).
+</Info>
+
+## Why this matters
+
+Designers and engineers need image-shaped fixtures every day: avatars in user lists, hero images in layout tests, thumbnails in card grids, SVG placeholders in storybook screens. Hard-coding URLs against public CDNs from inside test data scatters dependencies and breaks when those services change.
+
+A placeholder image endpoint keeps URL formats in one well-tested place. Pass a numeric seed for reproducible avatars and Picsum URLs across runs. Reach for SVG data URIs when fixtures must work offline, in print, or inside locked-down preview environments.
+
+Each Extended API call deducts a small per-call amount from your Spotzee credit balance. The endpoint returns URLs and data URIs only; image bytes are served by the public CDNs the URLs reference. See the [Spotzee pricing page](https://spotzee.com/pricing/) for live per-tool pricing.
+
+## How it works
+
+<Steps>
+  <Step title="Send the request">
+    POST to `/generic/data/generate/image` with `count`. The count is a string
+    from `1` to `100`.
+  </Step>
+  <Step title="Choose a method">
+    Pick `profile` for the bundled record, or one of `url`, `urlPicsumPhotos`,
+    `urlLoremFlickr`, `avatar`, `avatarGitHub`, `personPortrait` or `dataUri`.
+  </Step>
+  <Step title="Set scoped options">
+    Width and height work for URL and data-URI methods. Category targets
+    `urlLoremFlickr`. Greyscale and blur target `urlPicsumPhotos`. Colour and
+    SVG type target `dataUri`. Sex and size target `personPortrait`.
+  </Step>
+  <Step title="Read the response">
+    The response returns `data.images[]`, `generated`, `locale`, optional
+    `seed` and the resolved `method`. Profile records also fill the per-method
+    URL fields.
+  </Step>
+</Steps>
+
+## Method reference
+
+| Method            | Output                                              | Scoped options                          |
+| ----------------- | --------------------------------------------------- | --------------------------------------- |
+| `profile`         | All URL types plus a data URI in one record         | All scoped options                      |
+| `url`             | Generic image URL                                   | `width`, `height`                        |
+| `urlPicsumPhotos` | Picsum URL with seed and optional grey/blur         | `width`, `height`, `grayscale`, `blur`   |
+| `urlLoremFlickr`  | LoremFlickr URL with optional category              | `width`, `height`, `category`            |
+| `avatar`          | Faker portrait avatar URL (fixed size)              | none                                     |
+| `avatarGitHub`    | GitHub avatar URL                                    | none                                     |
+| `personPortrait`  | Faker portrait CDN URL                               | `sex`, `size`                            |
+| `dataUri`         | Inline `data:image/svg+xml` URI                      | `width`, `height`, `color`, `dataUriType` |
+
+Pick `profile` to inspect every output shape at once. Pick a method when fixtures need one URL shape per record.
+
+## What to watch for
+
+- **Count outside `1` to `100`.** One request returns up to 100 records. Call the endpoint again for larger datasets.
+- **Width or height outside `1` to `3999`.** Both must be positive integers up to 3999. They only apply to `profile`, `url`, `urlPicsumPhotos`, `urlLoremFlickr` and `dataUri` methods.
+- **Method-scoped option mismatch.** The endpoint rejects unsupported combinations, for example `category` with `urlPicsumPhotos`. Use `profile` if you want every option active in one record.
+- **Treating fixtures as licensed assets.** Returned URLs point at public placeholder services. Confirm each provider's terms before reusing the assets in production marketing or paid products.
+- **Unseeded snapshots.** Send a numeric `seed` when tests assert exact URLs or snapshot the rendered output.
+
+## FAQs
+
+<AccordionGroup>
+  <Accordion title="What is a placeholder image generator?">
+    A placeholder image generator returns synthetic image URLs and SVG data
+    URIs for tests, examples and design fixtures. Spotzee returns Picsum,
+    LoremFlickr, GitHub avatar and portrait URLs from one endpoint with
+    optional size, category, blur and colour controls.
+  </Accordion>
+  <Accordion title="Does this return actual image bytes?">
+    No. Each response value is a URL pointing at a public image service or a
+    `data:image/svg+xml` URI you can embed directly. The endpoint never
+    fetches or proxies image bytes.
+  </Accordion>
+  <Accordion title="Can I get a dummy image url at a specific size?">
+    Yes. Send `width` and `height` from `1` to `3999` for the `url`,
+    `urlPicsumPhotos`, `urlLoremFlickr`, `dataUri` and `profile` methods.
+    Avatar and portrait methods use sizes set by the upstream provider.
+  </Accordion>
+  <Accordion title="Is this a picsum alternative?">
+    It bundles `urlPicsumPhotos` plus LoremFlickr, GitHub avatars, Faker
+    portraits and SVG data URIs into one endpoint. Use it as a picsum
+    alternative when fixtures need more than one URL shape.
+  </Accordion>
+  <Accordion title="Can I generate offline-friendly placeholder bytes?">
+    Yes. Pick `dataUri` to return a `data:image/svg+xml` URI. The SVG
+    embeds inline, so fixtures keep rendering without network access.
+  </Accordion>
+  <Accordion title="Where can I learn more about placeholder image generation?">
+    Read the [placeholder image generator
+    guide](https://docs.spotzee.com/guides/tools/data-generation/placeholder-image-generator)
+    for endpoint options, response fields and embedding patterns. The guide
+    also shows where placeholder image URLs fit beside colour, lorem ipsum,
+    string and developer fixture generators.
+  </Accordion>
+</AccordionGroup>
+
+## Try it
+
+Generate placeholder image URLs in the browser at [spotzee.com/tools/placeholder-image-generator](https://spotzee.com/tools/placeholder-image-generator/), or call the Extended API when you need image fixtures inside design systems, prototypes, demo screens, storybooks and avatar lists.
