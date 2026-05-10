@@ -203,7 +203,8 @@
                   "guides/tools/data-generation/database-generator",
                   "guides/tools/data-generation/boolean-generator",
                   "guides/tools/data-generation/tech-jargon-generator",
-                  "guides/tools/data-generation/placeholder-image-generator"
+                  "guides/tools/data-generation/placeholder-image-generator",
+                  "guides/tools/data-generation/music-generator"
                 ]
               },
               {

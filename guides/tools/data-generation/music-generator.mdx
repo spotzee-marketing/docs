@@ -1,0 +1,113 @@
+---
+title: "Music Data Generator"
+description: "Generate album, artist, genre and song name fixtures from one endpoint for music app prototypes, catalog screens and search-index seeds."
+keywords:
+  [
+    "music genre generator",
+    "random song generator",
+    "music data generator",
+    "song name generator",
+    "band name generator",
+    "album name generator",
+    "free music data generator",
+    "fake music data generator",
+    "best free music data generator",
+  ]
+---
+
+A music data generator creates synthetic album, artist, genre and song name values for tests, demos and fixture files. Spotzee returns those fields from one endpoint with optional locale and seed metadata, so the same record can be reproduced across runs.
+
+<Info>
+  Generate sample music data at
+  [spotzee.com/tools/music-generator](https://spotzee.com/tools/music-generator/).
+</Info>
+
+## Why this matters
+
+Music apps, podcast clones, social-radio products and recommendation flows all rely on catalog rows. Tests, demos and screenshots need believable album titles, artist names and song names. They should not embed real licensed catalog rows in fixtures, marketing mocks or seed scripts.
+
+Synthetic music data gives engineering and QA teams a controlled lorem-ipsum-alternative for catalog content. A numeric seed reproduces the same record set after a failed test. Method-specific output keeps fixtures focused on the field shape under test.
+
+Generated values are placeholder strings. Each Extended API call deducts a small per-call amount from your Spotzee credit balance. See the [Spotzee pricing page](https://spotzee.com/pricing/) for live per-tool pricing.
+
+## How it works
+
+<Steps>
+  <Step title="Send the request">
+    POST to `/generic/data/generate/music` with `count`. The count is a string
+    from `1` to `100`.
+  </Step>
+  <Step title="Choose a method">
+    Use `method=profile` for the bundled record, or pick one method such as
+    `songName`, `album`, `artist` or `genre`.
+  </Step>
+  <Step title="Set repeatability">
+    Send `locale` where supported and an optional numeric `seed` when the same
+    output needs to repeat in tests.
+  </Step>
+  <Step title="Read the response">
+    The response returns `data.music[]`, `generated`, `locale`, optional
+    `seed`, and the resolved `method`. Profile records also fill the per-field
+    keys.
+  </Step>
+</Steps>
+
+## Method reference
+
+| Method     | Output                                | Main parameters         |
+| ---------- | ------------------------------------- | ----------------------- |
+| `profile`  | Album, artist, genre and song name    | `count`, `locale`, `seed` |
+| `songName` | Single song name                      | `count`, `locale`, `seed` |
+| `album`    | Single album title                    | `count`, `locale`, `seed` |
+| `artist`   | Single artist or band name            | `count`, `locale`, `seed` |
+| `genre`    | Single music genre                    | `count`, `locale`, `seed` |
+
+Pick `profile` when a screen needs related catalog fields together. Pick a single method when a parser, tag or column expects one shape per record.
+
+## What to watch for
+
+- **Count outside `1` to `100`.** One request returns up to 100 records. Call the endpoint again for larger datasets.
+- **Method not matching the field under test.** Use `profile` for related fields together, or pick one method when a parser expects a single value shape.
+- **Treating fixtures as licensed catalog rows.** Generated values are synthetic strings. Replace them before publishing marketing copy, app store listings or production catalog data.
+- **Locale assumptions.** Most vocabulary is English-coded today. Send a non-English locale only after confirming upstream support for the words you need.
+- **Unseeded snapshots.** Send a numeric `seed` when tests assert exact strings or snapshot the rendered output.
+
+## FAQs
+
+<AccordionGroup>
+  <Accordion title="What is a music data generator?">
+    A music data generator creates synthetic album, artist, genre and song
+    name values for tests, examples and seed scripts. Spotzee returns those
+    fields from one endpoint with optional locale and seed metadata.
+  </Accordion>
+  <Accordion title="Can I get just a song name or album name?">
+    Yes. Pick `songName` for a single song name per record, or `album` for a
+    single album title. Choose `profile` when you need the bundled album,
+    artist, genre and song name together.
+  </Accordion>
+  <Accordion title="Is the music genre generator useful for filter screens?">
+    Yes. Pick `genre` and the endpoint returns one music genre string per
+    record. Use a numeric seed when the same music genre generator output
+    must repeat across runs.
+  </Accordion>
+  <Accordion title="Can I reproduce the same music records?">
+    Yes. Send a numeric `seed` and the endpoint returns the same records on
+    every run. Drop the seed for fresh output each time.
+  </Accordion>
+  <Accordion title="Are these real albums, artists or songs?">
+    No. Generated values are synthetic placeholder strings built from common
+    music vocabulary. Treat them as fixture copy and replace them before
+    shipping documentation, marketing or production catalog data.
+  </Accordion>
+  <Accordion title="Where can I learn more about music data generation?">
+    Read the [music data generator
+    guide](https://docs.spotzee.com/guides/tools/data-generation/music-generator)
+    for endpoint options, response fields and integration patterns. The guide
+    also shows where music data fits beside book, word, string and developer
+    fixture generators.
+  </Accordion>
+</AccordionGroup>
+
+## Try it
+
+Generate sample music data in the browser at [spotzee.com/tools/music-generator](https://spotzee.com/tools/music-generator/), or call the Extended API when you need music fixtures inside catalog screens, search seeds, recommendation flows and demo libraries.
