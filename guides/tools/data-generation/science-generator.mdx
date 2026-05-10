@@ -1,0 +1,113 @@
+---
+title: "Science Data Generator"
+description: "Generate chemical element and SI unit fixtures from one endpoint for chemistry quizzes, science app prototypes, learning content and search-index seeds."
+keywords:
+  [
+    "random chemical element generator",
+    "random element generator",
+    "chemical element generator",
+    "science data generator",
+    "periodic table generator",
+    "unit of measure generator",
+    "si unit generator",
+    "free science data generator",
+    "fake science data generator",
+  ]
+---
+
+A science data generator creates synthetic chemical element and SI unit values for tests, demos and learning content. Spotzee returns those fields from one endpoint with optional locale and seed metadata, so the same record can be reproduced across runs.
+
+<Info>
+  Generate sample science data at
+  [spotzee.com/tools/science-generator](https://spotzee.com/tools/science-generator/).
+</Info>
+
+## Why this matters
+
+Chemistry quizzes, periodic-table apps, conversion tools and science learning content all rely on element and unit data. Tests and demos need believable element symbols, atomic numbers and SI unit names without copying licensed reference databases into fixture files.
+
+Synthetic science data gives engineering, education and QA teams a controlled fixture source. A numeric seed reproduces the same record set after a failed test. Method-specific output keeps fixtures focused on the field shape under test.
+
+Generated values draw from common periodic-table and SI unit vocabulary. Cross-check against an authoritative source before publishing learning material or shipping conversion tools. Each Extended API call deducts a small per-call amount from your Spotzee credit balance. See the [Spotzee pricing page](https://spotzee.com/pricing/) for live per-tool pricing.
+
+## How it works
+
+<Steps>
+  <Step title="Send the request">
+    POST to `/generic/data/generate/science` with `count`. The count is a
+    string from `1` to `100`.
+  </Step>
+  <Step title="Choose a method">
+    Use `method=profile` for the bundled record covering both a chemical
+    element and an SI unit. Pick `chemicalElement` or `unit` to return one
+    science field type.
+  </Step>
+  <Step title="Set repeatability">
+    Send `locale` where supported and an optional numeric `seed` when the same
+    output needs to repeat in tests.
+  </Step>
+  <Step title="Read the response">
+    The response returns `data.science[]`, `generated`, `locale`, optional
+    `seed`, and the resolved `method`. Each record fills the relevant
+    sub-object.
+  </Step>
+</Steps>
+
+## Method reference
+
+| Method            | Output                                              | Main parameters         |
+| ----------------- | --------------------------------------------------- | ----------------------- |
+| `profile`         | Chemical element plus SI unit in one record         | `count`, `locale`, `seed` |
+| `chemicalElement` | Element with `symbol`, `name`, `atomicNumber`       | `count`, `locale`, `seed` |
+| `unit`            | SI unit with `name` and `symbol`                    | `count`, `locale`, `seed` |
+
+Pick `profile` when a screen needs both shapes together. Pick `chemicalElement` or `unit` when a parser, flashcard or column expects one shape per record.
+
+## What to watch for
+
+- **Count outside `1` to `100`.** One request returns up to 100 records. Call the endpoint again for larger datasets.
+- **Method not matching the field under test.** Use `profile` for both element and unit together, or pick `chemicalElement` or `unit` when a parser expects one shape.
+- **Treating fixtures as official reference data.** Generated values draw from common periodic-table and SI unit vocabulary. Cross-check against an authoritative source before publishing learning material or conversion tools.
+- **Locale assumptions.** Most vocabulary is English-coded today. Send a non-English locale only after confirming upstream support for the words you need.
+- **Unseeded snapshots.** Send a numeric `seed` when tests assert exact strings or snapshot the rendered output.
+
+## FAQs
+
+<AccordionGroup>
+  <Accordion title="What is a science data generator?">
+    A science data generator creates synthetic chemical element and SI unit
+    values for tests, examples and learning fixtures. Spotzee returns those
+    fields from one endpoint with optional locale and seed metadata.
+  </Accordion>
+  <Accordion title="Can I get just a chemical element?">
+    Yes. Pick `chemicalElement` and the endpoint returns an element with its
+    name, symbol and atomic number per record. Pick `profile` to get the
+    bundled record covering both an element and an SI unit.
+  </Accordion>
+  <Accordion title="Can I generate SI units only?">
+    Yes. Pick `unit` and the endpoint returns one SI unit with its name and
+    symbol per record. Use a numeric seed when the same SI unit generator
+    output must repeat.
+  </Accordion>
+  <Accordion title="Can I reproduce the same science records?">
+    Yes. Send a numeric `seed` and the endpoint returns the same records on
+    every run. Drop the seed for fresh output each time.
+  </Accordion>
+  <Accordion title="Are these elements and units a verified reference?">
+    No. Generated values draw from common periodic-table and SI unit
+    vocabulary. Treat them as fixture copy and cross-check against an
+    authoritative reference before publishing learning content or shipping
+    conversion tools.
+  </Accordion>
+  <Accordion title="Where can I learn more about science data generation?">
+    Read the [science data generator
+    guide](https://docs.spotzee.com/guides/tools/data-generation/science-generator)
+    for endpoint options, response fields and integration patterns. The guide
+    also shows where science data fits beside word, string, number and
+    developer fixture generators.
+  </Accordion>
+</AccordionGroup>
+
+## Try it
+
+Generate sample science data in the browser at [spotzee.com/tools/science-generator](https://spotzee.com/tools/science-generator/), or call the Extended API when you need science fixtures inside chemistry quizzes, learning content, conversion tests and prototype catalogs.
