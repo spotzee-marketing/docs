@@ -1,0 +1,116 @@
+---
+title: "Tech Jargon Generator"
+description: "Generate technical phrases, abbreviations, adjectives, nouns and verbs as a lorem ipsum alternative for prototypes, support fixtures and search-index seeds."
+keywords:
+  [
+    "lorem ipsum alternative",
+    "jargon generator",
+    "tech jargon generator",
+    "free tech jargon generator",
+    "tech jargon generator online",
+    "random tech jargon generator",
+    "developer jargon generator",
+    "technical jargon generator",
+    "best free tech jargon generator",
+  ]
+---
+
+A tech jargon generator creates synthetic technical phrases, abbreviations, adjectives, nouns and verbs for tests, demos and placeholder copy. Spotzee returns those fields from one endpoint with optional locale and seed metadata, so the same record can be reproduced across runs.
+
+<Info>
+  Generate sample tech jargon at
+  [spotzee.com/tools/tech-jargon-generator](https://spotzee.com/tools/tech-jargon-generator/).
+</Info>
+
+## Why this matters
+
+Lorem ipsum reads as obviously fake. Designers, support teams and QA engineers often want placeholder copy that sounds like a real tech product, error message or release note. Stakeholders need to picture how a screen will read in production, not how Latin filler renders.
+
+Synthetic tech jargon gives you a controlled lorem ipsum alternative. A numeric seed reproduces the same phrase, abbreviation and noun set after a failed test. Method-specific output keeps fixtures focused on the one field shape you care about, instead of cluttering screens with everything at once.
+
+But generated jargon is placeholder copy, not product strings. Replace it before publishing docs, marketing or production text. Each Extended API call deducts a small per-call amount from your Spotzee credit balance. See the [Spotzee pricing page](https://spotzee.com/pricing/) for live per-tool pricing.
+
+## How it works
+
+<Steps>
+  <Step title="Send the request">
+    POST to `/generic/data/generate/hacker` with `count`. The count is a string
+    from `1` to `100`.
+  </Step>
+  <Step title="Choose a method">
+    Use `method=profile` for the bundled record, or pick one method such as
+    `phrase`, `noun`, `verb`, `adjective`, `ingverb` or `abbreviation`.
+  </Step>
+  <Step title="Set repeatability">
+    Send `locale` where supported and an optional numeric `seed` when the same
+    output needs to repeat in tests.
+  </Step>
+  <Step title="Read the response">
+    The response returns `data.hackers[]`, `generated`, `locale`, optional
+    `seed`, and the resolved `method`. Profile records also fill the per-field
+    keys.
+  </Step>
+</Steps>
+
+## Method reference
+
+| Method         | Output                                          | Main parameters         |
+| -------------- | ----------------------------------------------- | ----------------------- |
+| `profile`      | Full record: phrase plus all single-field types | `count`, `locale`, `seed` |
+| `phrase`       | Full sentence-style tech phrase                 | `count`, `locale`, `seed` |
+| `noun`         | Single technical noun                           | `count`, `locale`, `seed` |
+| `verb`         | Single technical verb                           | `count`, `locale`, `seed` |
+| `adjective`    | Single technical adjective                      | `count`, `locale`, `seed` |
+| `ingverb`      | Continuous-action verb (parsing, copying)       | `count`, `locale`, `seed` |
+| `abbreviation` | Tech abbreviation (HTTP, VGA, SMTP)             | `count`, `locale`, `seed` |
+
+Pick `profile` when a screen needs a believable bundle of related jargon. Pick a single method when a parser, tag or column expects one shape per record.
+
+## What to watch for
+
+- **Count outside `1` to `100`.** One request returns up to 100 records. For more rows, call the endpoint again and vary the seed when you need a different batch.
+- **Method not matching the field under test.** Use `profile` for related fields together, or pick one method when only a single shape matters.
+- **Treating jargon as real product copy.** Generated phrases are synthetic placeholder text. Replace them before publishing docs, marketing or production strings.
+- **Locale assumptions.** Most jargon vocabulary is English-coded today. Send a non-English locale only after confirming upstream support for the words you need.
+- **Unseeded snapshots.** Send a numeric `seed` when tests assert exact strings or snapshot the rendered output.
+
+## FAQs
+
+<AccordionGroup>
+  <Accordion title="What is a tech jargon generator?">
+    A tech jargon generator creates synthetic technical phrases, abbreviations,
+    adjectives, nouns and verbs for tests, examples and placeholder copy.
+    Spotzee returns those fields from one endpoint with optional locale and
+    seed metadata.
+  </Accordion>
+  <Accordion title="Is this a lorem ipsum alternative?">
+    Yes. Use it as a lorem ipsum alternative when prototype copy needs to sound
+    like a real tech product instead of generic Latin filler. The endpoint can
+    return full phrases or single field types.
+  </Accordion>
+  <Accordion title="Can I generate just an abbreviation, noun or verb?">
+    Yes. Choose `abbreviation`, `noun`, `verb`, `adjective` or `ingverb` to
+    return one field type per record. Pick `phrase` for a full sentence, or
+    `profile` for the bundled record with every field filled.
+  </Accordion>
+  <Accordion title="Can I reproduce the same jargon output?">
+    Yes. Send a numeric `seed` and the endpoint returns the same records on
+    every run. Drop the seed for fresh output each time.
+  </Accordion>
+  <Accordion title="Are these real product names or trademarks?">
+    No. Generated values are synthetic placeholder text built from common tech
+    vocabulary. Treat them as fixture copy and replace them before shipping
+    documentation, marketing or production strings.
+  </Accordion>
+  <Accordion title="Where can I learn more about tech jargon generation?">
+    Read the [tech jargon generator
+    guide](https://docs.spotzee.com/guides/tools/data-generation/tech-jargon-generator)
+    for endpoint options, response fields and integration patterns. The guide
+    also shows where tech jargon fits beside lorem ipsum, word, string and
+    developer fixture generators.
+  </Accordion>
+</AccordionGroup>
+
+## Try it
+
+Generate sample tech jargon in the browser at [spotzee.com/tools/tech-jargon-generator](https://spotzee.com/tools/tech-jargon-generator/), or call the Extended API when you need jargon fixtures inside support tickets, demo screens, search-index seeds, mocks and prototypes.
