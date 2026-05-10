@@ -1,0 +1,112 @@
+---
+title: "Boolean Generator"
+description: "Generate true or false fixtures with optional probability control for feature flags, toggles, validators, import jobs and seed scripts."
+keywords:
+  [
+    "fake data generator",
+    "data generator",
+    "boolean generator",
+    "random boolean generator",
+    "free boolean generator",
+    "boolean generator online",
+    "random boolean generator online",
+    "boolean test data generator",
+    "best free boolean generator",
+  ]
+---
+
+A boolean generator creates synthetic true or false values for tests, demos and sample datasets. Spotzee can return boolean records with repeatable seeds and optional probability control for feature flags, toggles, validators and import fixtures.
+
+<Info>
+  Generate sample boolean data at
+  [spotzee.com/tools/boolean-generator](https://spotzee.com/tools/boolean-generator/).
+</Info>
+
+## Why this matters
+
+Boolean fields are small, but they drive important branches. Feature flags, consent toggles, checkbox states, import validators and workflow guards often need both true and false values to be tested properly.
+
+Synthetic boolean data gives you controlled variation without copying production application state into docs, fixtures or lower-control test environments. Probability control also lets you force all-false, all-true or biased output when a branch needs specific coverage.
+
+But generated boolean records are test data only. They are not live customer states, consent records or feature-flag settings. Each Extended API call deducts a small per-call amount from your Spotzee credit balance. See the [Spotzee pricing page](https://spotzee.com/pricing/) for live per-tool pricing.
+
+## How it works
+
+<Steps>
+  <Step title="Send the request">
+    POST to `/generic/data/generate/datatype` with `count`. The count is a
+    string from `1` to `100`.
+  </Step>
+  <Step title="Choose the method">
+    Use `method=boolean`. The upstream datatype endpoint currently exposes this
+    single method.
+  </Step>
+  <Step title="Set probability">
+    Send optional `probability` from `0` to `1` with up to two decimal places
+    when you need to control the chance of `true`.
+  </Step>
+  <Step title="Set repeatability">
+    Send `locale` where supported and an optional numeric `seed` when the same
+    output needs to repeat in tests.
+  </Step>
+  <Step title="Read the response">
+    The response returns `data.datatypes[]`, `generated`, `locale`, optional
+    `seed`, and the resolved `method`.
+  </Step>
+</Steps>
+
+## Method reference
+
+| Method    | Output             | Main parameters                         |
+| --------- | ------------------ | --------------------------------------- |
+| `boolean` | True/false records | `count`, `locale`, `seed`, `probability` |
+
+Use `probability=0` when every value should be false. Use `probability=1` when every value should be true. Use a decimal such as `0.75` when you need mostly true output.
+
+## What to watch for
+
+- **Count outside `1` to `100`.** One request generates up to 100 boolean records. For more rows, call the endpoint again and vary the seed when you need a different batch.
+- **Probability outside `0` to `1`.** Send `0`, `1` or a decimal value in between.
+- **Too many decimal places.** Probability accepts up to two decimal places, so use `0.75` rather than `0.755`.
+- **Unseeded snapshots.** Send a numeric `seed` when tests assert exact true/false sequences.
+- **Treating fixtures as live state.** Generated boolean values are synthetic sample data. Do not use them as customer consent, feature-flag or preference records.
+
+## FAQs
+
+<AccordionGroup>
+  <Accordion title="What is a boolean generator?">
+    A boolean generator creates synthetic true or false values for tests,
+    examples and seed scripts. Spotzee can return boolean records with resolved
+    probability, locale and seed metadata.
+  </Accordion>
+  <Accordion title="Can I use this boolean generator online for QA?">
+    Yes. Enter a count, set an optional probability and generate true or false
+    values in the browser. Use a numeric seed when the same output must repeat
+    across test runs.
+  </Accordion>
+  <Accordion title="Can I control the chance of true values?">
+    Yes. Set `probability` from `0` to `1` with up to two decimal places. Use
+    `0` for all false, `1` for all true, or a value such as `0.75` for mostly
+    true output.
+  </Accordion>
+  <Accordion title="Can I generate all false or all true records?">
+    Yes. Set `probability=0` for all false values, or `probability=1` for all
+    true values. This is useful for boundary tests and branch coverage.
+  </Accordion>
+  <Accordion title="Are generated boolean values real application state?">
+    No. Generated boolean records are synthetic sample data for software
+    testing, fixture files and prototypes. Do not use them as verified consent,
+    preference or feature-flag records.
+  </Accordion>
+  <Accordion title="Where can I learn more about boolean data generation?">
+    Read the [boolean generator
+    guide](https://docs.spotzee.com/guides/tools/data-generation/boolean-generator)
+    for endpoint options, response fields and integration patterns. The guide
+    also shows where boolean fixture data fits beside number, string, developer
+    fixture and database generators.
+  </Accordion>
+</AccordionGroup>
+
+## Try it
+
+Generate sample boolean data in the browser at [spotzee.com/tools/boolean-generator](https://spotzee.com/tools/boolean-generator/), or call the Extended API when you need boolean fixtures inside flag tests, toggle states, validators, imports and seed scripts.
