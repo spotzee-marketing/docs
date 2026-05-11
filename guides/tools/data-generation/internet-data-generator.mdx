@@ -1,0 +1,135 @@
+---
+title: "Internet Data Generator"
+description: "Generate email, IP, domain, JWT, MAC, password, port, URL and user agent fixtures from one endpoint with method-scoped controls for API tests and mock services."
+keywords:
+  [
+    "fake email generator",
+    "password generator",
+    "internet data generator",
+    "random ip generator",
+    "random domain name generator",
+    "jwt generator",
+    "user agent generator",
+    "fake api data generator",
+    "free internet data generator",
+  ]
+---
+
+An internet data generator returns synthetic email, IP, domain, JWT, MAC, password, port, URL, user-agent and emoji values for tests, mock services and prototype screens. Spotzee bundles 22 methods in one endpoint with method-scoped controls for first/last name, email domain, password length, IP CIDR block, URL protocol and JWT reference date.
+
+<Info>
+  Generate sample internet data at
+  [spotzee.com/tools/internet-data-generator](https://spotzee.com/tools/internet-data-generator/).
+</Info>
+
+## Why this matters
+
+API tests, mock services, middleware suites and developer prototypes all rely on internet-shaped data. Tests need email addresses that pass parser checks, IP addresses inside a sensible network range, JWTs with a known reference date, and user-agent strings that match the browsers under test.
+
+A single internet endpoint keeps those rules in one well-tested place. Use a numeric seed for reproducible runs. Use the `password` method with a character-set restriction when fixtures must avoid symbols. Use the `ipv4` CIDR block when fixtures must stay inside a private subnet. Use `useExampleEmail=true` when fixtures must avoid risk of accidentally hitting a real mailbox.
+
+Generated values are placeholder strings only. Each Extended API call deducts a small per-call amount from your Spotzee credit balance. See the [Spotzee pricing page](https://spotzee.com/pricing/) for live per-tool pricing.
+
+## How it works
+
+<Steps>
+  <Step title="Send the request">
+    POST to `/generic/data/generate/internet` with `count`. The count is a
+    string from `1` to `100`.
+  </Step>
+  <Step title="Choose a method">
+    Pick from 22 methods including `email`, `ipv4`, `ipv6`, `mac`,
+    `password`, `jwt`, `userAgent`, `url`, `domainName`, `port` and
+    `httpStatusCode`.
+  </Step>
+  <Step title="Set scoped options">
+    First/last name target name-derived methods. Email domain and example
+    email scope email output. CIDR block and IPv4 network alias scope IPv4
+    generation. Password length, prefix and character set scope password
+    output. URL append-slash and protocol scope URL output.
+  </Step>
+  <Step title="Read the response">
+    The response returns `data.internet[]`, `generated`, `locale`, optional
+    `seed`, and the resolved `method`. Each record fills the relevant
+    per-method key plus a primary `value`.
+  </Step>
+</Steps>
+
+## Method reference
+
+| Method            | Output                                  | Scoped options                                                                          |
+| ----------------- | --------------------------------------- | --------------------------------------------------------------------------------------- |
+| `account`         | Account name                            | `firstName`, `lastName`                                                                  |
+| `displayName`     | Display name                            | `firstName`, `lastName`                                                                  |
+| `username`        | Username                                | `firstName`, `lastName`                                                                  |
+| `email`           | Email address                           | `firstName`, `lastName`, `emailDomain`, `useExampleEmail`, `allowSpecialCharacters`      |
+| `exampleEmail`    | Reserved-domain example email           | `allowSpecialCharacters`                                                                 |
+| `domainName`      | Full domain name                        | none                                                                                     |
+| `domainSuffix`    | TLD suffix                              | none                                                                                     |
+| `domainWord`      | Single domain word                      | none                                                                                     |
+| `url`             | URL                                     | `urlAppendSlash`, `urlProtocol`                                                          |
+| `ip`              | Any IP                                  | none                                                                                     |
+| `ipv4`            | IPv4 address                            | `ipv4CidrBlock` or `ipv4Network` (mutually exclusive)                                    |
+| `ipv6`            | IPv6 address                            | none                                                                                     |
+| `mac`             | MAC address                             | `macSeparator` (`colon`, `hyphen`, `none`)                                               |
+| `port`            | TCP/UDP port                            | none                                                                                     |
+| `protocol`        | URL protocol                            | none                                                                                     |
+| `httpMethod`      | HTTP method (GET, POST, etc.)           | none                                                                                     |
+| `httpStatusCode`  | HTTP status code                        | `httpStatusTypes` (e.g. `success,serverError`)                                           |
+| `userAgent`       | User-agent string                       | none                                                                                     |
+| `password`        | Password fixture                        | `passwordLength` (1-128), `passwordMemorable`, `passwordPrefix`, `passwordCharacterSet`  |
+| `jwt`             | JWT token                               | `jwtRefDate` (ISO 8601)                                                                  |
+| `jwtAlgorithm`    | JWT algorithm name                      | none                                                                                     |
+| `emoji`           | Emoji character                         | `emojiTypes` (e.g. `food,nature`)                                                        |
+
+Pick a method per fixture shape. Combine method + scoped options to bias output toward what the test needs.
+
+## What to watch for
+
+- **Count outside `1` to `100`.** One request returns up to 100 records. Call the endpoint again for larger datasets.
+- **Method-scoped option mismatch.** Each option is forwarded only to methods that support it. Password options do not apply to URL generation, and email options do not apply to MAC generation.
+- **Email domain vs example email.** Use `emailDomain` for a custom domain, or `useExampleEmail=true` for reserved example domains. Do not combine the two.
+- **IPv4 CIDR vs network alias.** Use `ipv4CidrBlock` for a custom CIDR, or `ipv4Network` for well-known aliases such as `private-a`. Do not combine the two.
+- **Treating fixtures as real credentials.** Generated passwords, JWTs, emails and accounts are placeholder strings only. Do not treat them as real credentials, valid signing keys or production accounts.
+
+## FAQs
+
+<AccordionGroup>
+  <Accordion title="What is an internet data generator?">
+    An internet data generator creates synthetic email, IP, domain, JWT, MAC,
+    password, port, URL and user-agent values for tests, examples and seed
+    scripts. Spotzee returns those fields from one endpoint with
+    method-scoped options.
+  </Accordion>
+  <Accordion title="Can I generate fake emails with my own domain?">
+    Yes. Pick `email` and send `emailDomain` for a custom domain, or
+    `useExampleEmail=true` to use reserved example domains. Do not combine
+    the two.
+  </Accordion>
+  <Accordion title="Can I get IPv4 fixtures inside a CIDR block?">
+    Yes. Pick `ipv4` and send `ipv4CidrBlock` (for example `192.168.0.0/16`)
+    or `ipv4Network` (for example `private-a`). Pick `ipv6` for IPv6
+    fixtures or `ip` for any IP.
+  </Accordion>
+  <Accordion title="Can I generate passwords with specific constraints?">
+    Yes. Set `passwordLength` (1-128), `passwordPrefix`, `passwordMemorable`
+    and `passwordCharacterSet` (`word`, `alphanumeric`, `alpha`, `numeric`
+    or `symbol`) for the `password` method. The output is fixture data, not
+    a hardened secret.
+  </Accordion>
+  <Accordion title="Are these JWTs signed with a real key?">
+    No. Generated JWTs are synthetic fixture tokens, not signed credentials.
+    Do not treat them as authentication evidence in production code.
+  </Accordion>
+  <Accordion title="Where can I learn more about internet data generation?">
+    Read the [internet data generator
+    guide](https://docs.spotzee.com/guides/tools/data-generation/internet-data-generator)
+    for endpoint options, response fields and integration patterns. The
+    guide also shows where internet data fits beside string, number,
+    developer fixture and database generators.
+  </Accordion>
+</AccordionGroup>
+
+## Try it
+
+Generate sample internet data in the browser at [spotzee.com/tools/internet-data-generator](https://spotzee.com/tools/internet-data-generator/), or call the Extended API when you need internet fixtures inside API tests, mock services, network rules and authentication flows.

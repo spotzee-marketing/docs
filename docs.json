@@ -206,7 +206,8 @@
                   "guides/tools/data-generation/placeholder-image-generator",
                   "guides/tools/data-generation/music-generator",
                   "guides/tools/data-generation/science-generator",
-                  "guides/tools/data-generation/location-generator"
+                  "guides/tools/data-generation/location-generator",
+                  "guides/tools/data-generation/internet-data-generator"
                 ]
               },
               {
