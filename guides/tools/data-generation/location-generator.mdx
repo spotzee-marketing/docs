@@ -1,0 +1,133 @@
+---
+title: "Location Data Generator"
+description: "Generate address, city, country, GPS coordinate and zip code fixtures from one endpoint with method-scoped controls for ranges, origin coordinates and address inclusions."
+keywords:
+  [
+    "fake address generator",
+    "random address generator",
+    "location data generator",
+    "random city generator",
+    "random country generator",
+    "zip code generator",
+    "random gps coordinate generator",
+    "free location data generator",
+    "best free location data generator",
+  ]
+---
+
+A location data generator returns synthetic addresses, cities, countries, GPS coordinates and zip codes for tests, prototypes and fixture screens. Spotzee bundles 20 methods in one endpoint with method-scoped controls for latitude/longitude ranges, origin coordinates, country-code variants and address inclusion flags.
+
+<Info>
+  Generate sample location data at
+  [spotzee.com/tools/location-generator](https://spotzee.com/tools/location-generator/).
+</Info>
+
+## Why this matters
+
+Maps, geo apps, shipping flows, ride-share simulators, store locators and rendezvous tools all rely on believable location data. Tests need addresses that pass parser checks, GPS points that sit inside a sensible bounding box, and zip codes that match a market format.
+
+A location data endpoint keeps those rules in one well-tested place. Use a numeric seed for reproducible address sets across runs. Use `nearbyGPSCoordinate` with an origin and radius when fixtures must cluster around a city or store. Use abbreviated state and country-code variants when downstream systems expect short codes.
+
+Generated values are synthetic placeholder strings. Each Extended API call deducts a small per-call amount from your Spotzee credit balance. See the [Spotzee pricing page](https://spotzee.com/pricing/) for live per-tool pricing.
+
+## How it works
+
+<Steps>
+  <Step title="Send the request">
+    POST to `/generic/data/generate/location` with `count`. The count is a
+    string from `1` to `100`.
+  </Step>
+  <Step title="Choose a method">
+    Pick `address` for the bundled record, or one of 19 single-field methods
+    such as `city`, `country`, `state`, `zipCode`, `latitude`, `longitude` or
+    `nearbyGPSCoordinate`.
+  </Step>
+  <Step title="Set scoped options">
+    Latitude/longitude ranges scope coordinate methods. Origin latitude,
+    longitude, radius and metric flag scope `nearbyGPSCoordinate`. Address
+    methods accept include flags for coordinates, country code, time zone,
+    language, directions and secondary address.
+  </Step>
+  <Step title="Read the response">
+    The response returns `data.locations[]`, `generated`, `locale`, optional
+    `seed`, and the resolved `method`. Address records fill the relevant
+    sub-fields when their include flags are on.
+  </Step>
+</Steps>
+
+## Method reference
+
+| Method                | Output                                | Scoped options                                                                  |
+| --------------------- | ------------------------------------- | ------------------------------------------------------------------------------- |
+| `address`             | Bundled street, city, state, zip      | All include flags (coordinates, country code, time zone, language, directions)  |
+| `streetAddress`       | Street address line                   | `useFullAddress`                                                                 |
+| `street`              | Street name                           | none                                                                             |
+| `buildingNumber`      | Building number                       | none                                                                             |
+| `secondaryAddress`    | Apartment, suite, unit                | `useFullAddress`                                                                 |
+| `city`                | City name                             | none                                                                             |
+| `county`              | County name                           | none                                                                             |
+| `state`               | State name or abbreviation            | `abbreviated`                                                                    |
+| `country`             | Country name                          | none                                                                             |
+| `countryCode`         | ISO country code                      | `countryCodeVariant` (alpha-2, alpha-3, numeric)                                 |
+| `continent`           | Continent name                        | none                                                                             |
+| `zipCode`             | Zip code                              | `zipCodeFormat` (e.g. `#####-####`)                                              |
+| `latitude`            | Latitude value                        | `latitudeMin`, `latitudeMax`, `precision`                                        |
+| `longitude`           | Longitude value                       | `longitudeMin`, `longitudeMax`, `precision`                                      |
+| `nearbyGPSCoordinate` | Coordinate near a fixed origin        | `originLatitude`, `originLongitude`, `radius`, `isMetric`, `precision`           |
+| `cardinalDirection`   | N, S, E, W                            | `abbreviated`                                                                    |
+| `ordinalDirection`    | NE, SE, SW, NW                        | `abbreviated`                                                                    |
+| `direction`           | Combined cardinal/ordinal             | `abbreviated`                                                                    |
+| `language`            | Language with `name`, `alpha2`, `alpha3` | none                                                                          |
+| `timeZone`            | IANA time zone identifier             | none                                                                             |
+
+Pick `address` when fixtures need every related field together. Pick a single method when a parser, dropdown or field expects one shape per record.
+
+## What to watch for
+
+- **Count outside `1` to `100`.** One request returns up to 100 records. Call the endpoint again for larger datasets.
+- **Method-scoped option mismatch.** Each option is forwarded only to methods that support it. For example, latitude/longitude ranges only apply to coordinate methods, and include flags only apply to `address`.
+- **Latitude/longitude ranges and origin pairing.** Latitude minimum and maximum should bracket realistic values. Origin latitude and longitude must be sent together for `nearbyGPSCoordinate`.
+- **Treating fixtures as real customer addresses.** Generated addresses are synthetic. Do not treat them as real customer records, deliverable shipping targets or operating-area test cases without a downstream geocoder.
+- **Unseeded snapshots.** Send a numeric `seed` when tests assert exact strings or snapshot the rendered output.
+
+## FAQs
+
+<AccordionGroup>
+  <Accordion title="What is a location data generator?">
+    A location data generator creates synthetic address, city, country, GPS
+    coordinate and zip code values for tests, examples and seed scripts.
+    Spotzee returns those fields from one endpoint with method-scoped
+    options.
+  </Accordion>
+  <Accordion title="Can I cluster GPS coordinates around a fixed origin?">
+    Yes. Pick `nearbyGPSCoordinate`, send `originLatitude`, `originLongitude`
+    and a `radius`. Toggle `isMetric` to choose kilometres or miles.
+  </Accordion>
+  <Accordion title="Can I generate just a country, city or zip code?">
+    Yes. Pick `country`, `city`, `state` or `zipCode` to return one field per
+    record. Use `countryCodeVariant` (`alpha-2`, `alpha-3` or `numeric`) when
+    a downstream system expects a specific country-code shape.
+  </Accordion>
+  <Accordion title="Does the address output include coordinates and a time zone?">
+    Yes when those include flags are on. Send `includeCoordinates=true`,
+    `includeTimeZone=true`, `includeCountryCode=true`, `includeLanguage=true`,
+    `includeDirections=true` or `includeSecondaryAddress=true` to enrich the
+    address record.
+  </Accordion>
+  <Accordion title="Are these real customer addresses?">
+    No. Generated addresses are synthetic placeholder strings. Treat them as
+    fixture copy and do not use them as real customer records, shipping
+    targets or compliance evidence.
+  </Accordion>
+  <Accordion title="Where can I learn more about location data generation?">
+    Read the [location data generator
+    guide](https://docs.spotzee.com/guides/tools/data-generation/location-generator)
+    for endpoint options, response fields and integration patterns. The guide
+    also shows where location data fits beside phone, person, contact and
+    developer fixture generators.
+  </Accordion>
+</AccordionGroup>
+
+## Try it
+
+Generate sample location data in the browser at [spotzee.com/tools/location-generator](https://spotzee.com/tools/location-generator/), or call the Extended API when you need address fixtures inside maps, geo apps, store locators, shipping flows and form-validation tests.
