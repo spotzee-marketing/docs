@@ -50,7 +50,7 @@ Read the four fields the API returns in the order below. Each one has a differen
 - **MX hostname.** The raw record returned by DNS. Useful when the provider name is missing, because the hostname tells you which infrastructure is handling the domain even if the friendly mapping has not been added to the database yet.
 - **MX priority.** Lower is better. A `priority: 0` record is the primary mail exchanger. The tool only returns the lowest-priority record, matching what a real sender would actually talk to.
 
-A custom-domain shop running its own mail server will return `exists: true` with no provider name. That's expected. Inspect the hostname directly to identify the platform. Self-hosted Postfix, Mailcow, Stalwart, and Mail-in-a-Box all show up this way.
+A custom-domain shop running its own mail server will return `exists: true` with no provider name. That's expected. Inspect the hostname directly to identify the platform. Self-hosted mail platforms and custom relays all show up this way.
 
 ## Provider check vs ESP lookup
 
