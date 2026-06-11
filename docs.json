@@ -285,7 +285,10 @@
       },
       {
         "tab": "Main API",
-        "openapi": "https://apix.spotzee.com/api/openapi.json",
+        "openapi": {
+          "source": "https://apix.spotzee.com/api/openapi.json",
+          "directory": "api"
+        },
         "groups": [
           {
             "group": "Overview",
@@ -346,7 +349,10 @@
       },
       {
         "tab": "Extended API",
-        "openapi": "https://apix.spotzee.com/api/ext/openapi.json",
+        "openapi": {
+          "source": "https://apix.spotzee.com/api/ext/openapi.json",
+          "directory": "api"
+        },
         "groups": [
           {
             "group": "Overview",
@@ -395,7 +401,7 @@
   "logo": {
     "light": "/images/logo-light.svg",
     "dark": "/images/logo-dark.svg",
-    "href": "https://docs.spotzee.com"
+    "href": "https://spotzee.com/docs"
   },
   "navbar": {
     "links": [
@@ -443,7 +449,26 @@
       "weight": 400
     }
   },
+  "seo": {
+    "metatags": {
+      "canonical": "https://spotzee.com/docs"
+    }
+  },
   "appearance": {
     "default": "system"
-  }
+  },
+  "redirects": [
+    {
+      "source": "/api-reference",
+      "destination": "/main-api/introduction"
+    },
+    {
+      "source": "/api-reference/:slug*",
+      "destination": "/api/:slug*"
+    },
+    {
+      "source": "/api",
+      "destination": "/main-api/introduction"
+    }
+  ]
 }
