@@ -306,6 +306,10 @@
             "tag": "Users"
           },
           {
+            "group": "CRM",
+            "tag": "CRM"
+          },
+          {
             "group": "Events",
             "tag": "Events"
           },
