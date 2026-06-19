@@ -1,10 +1,10 @@
 ---
 title: "Main API"
-description: "Programmatic access to users, segments, journeys, campaigns, projects, and organisation management."
-keywords: ["api", "rest", "main api", "spotzee api"]
+description: "Programmatic access to contacts, CRM records, segments, journeys, campaigns, projects, and organisation management."
+keywords: ["api", "rest", "main api", "spotzee api", "crm"]
 ---
 
-The Main API is the primary way to integrate Spotzee with your own systems. Use it to sync users, trigger campaigns, build segments, manage journeys, and administer projects and organisations.
+The Main API is the primary way to integrate Spotzee with your own systems. Use it to sync contacts, manage CRM records, trigger campaigns, build segments, manage journeys, and administer projects and organisations.
 
 ## Base URL
 
@@ -43,8 +43,10 @@ The Main API is rolling out a set of wire-level conventions in stages. Per-IP ed
 ## Endpoints
 
 <Info>
-  Endpoint pages are auto-generated from the OpenAPI specification. See the sidebar for the full list, grouped by resource (Users, Lists, Subscriptions, Campaigns, Journeys, Templates, Events, Tags, Projects, API keys, Organisation).
+  Endpoint pages are auto-generated from the OpenAPI specification. See the sidebar for the full list, grouped by resource (Users, CRM, Lists, Subscriptions, Campaigns, Journeys, Templates, Events, Tags, Projects, API keys, Organisation).
 </Info>
+
+The CRM group covers contacts, companies, activities, pipeline stages, and saved views for the project authenticated by your API key.
 
 OpenAPI spec URL: `https://apix.spotzee.com/api/openapi.json`
 
