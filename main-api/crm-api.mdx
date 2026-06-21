@@ -1,0 +1,128 @@
+---
+title: "CRM API"
+description: "Use the CRM Main API to read contacts, companies, activities, pipeline stages, properties, and saved views."
+keywords: ["crm api", "contacts", "companies", "activities", "pipeline", "properties"]
+---
+
+The CRM API lets a server-side integration read and update the CRM records in one Spotzee project. Use it to keep companies in sync, attach contacts to companies, log sales activity, and move contacts through the pipeline.
+
+## Base URL
+
+CRM endpoints live under the Main API client surface:
+
+```text
+https://apix.spotzee.com/api/client/crm
+```
+
+The auto-generated endpoint reference uses paths such as `/crm/contacts`. Combine those paths with the Main API client base URL.
+
+## Authentication and roles
+
+Use a project secret key (`sk_`) in the `Authorization` header.
+
+```http
+Authorization: Bearer sk_your_project_secret_key
+```
+
+The key must belong to the project whose CRM records you want to access. Read endpoints use the secret project key. Mutations require the key to have the project `editor` role or higher.
+
+| Operation | Minimum key |
+|---|---|
+| List properties, contacts, companies, activities, pipeline stages, or saved views | Project secret key |
+| Update contact properties or stage | Project secret key with `editor` role |
+| Create or update companies | Project secret key with `editor` role |
+| Create activities | Project secret key with `editor` role |
+
+See [Authentication](/guides/authentication) for key types and [Manage API keys](/guides/manage-api-keys) for key creation and rotation.
+
+## Resources
+
+The CRM reference is generated from the live OpenAPI specification under the **CRM** group in the Main API tab.
+
+| Resource | What it covers |
+|---|---|
+| Properties | Public CRM property definitions for contacts and companies |
+| Contacts | CRM contact projections, public property values, company links, and pipeline stage |
+| Companies | Company records, public company properties, linked contacts, and company activity |
+| Activities | Notes, calls, emails, SMS, meetings, tasks, and stage-change activity |
+| Pipeline stages | Active stage keys, labels, ordering, colours, and won/lost flags |
+| Saved views | Saved CRM view metadata that can be applied to contact lists |
+
+Hidden and classified CRM properties are not exposed. Public property values appear inside each record's `properties` object, keyed by the property's stable `key`.
+
+Public CRM v1 reads pipeline stage definitions and saved-view metadata. It does not expose stage configuration or saved-view rule editing.
+
+## Pagination and filtering
+
+CRM list endpoints return a cursor page:
+
+```json
+{
+  "results": [],
+  "nextCursor": null,
+  "prevCursor": null,
+  "limit": 25
+}
+```
+
+Use `limit` up to `100`. Pass `cursor` with `page=next` or `page=prev` to move through results. CRM contact lists can filter by `pipeline_stage`, `crm_company_id`, `view_id`, and free-text `q` where supported. Activity lists require either `contact_id` or `company_id`.
+
+For shared Main API behaviour, see [Pagination](/guides/api-pagination), [Rate limits](/guides/api-rate-limits), [Idempotency](/guides/api-idempotency), and [Errors](/main-api/errors).
+
+## Get started
+
+<Steps>
+  <Step title="Create a secret project key">
+    In the app, create an `sk_` key for the project. Use `editor` or higher if the integration will write CRM records.
+  </Step>
+  <Step title="Read the property catalogue">
+    Call `GET /crm/properties?object_type=contact` and `GET /crm/properties?object_type=company` so your integration knows which public property keys it can read or write.
+  </Step>
+  <Step title="Read contacts and companies">
+    Use `GET /crm/contacts` and `GET /crm/companies` to sync current CRM records. Store the returned numeric IDs if you need to update the same records later.
+  </Step>
+  <Step title="Write changes with idempotency">
+    Send an `Idempotency-Key` on write requests so retries do not duplicate activity or company creation.
+  </Step>
+</Steps>
+
+## Example: list contacts
+
+```bash
+curl "https://apix.spotzee.com/api/client/crm/contacts?limit=25" \
+  -H "Authorization: Bearer sk_your_project_secret_key"
+```
+
+## Example: log an activity
+
+```bash
+curl -X POST "https://apix.spotzee.com/api/client/crm/activities" \
+  -H "Authorization: Bearer sk_your_project_secret_key" \
+  -H "Idempotency-Key: crm-activity-1024-2026-06-21T06-00-00Z" \
+  -H "Content-Type: application/json" \
+  --data '{
+    "contact_id": 1024,
+    "type": "call",
+    "direction": "outbound",
+    "subject": "Discovery call",
+    "body": "Qualified the account and agreed on a follow-up.",
+    "occurred_at": "2026-06-21T06:00:00Z"
+  }'
+```
+
+`stage_change` activities are created by the stage move endpoint. For manual activity creation, use `note`, `call`, `email`, `sms`, `meeting`, or `task`.
+
+## Reference
+
+- Endpoint reference: see the **CRM** group in the [Main API](/main-api/introduction).
+- Error codes: see [Errors](/main-api/errors).
+- API keys: see [Manage API keys](/guides/manage-api-keys).
+
+## Next steps
+
+<Columns cols={2}>
+  <Card title="Main API reference" icon="book-open" href="/main-api/introduction">Browse the generated CRM endpoint pages.</Card>
+  <Card title="Manage API keys" icon="key" href="/guides/manage-api-keys">Create a project secret key for your integration.</Card>
+  <Card title="Idempotency" icon="shield" href="/guides/api-idempotency">Make CRM writes safe to retry.</Card>
+  <Card title="Errors" icon="circle-exclamation" href="/main-api/errors">Handle validation and permission failures.</Card>
+</Columns>
