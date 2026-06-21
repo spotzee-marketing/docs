@@ -1,0 +1,66 @@
+---
+title: "CRM"
+description: "Use CRM to organise contacts, companies, activities, pipeline stages, and saved views inside a Spotzee project."
+keywords: ["crm", "contacts", "companies", "activities", "pipeline", "saved views"]
+---
+
+CRM adds sales and account context to the contact data you already use for campaigns, segments, journeys, and templates. Use it to organise contacts by company, track activity, and move contacts through a project pipeline.
+
+## What CRM includes
+
+| Area | Use it for |
+|---|---|
+| Contacts | View marketing contacts with CRM properties, company links, activity, and pipeline stage |
+| Companies | Group contacts by account, store company properties, and review company activity |
+| Activities | Record notes, calls, emails, SMS, meetings, tasks, and stage changes |
+| Pipeline | Track where each contact sits in your sales or account process |
+| Saved views | Reuse filtered contact or company views for common CRM workflows |
+
+CRM properties sit alongside the rest of your project data. Public CRM properties can be used by downstream workflows. Hidden and classified CRM properties stay out of shared CRM data.
+
+## Work with contacts and companies
+
+<Steps>
+  <Step title="Open CRM">
+    From a project, open **Tools** and choose **CRM**.
+  </Step>
+
+  <Step title="Review contacts">
+    Use the contacts view to search, filter, edit CRM properties, assign companies, and move contacts through the pipeline.
+  </Step>
+
+  <Step title="Organise companies">
+    Use companies to group contacts under an account. Company details show linked contacts, company properties, and recent activity.
+  </Step>
+
+  <Step title="Log activity">
+    Add activity from a contact, a company, or the pipeline. Use tasks for follow-up work and notes for context you want the team to see.
+  </Step>
+</Steps>
+
+## Configure the CRM shape
+
+Admins can manage CRM properties, pipeline stages, and saved views from the CRM settings surfaces. Keep properties focused on fields your team will search, filter, segment, or report on.
+
+Use colours on pipeline stages to make board state scannable. Use saved views for repeatable filters such as open opportunities, follow-ups due soon, or contacts assigned to a particular company.
+
+## Reference
+
+The Main API includes a generated **CRM** group for server-side integrations. CRM endpoint paths are relative to the Main API client surface, `https://apix.spotzee.com/api/client`, and use the `/crm` prefix.
+
+| Need | Read |
+|---|---|
+| Generated endpoint reference | [Main API](/main-api/introduction): **CRM** group |
+| API key setup | [Manage API keys](/guides/manage-api-keys) |
+| Authentication model | [Authentication](/guides/authentication) |
+| Cursor pagination | [Pagination](/guides/api-pagination) |
+| Error codes | [Main API errors](/main-api/errors) |
+
+## Next steps
+
+<Columns cols={2}>
+  <Card title="Build segments" icon="filter" href="/guides/segments">Use CRM and contact data in dynamic audiences.</Card>
+  <Card title="Manage API keys" icon="key" href="/guides/manage-api-keys">Create a secret project key for CRM integrations.</Card>
+  <Card title="Journeys" icon="route" href="/guides/journeys">Use contact data to branch automated journeys.</Card>
+  <Card title="Main API" icon="terminal" href="/main-api/introduction">Browse the generated CRM endpoint reference.</Card>
+</Columns>

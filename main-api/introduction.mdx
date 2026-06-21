@@ -46,14 +46,26 @@ The Main API is rolling out a set of wire-level conventions in stages. Per-IP ed
   Endpoint pages are auto-generated from the OpenAPI specification. See the sidebar for the full list, grouped by resource (Users, CRM, Lists, Subscriptions, Campaigns, Journeys, Templates, Events, Tags, Projects, API keys, Organisation).
 </Info>
 
-The CRM group covers contacts, companies, activities, pipeline stages, and saved views for the project authenticated by your API key.
+CRM endpoints are part of the generated Main API reference. Use the **CRM** group to read contacts, companies, activities, pipeline stages, properties, and saved views for the project authenticated by your API key.
+
+## CRM access
+
+CRM endpoints use the project-scoped `/client` surface. Generated CRM paths such as `/crm/contacts` are relative to:
+
+```text
+https://apix.spotzee.com/api/client
+```
+
+Use a project secret key (`sk_`) in the `Authorization` header. CRM reads require a secret project key. CRM writes require a secret project key with the project `editor` role or higher.
+
+Public CRM properties appear in each record's `properties` object. Hidden and classified CRM properties are not exposed in CRM API responses.
 
 OpenAPI spec URL: `https://apix.spotzee.com/api/openapi.json`
 
 ## Next steps
 
 <Columns cols={3}>
-  <Card title="CRM API" icon="users" href="/main-api/crm-api">Authentication, roles, and CRM workflow examples.</Card>
+  <Card title="CRM guide" icon="users" href="/guides/crm">Organise contacts, companies, activities, and pipeline stages.</Card>
   <Card title="Authentication" icon="key" href="/guides/authentication">Key types, scopes, and rotation.</Card>
   <Card title="Errors" icon="circle-exclamation" href="/main-api/errors">Status codes and the `code` catalogue.</Card>
 </Columns>

@@ -50,6 +50,7 @@
           {
             "group": "Build",
             "pages": [
+              "guides/crm",
               "guides/journeys",
               "guides/segments",
               "guides/channels",
@@ -294,7 +295,6 @@
             "group": "Overview",
             "pages": [
               "main-api/introduction",
-              "main-api/crm-api",
               "main-api/errors"
             ]
           },
