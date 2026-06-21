@@ -50,6 +50,7 @@
           {
             "group": "Build",
             "pages": [
+              "guides/crm",
               "guides/journeys",
               "guides/segments",
               "guides/channels",

@@ -1,7 +1,7 @@
 ---
 title: "Core concepts"
-description: "The building blocks of Spotzee: organisations, projects, users, segments, journeys, and channels."
-keywords: ["concepts", "data model", "users", "segments", "journeys", "channels"]
+description: "The building blocks of Spotzee: organisations, projects, contacts, CRM, segments, journeys, and channels."
+keywords: ["concepts", "data model", "contacts", "crm", "segments", "journeys", "channels"]
 ---
 
 This page introduces the objects you'll work with throughout the product and the API.
@@ -17,6 +17,12 @@ A workspace inside an organisation. A project owns its own users, segments, jour
 ## User
 
 A person or account that can be marketed to. Every user has standard identifiers (email, phone) plus arbitrary custom attributes you define. Users can sit in many segments at once.
+
+## CRM
+
+The sales and account layer around contacts. CRM adds companies, activities, pipeline stages, and saved views so your team can track relationship context alongside marketing data.
+
+See [CRM](/guides/crm) for the full guide.
 
 ## Segment
 
@@ -67,4 +73,5 @@ A behaviour signal sent into Spotzee: a page view, a purchase, a custom action. 
 <Columns cols={2}>
   <Card title="Build a journey" icon="route" href="/guides/journeys">Sequence, branch, test, exit.</Card>
   <Card title="Smart segments" icon="filter" href="/guides/segments">Define dynamic audiences.</Card>
+  <Card title="CRM" icon="users" href="/guides/crm">Organise contacts, companies, and activity.</Card>
 </Columns>
