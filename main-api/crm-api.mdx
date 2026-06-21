@@ -11,10 +11,10 @@ The CRM API lets a server-side integration read and update the CRM records in on
 CRM endpoints live under the Main API client surface:
 
 ```text
-https://apix.spotzee.com/api/client/crm
+https://apix.spotzee.com/api/client
 ```
 
-The auto-generated endpoint reference uses paths such as `/crm/contacts`. Combine those paths with the Main API client base URL.
+The CRM endpoint prefix is `/crm`. Combine the Main API client base URL with reference paths such as `/crm/contacts`.
 
 ## Authentication and roles
 
@@ -81,8 +81,8 @@ For shared Main API behaviour, see [Pagination](/guides/api-pagination), [Rate l
   <Step title="Read contacts and companies">
     Use `GET /crm/contacts` and `GET /crm/companies` to sync current CRM records. Store the returned numeric IDs if you need to update the same records later.
   </Step>
-  <Step title="Write changes with idempotency">
-    Send an `Idempotency-Key` on write requests so retries do not duplicate activity or company creation.
+  <Step title="Prepare write retries">
+    Send an `Idempotency-Key` on write requests. Main API idempotency enforcement is rolling out, so the header is forward-compatible; avoid blind automatic retries until enforcement is active for your project.
   </Step>
 </Steps>
 
@@ -123,6 +123,6 @@ curl -X POST "https://apix.spotzee.com/api/client/crm/activities" \
 <Columns cols={2}>
   <Card title="Main API reference" icon="book-open" href="/main-api/introduction">Browse the generated CRM endpoint pages.</Card>
   <Card title="Manage API keys" icon="key" href="/guides/manage-api-keys">Create a project secret key for your integration.</Card>
-  <Card title="Idempotency" icon="shield" href="/guides/api-idempotency">Make CRM writes safe to retry.</Card>
+  <Card title="Idempotency" icon="shield" href="/guides/api-idempotency">Prepare CRM writes for safe retries.</Card>
   <Card title="Errors" icon="circle-exclamation" href="/main-api/errors">Handle validation and permission failures.</Card>
 </Columns>
