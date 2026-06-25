@@ -1,24 +1,24 @@
 ---
-title: "Subscribe to webhook events"
-description: "Configure outbound webhook endpoints, subscribe to delivery events, rotate the signing secret, and run a test from Spotzee."
-keywords: ["webhooks", "events", "subscriptions", "endpoints", "signing", "delivery"]
+title: "Email delivery event webhooks"
+description: "Configure Enterprise email delivery event webhooks, select delivery events, rotate the signing secret, and run a test from Spotzee."
+keywords: ["webhooks", "events", "subscriptions", "endpoints", "signing", "delivery", "enterprise"]
 ---
 
-Webhook endpoints let downstream systems receive events from Spotzee instead of polling. Spotzee tracks 27 delivery and reputation events across the email pipeline. You add an endpoint, pick which events you care about, and your endpoint receives signed JSON whenever those events fire.
-
-<Note>
-Endpoint configuration is **live today**: you can create endpoints, subscribe to events, run test calls from the Spotzee UI, and rotate signing secrets right now. **Outbound delivery of catalogued events is on the roadmap.** Subscriptions you set up today will start receiving events once the dispatch loop ships. The test affordance lets you validate signature verification before that.
-</Note>
+Webhook endpoints let your systems receive high-deliverability email events from Spotzee instead of polling. Spotzee tracks 27 queue, delivery, and reputation events, records the matching activity on the Contact profile, and can forward each event name with its detail payload to your selected endpoint.
 
 <Info>
-Webhook endpoint management lives under **Settings** → **Webhook Endpoints** and requires the project `admin` role.
+This page only applies to Enterprise customers with Spotzee's high-deliverability email service enabled. It does not apply to non-Enterprise customers or projects using standard provider delivery.
+</Info>
+
+<Info>
+Webhook endpoint management lives under **Settings** → **Webhook Endpoints** at `/projects/{projectId}/settings/webhooks` and requires the project `admin` role.
 </Info>
 
 ## Add an endpoint
 
 <Steps>
 <Step title="Open Settings → Webhook Endpoints">
-Inside the project, open **Settings** and pick the **Webhook Endpoints** tab.
+Inside the project, open **Settings** and select **Webhook Endpoints**.
 </Step>
 
 <Step title="Create the endpoint">
@@ -26,7 +26,7 @@ Choose **Add endpoint**, then complete:
 - **Name**. Recognisable label (for example, `analytics-pipeline`).
 - **Description**. Optional. Useful for documenting what the endpoint is for.
 - **URL**. Where Spotzee will POST events. Must be HTTPS.
-- **Events**. Pick the events to subscribe to. See the catalogue below.
+- **Events**. Pick the event names you want to receive. See the catalogue below.
 </Step>
 
 <Step title="Save">
@@ -34,9 +34,9 @@ Save. Spotzee generates a signing secret and shows it once. Copy the secret into
 </Step>
 </Steps>
 
-## Pick events
+## Choose events
 
-The 27 events split into seven categories. Pick whichever match the signal you need.
+Choose the events that match the signals your downstream system needs. Each forwarded payload includes the event type, project identifier, timestamp, and event-specific data.
 
 | Category | Events | Use for |
 |---|---|---|
@@ -44,17 +44,134 @@ The 27 events split into seven categories. Pick whichever match the signal you n
 | **Delivery lifecycle** | `delivery.attempt-start`, `delivery.attempt-end`, `delivery.completed` | Per-attempt audit trail |
 | **Delivery success** | `delivery.delivered` | The "this landed" signal |
 | **Delivery bounces** | `delivery.dsn-perm-fail`, `delivery.dsn-temp-fail`, `delivery.failed`, `delivery.mail-from-rejected`, `delivery.message-rejected`, `delivery.rcpt-to-rejected`, `delivery.rcpt-to-failed` | Bounce classification, list hygiene |
-| **Delivery infrastructure** | `delivery.mx-lookup-failed`, `delivery.ip-lookup-failed`, `delivery.null-mx`, `delivery.connect-error`, `delivery.greeting-failed`, `delivery.ehlo-rejected` | Infrastructure failures (DNS, network, SMTP handshake) |
-| **Delivery TLS** | `delivery.start-tls-error`, `delivery.start-tls-unavailable`, `delivery.implicit-tls-error` | TLS negotiation failures |
+| **Delivery infrastructure** | `delivery.mx-lookup-failed`, `delivery.ip-lookup-failed`, `delivery.null-mx`, `delivery.connect-error`, `delivery.greeting-failed`, `delivery.ehlo-rejected` | Routing and connection failures |
+| **Encrypted delivery** | `delivery.start-tls-error`, `delivery.start-tls-unavailable`, `delivery.implicit-tls-error` | Encrypted handoff failures |
 | **Reputation** | `incoming-report.abuse-report`, `incoming-report.fraud-report`, `incoming-report.virus-report` | Sender-reputation feedback |
 
-You can subscribe to as many events as you like. Each event Spotzee sends carries the event type, the message identifier, the project identifier, and event-specific payload data.
+You can subscribe to as many events as you like. Keep the list focused if your receiver routes different event types to different systems.
 
-For the wire-level format (signature scheme, payload shape, retry policy plans), see [Webhook conventions](/guides/api-webhooks).
+For the wire-level format, signing scheme, and API endpoint management, see [Webhook conventions](/guides/api-webhooks).
+
+## Payload details
+
+Live delivery webhooks use the same top-level wrapper as other Spotzee webhooks. The `data` object changes by event type and includes the delivery details available for that event.
+
+```json
+{
+  "event_type": "delivery.delivered",
+  "timestamp": "2026-06-25T13:00:00.000Z",
+  "project_id": 42,
+  "data": {
+    "queueId": "queue-id-from-payload",
+    "spanId": "delivery-attempt-id",
+    "to": "recipient@example.com",
+    "hostname": "recipient-host.example",
+    "code": 250,
+    "details": "accepted",
+    "elapsed": 842
+  }
+}
+```
+
+<Info>
+  Spotzee omits unavailable values and may add extra diagnostic keys over time. Build receivers to ignore fields they do not use.
+</Info>
+
+| Detail field | What it tells you |
+|---|---|
+| `queueId` | Correlates events that belong to the same message lifecycle. |
+| `spanId` | Correlates events from the same delivery attempt. |
+| `from`, `to` | Sender and recipient addresses involved in the event. |
+| `queueName` | Delivery lane that processed the message, when available. |
+| `hostname`, `domain` | Recipient-side host or domain involved in the event. |
+| `code`, `details`, `reason`, `causedBy` | Response and diagnostic information explaining an acceptance, rejection, or failure. |
+| `size`, `total` | Message size and recipient or attempt counts. |
+| `elapsed` | Duration reported for the event, in milliseconds. |
+| `nextRetry`, `nextDsn`, `expires` | Retry, notification, and expiry times for deferred messages. |
+| `localIp`, `remoteIp`, `remotePort` | Connection endpoint diagnostics for connectivity failures. |
+| `rangeFrom`, `url`, `result` | Report metadata for abuse, fraud, or malware reports. |
+
+Common detail fields by event family:
+
+| Event family | Detail keys you can receive |
+|---|---|
+| Queue and capacity | `queueId`, `from`, `to`, `size`, `nextRetry`, `nextDsn`, `expires`, `id`, `type` |
+| Delivery lifecycle | `queueId`, `spanId`, `queueName`, `from`, `to`, `size`, `total`, `elapsed` |
+| Delivery success | `queueId`, `spanId`, `to`, `hostname`, `code`, `details`, `elapsed` |
+| Bounce and rejection | `queueId`, `spanId`, `to`, `hostname`, `code`, `details`, `reason`, `causedBy`, `nextRetry`, `expires`, `total` |
+| Routing and connection | `queueId`, `spanId`, `domain`, `hostname`, `localIp`, `remoteIp`, `remotePort`, `details`, `causedBy`, `elapsed` |
+| Encrypted delivery | `queueId`, `spanId`, `domain`, `hostname`, `code`, `details`, `causedBy`, `elapsed` |
+| Reputation | `rangeFrom`, `domain`, `hostname`, `url`, `remoteIp`, `total`, `result`, `details` |
+
+## Event catalogue
+
+The `event_type` value in the webhook payload matches the names below exactly.
+
+### Queue events
+
+| Event | When it triggers |
+|---|---|
+| `queue.queue-message-authenticated` | The message has been accepted for delivery after Spotzee's initial sender and message checks. |
+| `queue.rescheduled` | A message delivery attempt has been deferred and scheduled to run again later. |
+| `queue.quota-exceeded` | The send cannot continue because the project's allocated sending quota has been reached. |
+| `delivery.concurrency-limit-exceeded` | Delivery is paused because the project has reached the allowed number of simultaneous delivery attempts. |
+
+### Delivery lifecycle events
+
+| Event | When it triggers |
+|---|---|
+| `delivery.attempt-start` | Spotzee has started an attempt to deliver the message to the recipient's domain. |
+| `delivery.attempt-end` | A specific delivery attempt has finished, whether it succeeded, failed, or will be retried. |
+| `delivery.completed` | Spotzee has completed the delivery process for the message and no further attempts are pending. |
+
+### Delivery success event
+
+| Event | When it triggers |
+|---|---|
+| `delivery.delivered` | The recipient's mail service accepted the message for delivery to the recipient. |
+
+### Bounce and rejection events
+
+| Event | When it triggers |
+|---|---|
+| `delivery.dsn-perm-fail` | A permanent delivery failure was received, so the address should usually be treated as a hard bounce. |
+| `delivery.dsn-temp-fail` | A temporary delivery failure was received, so the message may still be retried before it expires. |
+| `delivery.failed` | Spotzee could not deliver the message after the available attempts or delivery window ended. |
+| `delivery.mail-from-rejected` | The recipient side rejected the sender address during the delivery conversation. |
+| `delivery.message-rejected` | The recipient side rejected the message content or message-level policy during delivery. |
+| `delivery.rcpt-to-rejected` | The recipient side rejected the recipient address before accepting the message. |
+| `delivery.rcpt-to-failed` | Recipient validation failed during the delivery attempt, usually before the message body was accepted. |
+
+### Routing and connection events
+
+| Event | When it triggers |
+|---|---|
+| `delivery.mx-lookup-failed` | Spotzee could not resolve the recipient domain's mail-routing records. |
+| `delivery.ip-lookup-failed` | Spotzee could not resolve the selected recipient host to an IP address. |
+| `delivery.null-mx` | The recipient domain explicitly publishes that it does not accept email. |
+| `delivery.connect-error` | Spotzee could not establish a network connection to the recipient side. |
+| `delivery.greeting-failed` | The recipient side did not provide a usable initial greeting for message delivery. |
+| `delivery.ehlo-rejected` | The recipient side rejected the initial capability negotiation for message delivery. |
+
+### Encrypted delivery events
+
+| Event | When it triggers |
+|---|---|
+| `delivery.start-tls-error` | The encrypted delivery upgrade failed after the recipient side offered it. |
+| `delivery.start-tls-unavailable` | The recipient side did not offer the expected encrypted delivery upgrade. |
+| `delivery.implicit-tls-error` | A direct encrypted delivery connection failed before the message could be transferred. |
+
+### Reputation events
+
+| Event | When it triggers |
+|---|---|
+| `incoming-report.abuse-report` | Spotzee received an abuse complaint related to a delivered message. |
+| `incoming-report.fraud-report` | Spotzee received a fraud report related to a delivered message or sender identity. |
+| `incoming-report.virus-report` | Spotzee received a malware or virus report related to a delivered message. |
 
 ## Test the endpoint
 
-The test affordance fires a sample payload at your endpoint right now, before outbound delivery ships. Use it to validate that your signature verification works.
+The test action sends a sample payload to your endpoint. Use it to validate reachability and signature verification before relying on live event traffic.
 
 <Steps>
 <Step title="Open the endpoint">
@@ -70,7 +187,7 @@ Your endpoint should compute the same HMAC over the request body and compare it 
 </Step>
 </Steps>
 
-The production-dispatch scheme will switch to a timestamped signing envelope (`Spotzee-Signature: t=...,v1=...`) when the outbound loop ships. Until then, build your verifier against the test scheme.
+Live event deliveries use the timestamped `Spotzee-Signature: t=...,v1=...` signing envelope. Test deliveries use `X-Spotzee-Signature: sha256=<hex>` so you can verify the endpoint from the Spotzee UI.
 
 ## Rotate the signing secret
 
@@ -86,7 +203,7 @@ Use the **Rotate secret** action. Spotzee generates a new signing secret and sho
 </Step>
 
 <Step title="Update your verifier">
-Update your endpoint to use the new secret. Once outbound delivery ships, only the new secret is valid; the old secret stops verifying immediately on rotation.
+Update your endpoint to use the new secret. Only the new secret is valid after rotation; the old secret stops verifying immediately.
 </Step>
 </Steps>
 
@@ -110,7 +227,7 @@ The wire-level signing scheme and event payload shape.
 </Card>
 
 <Card title="Trigger a campaign" icon="send" href="/guides/trigger-campaign">
-Send a campaign and watch its delivery events flow into your endpoint.
+Send a campaign and watch enabled delivery events flow into your endpoint.
 </Card>
 
 <Card title="Manage API keys" icon="key" href="/guides/manage-api-keys">

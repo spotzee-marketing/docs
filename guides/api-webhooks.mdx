@@ -1,23 +1,27 @@
 ---
 title: "Webhooks"
-description: "Configure webhook endpoints today; outbound delivery of platform events ships next."
+description: "Configure webhook endpoints, subscribe to enabled event types, and verify signed deliveries."
 keywords: ["webhooks", "subscriptions", "endpoints", "signing", "rotate-secret"]
 ---
 
-Spotzee's webhook system has two halves: configuring endpoints (live today) and dispatching platform events to those endpoints (rolling out). You can create endpoints, subscribe them to event types, rotate signing secrets, and run a test delivery against your URL right now. Production dispatch of the catalogued event types lands in a future release.
+Spotzee webhooks let enabled projects send signed event payloads to your HTTPS endpoint. You can create endpoints, subscribe them to event types, rotate signing secrets, and run a test delivery against your URL.
 
-## What's live today
+<Info>
+High-deliverability email event webhooks are restricted to Enterprise customers with that service enabled. Standard delivery projects can still manage endpoint configuration where available, but they do not receive the Enterprise email event stream.
+</Info>
+
+## What you can configure
 
 - Create, list, update, and delete webhook endpoints.
-- Subscribe an endpoint to one or more event types from the catalogue.
+- Subscribe an endpoint to one or more enabled event types from the catalogue.
 - Rotate the signing secret.
 - Send a test payload to your endpoint to verify reachability and signature handling.
 
-## What's rolling out
+## Delivery behaviour
 
-- Production dispatch of the catalogued events. The event catalogue exists as a subscription model today, but no production loop dispatches them yet.
-- Timestamped `Spotzee-Signature: t=<unix-ts>,v1=<hex-hmac-sha256>` signing scheme with replay protection. Test deliveries use a simpler `X-Spotzee-Signature: sha256=<hex>` header today; the timestamped scheme ships when production dispatch lights up.
-- Exponential-backoff retry policy with delivery logs and replay.
+- Live event deliveries use `Spotzee-Signature: t=<unix-ts>,v1=<hex-hmac-sha256>` with replay protection.
+- Test deliveries from the Spotzee UI use `X-Spotzee-Signature: sha256=<hex>` so you can verify endpoint reachability before relying on live traffic.
+- Failed endpoints may be disabled to prevent repeated delivery attempts to an unreachable URL.
 
 ## Configure an endpoint
 
@@ -31,7 +35,7 @@ The plaintext signing secret is returned **exactly once** on the create response
 
 ## Test a delivery
 
-The webhook detail page in the Spotzee app exposes a **Send test** action that delivers a fixed test payload to your URL with a signed header. Use it to verify your verifier locally before production dispatch lights up.
+The webhook detail page in the Spotzee app exposes a **Send test** action that delivers a fixed test payload to your URL with a signed header. Use it to verify your receiver before relying on live event traffic.
 
 The test payload looks like this:
 
@@ -70,7 +74,7 @@ export function verifyTestWebhook(rawBody, header, secret) {
   Sign the raw request body, not a parsed-and-re-stringified version. JSON re-encoding can change byte-for-byte content and break the signature.
 </Warning>
 
-If the test response status is anything but `2xx`, the Spotzee app marks the endpoint as **disabled** so an unreachable URL doesn't accumulate failed deliveries when production dispatch lights up. Re-enable from the same page once you've fixed the receiver.
+If the test response status is anything but `2xx`, the Spotzee app marks the endpoint as **disabled** so an unreachable URL doesn't accumulate failed deliveries. Re-enable from the same page once you've fixed the receiver.
 
 ## Rotate the signing secret
 
@@ -81,7 +85,7 @@ The previous secret stops verifying deliveries the moment the rotate call return
 ## Reference
 
 - Webhook endpoint CRUD: see the **Webhooks** tag in the [Main API reference](/main-api/introduction).
-- Event catalogue: subscription names today; production dispatch ships next.
+- Enterprise email event catalogue: see [Email delivery event webhooks](/guides/webhook-endpoints).
 
 ## Next steps
 

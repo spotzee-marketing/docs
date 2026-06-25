@@ -61,7 +61,7 @@ A backend call that:
     On success the response confirms the entrance was queued. If the user wasn't found and the supplied `user` block didn't carry enough information to upsert one, the call returns an error from the [error catalogue](/main-api/errors).
   </Step>
   <Step title="Verify in the journey view">
-    The journey's runtime view in the Spotzee UI shows fresh entrances within seconds. Outbound webhook delivery for journey-state events is on the roadmap; today the runtime view is the system of record.
+    The journey's runtime view in the Spotzee UI shows fresh entrances within seconds. For email messages sent by the journey, Enterprise high-deliverability projects can forward enabled delivery events from **Settings** → **Webhook Endpoints**.
   </Step>
 </Steps>
 
