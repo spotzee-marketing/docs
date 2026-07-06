@@ -270,6 +270,7 @@
             "group": "Recipes",
             "pages": [
               "guides/sync-users",
+              "guides/sync-product-source",
               "guides/event-ingestion",
               "guides/build-segment-via-api",
               "guides/trigger-campaign",
@@ -309,6 +310,10 @@
           {
             "group": "CRM",
             "tag": "CRM"
+          },
+          {
+            "group": "Source Sync",
+            "tag": "Source Sync"
           },
           {
             "group": "Events",

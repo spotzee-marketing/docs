@@ -1,0 +1,247 @@
+---
+title: "Sync a product source"
+description: "Push contacts, companies, memberships, properties, and product events from your app into Spotzee."
+keywords: ["source sync", "contacts", "companies", "memberships", "crm", "events", "external_id"]
+---
+
+Use source sync when your app is the source of truth for customers, accounts, teams, roles, onboarding answers, and product events. Spotzee receives that data so segments and journeys can act on the same customer state your product uses.
+
+This is the right path for a SaaS product that wants to model:
+
+- **Contacts**: users, buyers, admins, members, or invitees.
+- **Companies**: accounts, workspaces, teams, stores, practices, or organisations.
+- **Memberships**: which contact belongs to which company, including role and primary company.
+- **Properties**: source-managed company fields such as plan, signup reason, account status, or onboarding answers.
+- **Events**: stable product milestones that should trigger journeys.
+
+## Prerequisites
+
+<Info>
+  You'll need a `sk_` project key with write access. See [Authentication](/guides/authentication) for key setup.
+</Info>
+
+All examples below use this base URL:
+
+```text
+https://apix.spotzee.com/api/client
+```
+
+Send `Spotzee-Version: 2026-04-28` on each request so payload behaviour stays pinned.
+
+## Walkthrough
+
+<Steps>
+  <Step title="Choose your source namespace">
+    Pick a short, stable source key for your product. It must start with a letter and only use lowercase letters, numbers, and underscores.
+
+    ```text
+    acmeapp
+    ```
+
+    Use the same `source` value on identities, companies, property manifests, and memberships.
+  </Step>
+
+  <Step title="Use stable source IDs">
+    Keep your own product IDs as source IDs. They should be stable even if the customer changes email address, company name, or role.
+
+    | Spotzee field | Use for |
+    |---|---|
+    | `source_person_id` | Your user, member, or customer ID |
+    | `source_company_id` | Your account, workspace, team, or company ID |
+    | `source_membership_id` | Your membership or role assignment ID |
+  </Step>
+
+  <Step title="Hash the normalised email">
+    `external_id` must be the SHA-256 hex digest of the customer's normalised email address.
+
+    ```text
+    normalised_email = lower(trim(email))
+    external_id = sha256_hex(normalised_email)
+    ```
+
+    This gives every integration the same customer reference without using raw email as the key. If the same source person later changes email, Spotzee can re-link the same contact when the new email hash is unused. If the new email hash already belongs to another contact, the identity is quarantined for manual review.
+  </Step>
+
+  <Step title="Declare source-managed properties">
+    Create a property manifest before sending source-managed company properties. Property keys must start with your source namespace plus an underscore.
+
+    ```http
+    POST /source-systems/property-manifests HTTP/1.1
+    Host: apix.spotzee.com
+    Authorization: Bearer sk_...
+    Spotzee-Version: 2026-04-28
+    Content-Type: application/json
+
+    {
+      "source": "acmeapp",
+      "version": "v1",
+      "properties": [
+        {
+          "object_type": "company",
+          "key": "acmeapp_plan",
+          "label": "Plan",
+          "data_type": "select",
+          "group": "Acme App",
+          "options": [
+            { "label": "Free", "value": "free" },
+            { "label": "Growth", "value": "growth" }
+          ]
+        },
+        {
+          "object_type": "company",
+          "key": "acmeapp_signup_reason",
+          "label": "Signup reason",
+          "data_type": "string",
+          "group": "Acme App"
+        }
+      ]
+    }
+    ```
+  </Step>
+
+  <Step title="Upsert the contact identity">
+    Send each known person with your source ID, the email-hash `external_id`, and any useful contact data.
+
+    ```http
+    POST /source-systems/identities HTTP/1.1
+    Host: apix.spotzee.com
+    Authorization: Bearer sk_...
+    Idempotency-Key: acmeapp-identity-user_123-v1
+    Spotzee-Version: 2026-04-28
+    Content-Type: application/json
+
+    {
+      "source": "acmeapp",
+      "source_person_id": "user_123",
+      "external_id": "b5fc85e55755f9e0d030a10ab4429b6b2944855f9a0d60077fe832becbc41d72",
+      "email": "ada@example.com",
+      "timezone": "Australia/Melbourne",
+      "locale": "en-AU",
+      "data": {
+        "first_name": "Ada",
+        "last_name": "Lovelace",
+        "onboarding_completed": true
+      }
+    }
+    ```
+
+    A successful response returns `status: "upserted"`. If the response returns `status: "quarantined"`, do not retry blindly; review the identity conflict first.
+  </Step>
+
+  <Step title="Upsert the company">
+    Send each account, team, or workspace as a CRM company. Put source-managed fields in `properties`.
+
+    ```http
+    POST /source-systems/companies HTTP/1.1
+    Host: apix.spotzee.com
+    Authorization: Bearer sk_...
+    Idempotency-Key: acmeapp-company-workspace_456-v1
+    Spotzee-Version: 2026-04-28
+    Content-Type: application/json
+
+    {
+      "source": "acmeapp",
+      "source_company_id": "workspace_456",
+      "name": "Ada Labs",
+      "domain": "adalabs.example",
+      "properties": {
+        "acmeapp_plan": "growth",
+        "acmeapp_signup_reason": "automate onboarding"
+      },
+      "data": {
+        "billing_status": "active",
+        "seats": 5
+      }
+    }
+    ```
+  </Step>
+
+  <Step title="Link contacts to companies">
+    Create a membership after both the identity and company exist. Mark one membership as `primary` when that company should become the contact's primary company in the CRM.
+
+    ```http
+    POST /source-systems/memberships HTTP/1.1
+    Host: apix.spotzee.com
+    Authorization: Bearer sk_...
+    Idempotency-Key: acmeapp-membership-member_789-v1
+    Spotzee-Version: 2026-04-28
+    Content-Type: application/json
+
+    {
+      "source": "acmeapp",
+      "source_membership_id": "member_789",
+      "source_person_id": "user_123",
+      "source_company_id": "workspace_456",
+      "role_key": "owner",
+      "role_label": "Owner",
+      "is_active": true,
+      "joined_at": "2026-07-06T01:57:00.000Z",
+      "primary": true,
+      "data": {
+        "invitation_source": "signup"
+      }
+    }
+    ```
+  </Step>
+
+  <Step title="Track product events with the same ID">
+    Send journey-triggering events through the Events API using the same email-hash `external_id`.
+
+    ```http
+    POST /events HTTP/1.1
+    Host: apix.spotzee.com
+    Authorization: Bearer sk_...
+    Idempotency-Key: acmeapp-event-user_123-workspace_created-v1
+    Spotzee-Version: 2026-04-28
+    Content-Type: application/json
+
+    [
+      {
+        "external_id": "b5fc85e55755f9e0d030a10ab4429b6b2944855f9a0d60077fe832becbc41d72",
+        "name": "workspace_created",
+        "data": {
+          "source": "acmeapp",
+          "source_company_id": "workspace_456",
+          "role_key": "owner",
+          "plan": "growth"
+        }
+      }
+    ]
+    ```
+
+    Keep event names stable. Put changing details in `data`, not in the event name.
+  </Step>
+</Steps>
+
+## Backfill order
+
+For an existing product, backfill in this order:
+
+1. Property manifests.
+2. Contact identities.
+3. Companies.
+4. Memberships.
+5. High-value historical events, if you want journeys and reporting to see past milestones.
+
+After the backfill, send changes as they happen: profile updates, company updates, role changes, and product events. Use deterministic `Idempotency-Key` values for retries and replays.
+
+## Pitfalls to avoid
+
+<Warning>
+  Do not use raw email or your source person ID as `external_id`. Use the SHA-256 hash of the lower-case, trimmed email address.
+</Warning>
+
+- **Don't send company properties before the manifest.** Spotzee validates source-managed company property keys against the latest manifest.
+- **Don't omit the source prefix on property keys.** `acmeapp_plan` is valid for `source: "acmeapp"`; `plan` is not source-managed.
+- **Don't send memberships before identities and companies.** The membership endpoint links existing source records.
+- **Don't retry quarantined identities as a normal failure.** A quarantine means the same source person now points at an email hash already used elsewhere.
+- **Don't include secrets or raw message content in event data.** Send stable public IDs, status fields, plan fields, amounts, currency, and coarse failure categories.
+
+## Reference
+
+- Source-sync endpoints: see **Main API -> Source Sync**
+- Events: see [Send events from your backend](/guides/event-ingestion)
+- Authentication: see [Authentication](/guides/authentication)
+- Safe retries: see [Idempotency](/guides/api-idempotency)
+- CRM concepts: see [CRM](/guides/crm)
+- Journeys: see [Journeys](/guides/journeys)
