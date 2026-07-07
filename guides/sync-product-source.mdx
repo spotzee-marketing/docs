@@ -63,7 +63,7 @@ Send `Spotzee-Version: 2026-04-28` on each request so payload behaviour stays pi
   </Step>
 
   <Step title="Declare source-managed properties">
-    Create a property manifest before sending source-managed company properties. Property keys must start with your source namespace plus an underscore.
+    Create a property manifest before sending source-managed CRM properties. Property keys must start with your source namespace plus an underscore.
 
     ```http
     POST /source-systems/property-manifests HTTP/1.1
@@ -75,6 +75,10 @@ Send `Spotzee-Version: 2026-04-28` on each request so payload behaviour stays pi
     {
       "source": "acmeapp",
       "version": "v1",
+      "mode": "replace",
+      "replace_scope": {
+        "object_types": ["company"]
+      },
       "properties": [
         {
           "object_type": "company",
@@ -97,6 +101,8 @@ Send `Spotzee-Version: 2026-04-28` on each request so payload behaviour stays pi
       ]
     }
     ```
+
+    Use `mode: "merge"` or omit `mode` when you only want to create or update the listed properties. Use `mode: "replace"` with `replace_scope.object_types` when the submitted list is authoritative for those object types; Spotzee archives omitted source-managed properties in that scope.
   </Step>
 
   <Step title="Upsert the contact identity">
@@ -233,6 +239,7 @@ After the backfill, send changes as they happen: profile updates, company update
 
 - **Don't send company properties before the manifest.** Spotzee validates source-managed company property keys against the latest manifest.
 - **Don't omit the source prefix on property keys.** `acmeapp_plan` is valid for `source: "acmeapp"`; `plan` is not source-managed.
+- **Don't use replace mode with a partial manifest.** In `mode: "replace"`, omitted source-managed properties are archived for the object types in `replace_scope.object_types`.
 - **Don't send memberships before identities and companies.** The membership endpoint links existing source records.
 - **Don't retry quarantined identities as a normal failure.** A quarantine means the same source person now points at an email hash already used elsewhere.
 - **Don't include secrets or raw message content in event data.** Send stable public IDs, status fields, plan fields, amounts, currency, and coarse failure categories.
