@@ -4,7 +4,7 @@ description: "Use 19 Shopify event types as journey triggers, segment by RFM and
 keywords: ["shopify", "journeys", "segments", "events", "rfm", "abandoned-cart", "personalisation"]
 ---
 
-Shopify data starts paying off the moment you build segments and journeys against it. The integration exposes 19 event types you can trigger journeys from, automatically calculates RFM segments and lifetime-value metrics on every customer, and makes Shopify properties available as Liquid variables in your templates.
+Shopify data starts paying off the moment you build segments and journeys against it. The integration exposes 19 event types you can trigger journeys from, automatically calculates RFM segments and lifetime-value metrics on every customer, and makes Shopify properties available as template variables.
 
 ## The 19 Shopify events
 
@@ -110,7 +110,7 @@ Entry: shopify_order_placed
   -> action: "You might also like..."
 ```
 
-The `shopify_order_placed` event payload includes line items, totals, currency, and shipping address. All of it is available as Liquid variables in the email template.
+The `shopify_order_placed` event payload includes line items, totals, currency, and shipping address. All of it is available as template variables in the email template.
 
 ### Fulfilment notification
 
@@ -184,12 +184,12 @@ Segment with rules like:
 
 ## Personalise with Shopify data
 
-Shopify customer and order data lands directly in Liquid variables you can drop into any template field that supports Liquid (subject lines, bodies, push titles, webhook payloads, and so on).
+Use Shopify customer and order data in template fields that support variables, including subject lines, bodies, push titles and webhook payloads.
 
 ### User-property personalisation
 
-```liquid
-Hi {{ user.first_name | default: "there" }}!
+```text
+Hi {{#if user.first_name}}{{user.first_name}}{{else}}there{{/if}}!
 
 You've placed {{ user.shopify_order_count }} orders with us.
 Total spend: {{ user.shopify_total_spent }}.
@@ -199,33 +199,33 @@ Total spend: {{ user.shopify_total_spent }}.
 
 When a journey fires off an event, the event's payload is available too. For `shopify_order_placed`:
 
-```liquid
+```text
 Order #{{ event.order_number }}
 Total: {{ event.total_price }} {{ event.currency }}
 
 Items:
-{% for line_item in event.line_items %}
+{{#each event.line_items as |line_item|}}
   - {{ line_item.title }} x {{ line_item.quantity }}
-{% endfor %}
+{{/each}}
 ```
 
 For `shopify_shipment_status`:
 
-```liquid
+```text
 Your order #{{ event.order_number }} is now {{ event.status }}.
-{% if event.tracking_number %}
+{{#if event.tracking_number}}
 Track it: {{ event.tracking_url }}
-{% endif %}
+{{/if}}
 ```
 
 ### RFM-based win-back
 
-```liquid
-{% if user.shopify_rfm_segment == "at_risk" %}
+```text
+{{#if (eq user.shopify_rfm_segment "at_risk")}}
 We miss you, {{ user.first_name }}. Here's 20% off your next order.
-{% elsif user.shopify_rfm_segment == "lost" %}
+{{else if (eq user.shopify_rfm_segment "lost")}}
 It's been a while. Come back and save 30%.
-{% endif %}
+{{/if}}
 ```
 
 ## Customer lists
@@ -246,7 +246,7 @@ The five categories that power events and properties.
 </Card>
 
 <Card title="Build templates" icon="file-text" href="/guides/templates">
-Liquid variables, locale variants, and per-channel template fields.
+Template variables, locale variants, and per-channel template fields.
 </Card>
 
 <Card title="Build segments" icon="filter" href="/guides/segments">

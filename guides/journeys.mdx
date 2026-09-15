@@ -27,7 +27,7 @@ A journey can have multiple entrance nodes for the same flow (e.g. one entrance 
 | `balancer` | Random distribution across children with per-child rate limits |
 | `throttle` | Hold users in a single-path queue until the next rate-limit window opens |
 | `link` | Hand the user off to another journey |
-| `update` | Patch user attributes from a Liquid template |
+| `update` | Patch user attributes using template variables |
 | `event` | Emit a tracked event for the user |
 | `exit` | Force-remove the user from another entrance |
 | `sticky` | Operator-facing canvas note. No runtime effect. |

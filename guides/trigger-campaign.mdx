@@ -34,7 +34,7 @@ A backend call that:
     | Field | Shape | Notes |
     |---|---|---|
     | `user` | object | Identifies the user. `external_id` is required; `email`, `phone`, `device_token`, `timezone`, `locale` are optional, and any additional custom attributes you include flow through to the user record. |
-    | `event` | object | Free-form JSON, exposed to the campaign template as `{{event}}` (so `{{event.order_id}}` etc. resolve in Handlebars). May be `{}` if your template doesn't reference event data. |
+    | `event` | object | Free-form JSON, exposed to the campaign template as `{{event}}` (so `{{event.order_id}}` etc. resolve as template variables). May be `{}` if your template doesn't reference event data. |
 
     To send to multiple users, call the endpoint once per user (typically from your queue/worker layer).
   </Step>
