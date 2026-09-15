@@ -6,15 +6,17 @@ keywords: ["changelog", "release notes", "versions", "api", "breaking changes", 
 
 The Spotzee API uses date-based versions. Pin a version with the `Spotzee-Version` request header. See [API versioning](/guides/api-versioning) for the full pinning model.
 
-## Unreleased
+## 2026-09-15
 
 ### Template email headers
 
 Email templates support optional `data.customHeaders` rows with `name` and `value` fields. Add per-contact values in email advanced settings across all editor types. Campaigns, journeys and proofs use the template's values, and preview and proof requests preserve supplied `journey` variables.
 
+Both the campaign wizard and template details form show compact header rows with names inside empty fields and a minus button in the third column. Failed saves keep your form open so you can correct validation errors. WYSIWYG saves preserve header rows, including literal empty values, and accept supported generated list styles.
+
 Template names override matching provider headers without regard to case. An empty or whitespace-only rendered value suppresses the matching provider header; removing the template row restores the provider default. Reserved names and duplicate names prevent saving. Unsafe rendered control characters stop the send before provider submission.
 
-Existing templates need no migration. See [Configure email delivery](/guides/configure-email-delivery) for template and provider configuration.
+Existing templates need no migration. See [Custom email headers](/guides/templates#custom-email-headers) for configuration, variables and validation rules, or [Set up email delivery](/guides/configure-email-delivery) for provider configuration.
 
 ## Tooling, 2026-04-29 (afternoon)
 

@@ -1,13 +1,13 @@
 ---
 title: "Build templates"
-description: "Build per-channel campaign templates with Liquid variables and locale variants for email, SMS, push, in-app, and webhook channels."
-keywords: ["templates", "liquid", "channels", "locales", "email", "html", "mjml"]
+description: "Build per-channel campaign templates with contact variables, custom email headers and locale variants."
+keywords: ["templates", "variables", "channels", "locales", "email", "custom headers"]
 ---
 
 Templates are how you author the actual content Spotzee sends. Every template belongs to a campaign and targets a single channel. Each template has a locale, so a campaign can carry multiple variants of the same channel for different audiences.
 
 <Info>
-Templates live inside the campaign that uses them, not as a separate top-level catalogue. Editing a campaign's templates requires the project `editor` role or higher. Liquid renders user attributes and event data into every field that supports variables.
+Templates live inside the campaign that uses them, not as a separate top-level catalogue. Editing a campaign's templates requires the project `editor` role or higher. Fields that support variables can use contact attributes and supplied event data.
 </Info>
 
 ## The template model
@@ -24,21 +24,21 @@ When Spotzee dispatches a campaign send, it picks the template whose channel mat
 <Tabs>
 <Tab title="Email">
 
-Email templates are the most field-heavy. Compose with HTML, MJML, or plain text.
+Compose email templates with the visual builder, WYSIWYG editor, HTML code or plain text.
 
 | Field | Purpose |
 |---|---|
 | `from` | The sender address. Either a plain email or an object with `name` and `address`. |
 | `reply_to` | Optional. Where replies go. Defaults to the from address. |
 | `cc`, `bcc` | Optional carbon-copy recipients. |
-| `subject` | The subject line. Liquid-rendered. |
+| `subject` | The subject line. Supports variables. |
 | `preheader` | Optional preview text shown next to the subject in most clients. HTML emails only; plain-text emails have no preheader. |
-| `html` | The HTML body. Required for `code` and `visual` editor modes. |
-| `mjml` | Optional MJML source. When present, the visual editor compiles it down to HTML on save. |
+| `html` | The HTML body. Required for `code`, `visual` and `wysiwyg` editor modes. The visual and WYSIWYG editors generate this field when you save. |
 | `text` | Optional plain-text alternative. Required for the `plain` editor mode. |
-| `editor` | One of `code`, `visual`, or `plain`. Decides which fields are required and which the UI shows. |
+| `editor` | One of `code`, `visual`, `plain` or `wysiwyg`. Decides which fields are required and which the UI shows. |
+| `customHeaders` | Optional array of objects with string `name` and `value` fields. Names are literal; values support variables. See [Custom email headers](#custom-email-headers). |
 
-The `subject`, `preheader`, `from.name`, `from.address`, `reply_to`, `cc`, `bcc`, `text`, and `html` fields all run through Liquid before sending.
+The `subject`, `preheader`, `from`, `from.name`, `from.address`, `reply_to`, `cc`, `bcc`, `text`, `html` and custom-header values support variables before sending.
 
 </Tab>
 <Tab title="SMS">
@@ -47,7 +47,7 @@ SMS templates have one field: the message body.
 
 | Field | Purpose |
 |---|---|
-| `text` | The message body. Liquid-rendered. |
+| `text` | The message body. Supports variables. |
 
 Keep messages under the carrier's segment limit (160 GSM-7 characters or 70 UCS-2 characters) where possible. Multi-segment messages cost more and arrive in pieces on some carriers.
 
@@ -71,9 +71,9 @@ Webhook templates fire an HTTP request from Spotzee to a destination of your cho
 | Field | Purpose |
 |---|---|
 | `method` | HTTP method: `GET`, `POST`, `PUT`, `PATCH`, or `DELETE`. |
-| `endpoint` | The destination URL. Liquid-rendered. |
-| `headers` | Key-value map of request headers. Liquid-rendered. |
-| `body` | Request body for `POST`, `PUT`, `PATCH`. JSON object. Liquid-rendered. Ignored for `GET` and `DELETE`. |
+| `endpoint` | The destination URL. Supports variables. |
+| `headers` | Key-value map of request headers. Values support variables. |
+| `body` | Request body for `POST`, `PUT`, `PATCH`. JSON object whose values support variables. Ignored for `GET` and `DELETE`. |
 | `cacheKey` | Optional. When set, identical requests with the same cache key are deduplicated. |
 
 </Tab>
@@ -92,24 +92,34 @@ In-app templates render inside your app at runtime. The fields cover both banner
 </Tab>
 </Tabs>
 
-## Liquid variables
+## Template variables
 
-Spotzee renders fields that support variables through Liquid. The most common variables are exposed under three roots:
+Use double braces to insert a value, such as `{{user.email}}`. The available variable families are:
 
-- `{{ user }}` for the user's attributes (`{{ user.email }}`, `{{ user.first_name }}`, `{{ user.attributes.tier }}`).
-- `{{ project }}` for project-level configuration.
-- `{{ context }}` for run-time context like `campaign_id`, `reference_id`, and the user's enrolment data.
+| Family | Available values |
+|---|---|
+| `user` | Contact fields and flattened custom properties, such as `user.email`, `user.firstName` and `user.sender_group`. A custom property named `tier` is available as `user.tier`. |
+| `event` | Supplied event properties. |
+| `journey` | Supplied journey variables. Preview and proof requests preserve supplied values. |
+| `context` | Message context, such as `campaign_id`, `subscription_id` and `reference_id`. |
+| `company` | The selected company and its relationship metadata. |
+| `companies` | Associated company records, accessible by index or with an `each` block. |
+| `unsubscribeEmailUrl`, `preferencesUrl` | Generated unsubscribe and preferences links. The unsubscribe link requires a campaign and contact context. |
 
-Liquid's standard filters work too. A few that come up often:
+Use helpers and blocks for formatting and conditional content:
 
-```liquid
-{{ user.first_name | default: "there" }}
-{{ user.signup_at | date: "%b %d, %Y" }}
-{{ "Hello " | append: user.first_name }}
-{{ "USD" | currency: user.lifetime_value }}
+```text
+{{#if user.firstName}}{{user.firstName}}{{else}}there{{/if}}
+{{dateFormat user.signup_at "MMM d, yyyy"}}
+{{append "Hello " user.firstName}}
+{{numberFormat user.lifetime_value "en-US" "currency" "USD"}}
 ```
 
-Spotzee renders Liquid in subject lines, preheaders, plain-text and HTML email bodies, SMS bodies, push titles, push bodies, push URLs, push custom maps, webhook endpoints, webhook headers, and webhook bodies. Anywhere user-specific values make sense.
+For a contact with `firstName` set to `Sam`, `signup_at` set to `2026-09-15T00:00:00Z` and `lifetime_value` set to the number `1250`, these examples produce `Sam`, `Sep 15, 2026`, `Hello Sam` and `$1,250.00`.
+
+Double braces escape HTML-sensitive characters. For example, `A&B` becomes `A&amp;B`. Use triple braces, such as `{{{user.sender_group}}}`, only when you intend unescaped output. Missing properties normally produce an empty string; use an `if` block to supply a fallback.
+
+The same expression syntax works in subject lines, preheaders, plain-text and HTML email bodies, custom email-header values, SMS bodies, push titles, push bodies, push URLs, push custom maps, webhook endpoints, webhook headers and webhook bodies.
 
 ## Locale variants
 
@@ -126,10 +136,49 @@ When Spotzee dispatches a send, it picks the variant whose locale matches the us
 Email templates carry an `editor` field that decides which authoring surface you see:
 
 - **`code`** drops you into raw HTML. You write or paste HTML directly. Good for templates moved over from another platform or built externally.
-- **`visual`** uses a drag-and-drop builder backed by MJML. The `mjml` field stores the source; the `html` field stores the compiled output that Spotzee actually sends.
+- **`visual`** uses the **Visual builder** with drag-and-drop blocks. It generates the HTML that Spotzee sends when you save.
+- **`wysiwyg`** uses the **WYSIWYG editor** for rich content. It preserves your editable design and generates the HTML that Spotzee sends when you save.
 - **`plain`** is plain-text only. The `text` field is required and the `html` field is ignored. Use this for transactional notifications, agent-style communications, or audiences where HTML is unwelcome.
 
-Switching between modes is permitted, but switching from `visual` to `code` discards the MJML source (the compiled HTML stays).
+Review the content after switching editor modes, then save and reopen the template to confirm the result. All four modes support the same custom email-header rows.
+
+## Custom email headers
+
+Use template headers for metadata that varies by contact or campaign. They apply to campaign emails, journey emails and proofs. Configure any routing rules at your provider separately.
+
+<Steps>
+<Step title="Open the template's header settings">
+In the campaign wizard, open the email template's advanced settings. You can also edit headers in the template details form.
+</Step>
+<Step title="Add a header row">
+Select **Add header**. Enter a literal name in **Header name** and an expression or fixed value in **Header value**. For example, use `X-Delivery-Group` with `{{user.sender_group}}` if your provider uses that header for routing.
+</Step>
+<Step title="Save and verify">
+Correct any inline validation error, then save. Reopen the template to confirm the rows, send a proof to a controlled contact and inspect the outgoing message headers.
+</Step>
+</Steps>
+
+The field names appear inside empty inputs. Use the minus button in the third column to remove a row. Remove every row to clear template headers. Keep a row with an empty value when you want to suppress its matching provider header.
+
+### Provider precedence
+
+Template names override matching provider headers without regard to case. Unrelated provider headers remain present. Each message renders its values from that contact's context, including company references used only in a header.
+
+An empty or whitespace-only rendered value suppresses the matching provider header and adds nothing in its place. Previews omit that empty header. Removing the template row restores the provider's default on later sends.
+
+### Save and send errors
+
+Invalid names, reserved names, duplicate names and malformed rows prevent saving and identify the affected row or name. Correct or remove the row and save again. The wizard keeps the form open after a failed save. If you edit while navigation is waiting for a save, check the latest edit and select the destination again.
+
+If WYSIWYG content fails validation, the previously saved content and header rows remain unchanged. Correct the content and save again.
+
+An invalid header expression follows the same error-reporting path as an invalid subject expression. Unsafe rendered control characters also stop the send before provider submission. Check the failed send, journey error or proof error, correct the expression or source data, then test again.
+
+### Routing from a journey
+
+For a provider that routes on `X-Delivery-Group`, set its template value to `{{user.sender_group}}`. In a journey, configure **User Update** with `{"sender_group":"grp_b"}`, followed by **Delay** and the email send. Confirm the property is saved during the delay, then inspect the outgoing message after the journey resumes for `X-Delivery-Group: grp_b`.
+
+A proof checks the supplied rendering context. A resumed journey checks that the send uses the saved contact update.
 
 ## Tracking and link wrapping
 
@@ -139,6 +188,40 @@ Two project-level switches change what Spotzee does to template content at send 
 - **Wrap links** (email and push). When on, Spotzee rewrites every link through your tracking domain so you can report click-throughs. The link wrapping respects your custom domain configuration if one is set.
 
 Both switches default to on for email. Push link wrapping is off by default. Toggle them under **Settings** → **General** → **Email tracking** and **Push and SMS**.
+
+## Reference
+
+### Template header data
+
+The optional `data.customHeaders` field contains an array of objects with string `name` and `value` fields. An empty array clears every template header. Existing templates need no migration. Duplication and WYSIWYG saves preserve header rows, including literal empty values.
+
+For example, this value defines one dynamic header and suppresses a provider's `X-Optional` default:
+
+```json
+[
+  { "name": "X-Delivery-Group", "value": "{{user.sender_group}}" },
+  { "name": "X-Optional", "value": "" }
+]
+```
+
+### Header names
+
+A name must contain one or more printable ASCII characters, excluding whitespace and `:`. Names are literal and do not support expressions. Duplicate names are rejected without regard to case.
+
+These exact names are reserved, without regard to case:
+
+- `From`, `Sender`, `Reply-To`, `To`, `Cc`, `Bcc`, `Subject`, `Date`, `Message-ID`.
+- `In-Reply-To`, `References`, `Return-Path`, `Received`, `Delivered-To`, `Errors-To`.
+- `MIME-Version`, `DKIM-Signature`, `Authentication-Results`, `Received-SPF`, `SPF`, `DMARC`.
+- `List-Unsubscribe`, `List-Unsubscribe-Post`, `X-Campaign-Id`, `X-Subscription-Id`, `X-Test-Email`.
+
+Names starting with `Content-`, `Resent-` or `ARC-` are also reserved, without regard to case. These restrictions protect addressing, message structure, authentication, tracking, unsubscribe and proof headers.
+
+### Header values
+
+Spotzee stores values unchanged, including expressions and empty strings. Template headers do not inherit provider header-count or value-length limits; provider configuration keeps its existing validation rules.
+
+After rendering, a value containing a carriage return, line feed or another ASCII control character fails compilation. Horizontal tab is allowed; DEL is rejected. The error identifies the header without including its rendered value. Non-empty values are not silently trimmed or sanitised.
 
 ## Next steps
 
