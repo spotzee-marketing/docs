@@ -32,7 +32,7 @@ A backend call that:
     Each journey has one or more **entrance steps** (the `entry` nodes in its graph). The trigger call must specify which one to enter the user at via the `entrance_id` field. This is a numeric step identifier from the journey's published graph.
   </Step>
   <Step title="Trigger an entrance">
-    The endpoint enters **one user at a time**. The body has three fields: `entrance_id` (which entrance step to use), `user` (the user identifier), and an optional `event` payload available to journey conditions and template Handlebars as `{{event}}`.
+    The endpoint enters **one user at a time**. The body has three fields: `entrance_id` (which entrance step to use), `user` (the user identifier), and an optional `event` payload available to journey conditions and templates as `{{event}}`.
 
     ```http
     POST /journeys/{journeyId}/trigger HTTP/1.1
