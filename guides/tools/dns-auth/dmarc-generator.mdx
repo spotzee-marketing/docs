@@ -16,7 +16,7 @@ This guide is for the API audience. Each call to `POST /generic/email/dmarc-gene
 
 DMARC is the policy layer that turns SPF and DKIM authentication into enforcement. Without a DMARC record, even a domain with perfect SPF and DKIM provides no protection against From-header spoofing — the address the recipient actually sees in their inbox. With `p=reject`, messages that fail authentication are dropped before they reach any inbox.
 
-The publishing requirement now has teeth. Google and Yahoo mandated at minimum `p=none` with an `rua=` address for bulk senders from February 2024. Non-compliance means mail goes to spam or is rejected outright. And for financial services firms under FCA Consumer Duty, the inability to demonstrate authenticated outbound communications is an audit finding. The FCA forced 19,766 financial promotions to be amended or withdrawn in 2024 — a 97.5% increase from 2023. Sender authentication is part of the evidence regulators expect.
+The publishing requirement now has teeth. Mailbox providers publish sender-authentication requirements for bulk mail. Check their current guidance before changing your policy. For regulated communications, retain evidence of your domain-authentication settings and monitor changes. Keep the published record and authentication reports as part of your own domain-control review.
 
 Most domains are stuck. They published `p=none` at some point, stopped there, and have no plan to escalate. A generator makes the next step easy — change the policy, regenerate, republish.
 
@@ -24,7 +24,7 @@ Most domains are stuck. They published `p=none` at some point, stopped there, an
 
 <Steps>
 <Step title="Identify your current authentication state">
-Before generating, confirm SPF and DKIM are passing for every legitimate sender. DMARC enforcement only works when both underlying mechanisms are in place. Run the [email health check](https://spotzee.com/tools/email-health-check/) first if you are unsure.
+Before enforcing DMARC, check that every legitimate sender passes an aligned SPF or DKIM check. Run the [email health check](https://spotzee.com/tools/email-health-check/) first if you are unsure.
 </Step>
 <Step title="Call the generator with your policy">
 Send a `POST` to `/generic/email/dmarc-generator` with `domain`, `failure_response`, and `subdomains`. Add `aggregate_reporting_email` (strongly recommended) and optionally `failure_reporting_email` and `percent`.

@@ -13,7 +13,7 @@ Spotzee-Version: 2026-04-28
 The current release is `2026-04-28`.
 
 <Note>
-  `Spotzee-Version` validation and response echo are live on the Extended API today and rolling out to the Main API. Including the header on Main API requests is forward-compatible: today the value is accepted as a forward-looking declaration; once the rollout completes, unrecognised values return `400 version_unsupported`.
+  Both APIs echo `Spotzee-Version` in responses. Strict validation is enabled on the Extended API; the Main API accepts unsupported values while strict validation is disabled. Do not use an unsupported version as a compatibility guarantee. When strict validation is enabled, unrecognised dates return `400 version_unsupported`.
 </Note>
 
 ## How it works
@@ -59,7 +59,7 @@ Treat the following as breaking:
 
 ## Deprecation windows
 
-Endpoints, fields, or behaviours scheduled for removal carry a `deprecated: true` marker in the OpenAPI spec along with the date after which they stop working. Spotzee aims for a 12-month deprecation window.
+The OpenAPI spec can mark an operation with `deprecated: true`; that flag does not include a removal date.
 
 ## Next steps
 

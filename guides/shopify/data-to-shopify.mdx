@@ -7,7 +7,7 @@ keywords: ["shopify", "sync", "two-way", "metafields", "consent", "profile"]
 Sync isn't only one-way. The **Sync data to Shopify** section of your sync settings has four toggles that push data from Spotzee back into Shopify. Off by default. Opt in to each one.
 
 <Info>
-Reverse sync writes to Shopify customer records and metafields. The connecting OAuth token needs write permission for the data you're pushing back; reconnect after granting if you turn on a toggle that fails for permission reasons.
+Reverse sync writes to Shopify customer records and metafields. The connecting OAuth grant needs the required write permissions; reconnect if the integration reports missing scopes.
 </Info>
 
 ## The four toggles
@@ -18,7 +18,7 @@ Fills in missing customer fields in Shopify with values you have in Spotzee.
 
 - Phone number missing on a Shopify customer but present in Spotzee? It gets written.
 - First name missing? Same.
-- Default address blank? Same.
+- Last name missing? Same.
 
 The rule that matters most: **this only fills in missing fields**. Spotzee never overwrites data that already exists in Shopify. If a phone number is set in Shopify, Spotzee leaves it alone, even if a different number is on the Spotzee user.
 
@@ -38,11 +38,11 @@ Writes Spotzee engagement metrics onto Shopify customer metafields so your Shopi
 
 Metafields written:
 
+- Last email delivery timestamp.
 - Last email open timestamp.
 - Last email click timestamp.
-- Last SMS click timestamp.
-- Spotzee RFM segment.
-- Spotzee total messages sent.
+- Last SMS send timestamp.
+- Email engagement score.
 
 Useful for in-store staff who pull up customer records, or for downstream Shopify apps that act on engagement state.
 
@@ -59,17 +59,17 @@ A few suggested patterns:
 
 Reverse sync runs in real time off Spotzee state changes:
 
-- Profile updates push when the relevant Spotzee user attribute changes.
+- Profile updates are checked every 15 minutes.
 - Subscription updates push when subscription state changes in Spotzee.
-- Engagement metafield writes happen periodically as engagement state evolves.
+- Engagement metafields are updated nightly.
 
 You don't need to schedule reverse syncs. Toggle on, and writes flow.
 
 ## When permissions matter
 
-If a reverse sync toggle fails after enabling, the most common reason is OAuth scope. The integration was originally connected without write permission for the resource you're now pushing back to. Reconnecting with the latest scopes resolves it.
+If a reverse sync fails with a missing-scope error, reconnect to approve the integration's current permissions. The initial connection requests the available write scopes; enabling a toggle does not itself change the scope request.
 
-The store card shows a **Reconnect required** badge when scopes need updating; it's the same flow as the initial connection.
+The store card shows **Reconnect required** when the granted scopes no longer match the integration's requirements.
 
 ## Next steps
 
@@ -78,11 +78,11 @@ The store card shows a **Reconnect required** badge when scopes need updating; i
 The five categories pulling data into Spotzee.
 </Card>
 
-<Card title="Sync settings" icon="settings" href="/guides/shopify/sync-settings">
+<Card title="Sync settings" icon="gear" href="/guides/shopify/sync-settings">
 Configure all toggles and start the initial sync.
 </Card>
 
-<Card title="Subscription preferences" icon="bell-off" href="/guides/subscription-preferences">
+<Card title="Subscription preferences" icon="bell-slash" href="/guides/subscription-preferences">
 How Spotzee tracks the consent state you're syncing back.
 </Card>
 

@@ -4,7 +4,7 @@ description: "Connect your existing email, SMS, and push delivery vendors so Spo
 keywords: ["providers", "byo", "smtp", "email provider", "sms provider", "push provider", "credentials"]
 ---
 
-A **provider** is the underlying delivery vendor that puts a message in front of a user. Spotzee builds, segments, schedules, and tracks the send; the provider executes the actual delivery. You can bring your own provider on every plan. Professional and Enterprise additionally include managed delivery infrastructure.
+A **provider** is the underlying delivery vendor that puts a message in front of a user. Spotzee builds, segments, schedules, and tracks the send; the provider executes the actual delivery. You can connect a supported provider. Managed delivery availability depends on your organisation's configuration.
 
 ## Why bring your own provider
 
@@ -13,7 +13,7 @@ A **provider** is the underlying delivery vendor that puts a message in front of
 - Stay portable. Switching marketing platforms doesn't mean re-warming a fresh sender.
 
 <Info>
-  Providers are configured per project. A project can hold multiple providers per channel, and Spotzee routes a send to the configured default unless a campaign or journey step picks a specific one.
+  Providers are configured per project. A project can hold multiple providers per channel. Select a provider for each campaign. Journey sends use that campaign's provider.
 </Info>
 
 ## Supported providers by channel
@@ -61,11 +61,11 @@ Outbound HTTP callbacks don't need a third-party provider. Spotzee delivers them
   <Step title="Add the provider in Spotzee">
     Open **Settings → Integrations**, choose the channel, then choose the vendor. Paste the credentials. Add a label so future you can tell two SES accounts apart.
   </Step>
-  <Step title="Send a test">
-    Trigger a test message from the provider settings page. A successful test confirms the credentials and that Spotzee can reach the vendor.
+  <Step title="Check the connection">
+    Where the provider form offers **Test connection**, run it to check access to the provider. Verify delivery with a controlled campaign before sending to your audience.
   </Step>
   <Step title="Set the default (optional)">
-    If you have multiple providers on a single channel, mark one as the default. Campaigns and journeys without a provider override use the default.
+    If you have multiple providers on a single channel, mark the one you normally use as the default. Check the selected provider when creating a campaign.
   </Step>
 </Steps>
 
@@ -76,10 +76,10 @@ Outbound HTTP callbacks don't need a third-party provider. Spotzee delivers them
     Create a new credential at the vendor. Same scope, fresh secret.
   </Step>
   <Step title="Update Spotzee">
-    Edit the provider entry under **Settings → Integrations** and paste the new credential. Send a test.
+    Edit the provider entry under **Settings → Integrations** and paste the new credential. Where available, use **Test connection**, then verify delivery with a controlled campaign.
   </Step>
   <Step title="Revoke the old credential">
-    Once traffic is on the new credential, revoke the old one at the vendor. Spotzee shows the date a credential was last used so you can confirm it's safe to retire.
+    After you verify sends with the new credential, revoke the old one at the vendor.
   </Step>
 </Steps>
 

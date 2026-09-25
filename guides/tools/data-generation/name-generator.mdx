@@ -29,7 +29,7 @@ Placeholder names like "John Doe" and "Test User" hide the cases that break inte
 
 Synthetic name data gives teams useful fixture values without copying customer records into staging, screenshots or automated test logs. And seeded output makes a failed test easier to debug because the same count, locale, gender and type can return the same dataset again.
 
-Each Extended API call deducts a small per-call amount from your Spotzee credit balance. See live per-tool pricing on the [Spotzee pricing page](https://spotzee.com/pricing/).
+Extended API calls use your Spotzee credit balance. See live per-tool pricing on the [Spotzee pricing page](https://spotzee.com/pricing/).
 
 ## How it works
 
@@ -60,7 +60,7 @@ Each Extended API call deducts a small per-call amount from your Spotzee credit 
 - **Middle name output.** `includeMiddleName=true` only affects full-name output, so keep `type=full` when you need middle names.
 - **Prefix and suffix output.** `includePrefixSuffix=true` only adds prefix and suffix fields when full-name output is selected.
 - **Invalid seed values.** Seeds must be whole numbers. Leave the field blank for random output.
-- **Locale assumptions.** The schema accepts locale strings such as `en`, `es`, `fr`, `de`, `pt_BR` and `zh_CN`. Test your storage and search paths with the locales you plan to use.
+- **Locale assumptions.** The schema accepts locale strings such as `en`, `es`, `fr`, `de`, `pt` and `zh`. Test your storage and search paths with the locales you plan to use.
 
 ## FAQs
 

@@ -20,7 +20,7 @@ High-deliverability email event webhooks are restricted to Enterprise customers 
 ## Delivery behaviour
 
 - Live event deliveries use `Spotzee-Signature: t=<unix-ts>,v1=<hex-hmac-sha256>` with replay protection.
-- Test deliveries from the Spotzee UI use `X-Spotzee-Signature: sha256=<hex>` so you can verify endpoint reachability before relying on live traffic.
+- Test deliveries from the Spotzee UI use `X-Spotzee-Signature: sha256=<hex>` when the endpoint has a signing secret.
 - Failed endpoints may be disabled to prevent repeated delivery attempts to an unreachable URL.
 
 ## Configure an endpoint
@@ -29,13 +29,13 @@ Create or rotate webhook endpoints from **Settings → Webhook Endpoints** in th
 
 - A target URL (must be `https://`).
 - A list of subscribed event types from the catalogue.
-- A signing secret (issued on creation; rotate via `POST /webhooks/{endpointId}/rotate-secret`).
+- A signing secret (issued on creation; rotate via `POST /api/client/webhooks/{endpointId}/rotate-secret`).
 
-The plaintext signing secret is returned **exactly once** on the create response and on every rotate. Persist it immediately. It cannot be re-fetched.
+The public API returns the plaintext signing secret on creation and rotation. Store it securely: public read responses omit it. Authorised team members can reveal the stored secret in the Spotzee app.
 
 ## Test a delivery
 
-The webhook detail page in the Spotzee app exposes a **Send test** action that delivers a fixed test payload to your URL with a signed header. Use it to verify your receiver before relying on live event traffic.
+The webhook detail page in the Spotzee app exposes a **Send test** action that sends a test payload to your URL. A configured signing secret is required for the test signature. Use it to verify your receiver before relying on live event traffic.
 
 The test payload looks like this:
 
@@ -52,7 +52,7 @@ The test payload looks like this:
 }
 ```
 
-The test path emits an `X-Spotzee-Signature: sha256=<hex>` header. The hex value is the HMAC-SHA256 of the JSON-stringified body using your endpoint's signing secret. Verify by recomputing the HMAC on your side:
+When a signing secret is configured, the test path emits an `X-Spotzee-Signature: sha256=<hex>` header. The hex value is the HMAC-SHA256 of the JSON-stringified body using your endpoint's signing secret. Verify by recomputing the HMAC on your side:
 
 ```javascript
 import crypto from 'node:crypto'
@@ -74,11 +74,11 @@ export function verifyTestWebhook(rawBody, header, secret) {
   Sign the raw request body, not a parsed-and-re-stringified version. JSON re-encoding can change byte-for-byte content and break the signature.
 </Warning>
 
-If the test response status is anything but `2xx`, the Spotzee app marks the endpoint as **disabled** so an unreachable URL doesn't accumulate failed deliveries. Re-enable from the same page once you've fixed the receiver.
+A `2xx` test response succeeds. Responses of `429` or `503` show a warning without disabling the endpoint. Other non-`2xx` responses and connection failures trigger an attempt to disable it. Check the resulting status, fix the receiver, then re-enable the endpoint if needed.
 
 ## Rotate the signing secret
 
-Call `POST /webhooks/{endpointId}/rotate-secret`, or use **Settings → Webhook Endpoints → Rotate** in the Spotzee app, to get a fresh signing secret. The plaintext value is returned exactly once on the rotate response. Persist it immediately.
+Call `POST /api/client/webhooks/{endpointId}/rotate-secret`, or use **Settings → Webhook Endpoints → Rotate** in the Spotzee app, to get a fresh signing secret. The plaintext value is returned exactly once on the rotate response. Persist it immediately.
 
 The previous secret stops verifying deliveries the moment the rotate call returns. Plan the rotation for a brief window where missed test deliveries are acceptable.
 

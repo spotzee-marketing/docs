@@ -1,10 +1,10 @@
 ---
 title: "Blacklist Monitoring overview"
-description: "Monitor sending IPs and domains against 70+ real-time blacklists, get email alerts when listings appear, and protect your email deliverability."
+description: "Monitor sending IPs and domains against blacklists, review check history, and receive digests for blacklisted check results."
 keywords: ["blacklist-monitoring", "deliverability", "rbl", "ip-monitoring", "domain-monitoring"]
 ---
 
-Blacklist Monitoring is a Tool that watches your sending infrastructure for blacklist appearances and alerts you the moment a listing happens. Add IPs and domains, pick how often they're checked, and Spotzee runs scheduled checks against 70+ real-time blacklists (RBLs) plus domain-based blacklists (DBLs) on the domain side.
+Blacklist Monitoring checks the IPs and domains you add against email blacklists. Set a daily or weekly schedule for each group, review results in the Tool, and receive digests for blacklisted check results.
 
 <Info>
 Blacklist Monitoring lives under **Tools** in the project sidebar and uses credits from your organisation's balance. The tool is read-and-write: you add resources, run checks, and configure groups; Spotzee handles the actual checking and alerting.
@@ -12,15 +12,15 @@ Blacklist Monitoring lives under **Tools** in the project sidebar and uses credi
 
 ## Why monitor blacklists
 
-Email deliverability is reputation-sensitive. A single listing on a major RBL can drop a sender's inbox placement to zero overnight, often without any obvious symptom from the sender's side until campaigns start failing.
+Email deliverability depends in part on sender reputation. A blacklist listing can affect delivery, so check which list reported it and investigate the cause before requesting removal.
 
 The integration:
 
 - **Watches IPs** (IPv4) against major RBLs.
 - **Watches domains** against domain-based blacklists.
 - **Schedules checks** on each resource by group (daily or weekly).
-- **Sends digest alerts** within an hour of a new listing being detected.
-- **Tracks history** over a rolling 30-day window so you can see whether a listing was a one-off or an ongoing issue.
+- **Sends digest emails** on the hourly dispatch for blacklisted check results.
+- **Shows a 30-day history chart** so you can review listing patterns. Stored check records have a separate retention period.
 
 ## Open the Tool
 
@@ -42,10 +42,10 @@ The Overview is your at-a-glance health view. Four statistics sit at the top:
 |---|---|
 | **Total IPs** | The number of IPs you're monitoring |
 | **Total domains** | The number of domains you're monitoring |
-| **Currently listed** | How many resources are blacklisted right now |
-| **Checks today** | Total checks run in the past 24 hours |
+| **Clean** | How many resources have a clean status |
+| **Blacklisted** | How many resources have a blacklisted status |
 
-A 30-day history chart sits below the stats showing listing counts over time. Sustained spikes mean a recurring listing problem; isolated bumps usually mean a transient listing that cleared.
+A 30-day history chart sits below the stats showing listing counts over time. A spike shows more resources listed on that day. Open the affected resources and check their latest status before deciding whether a listing has cleared.
 
 ## The four tabs
 
@@ -67,7 +67,7 @@ For each, see the dedicated guide:
 
 ## Credit usage
 
-Blacklist checks consume platform credits from your organisation's balance. Each check costs roughly the same regardless of resource type. Keep an eye on your credit balance under **Billing** to avoid alerts pausing because credits ran out.
+Blacklist checks consume platform credits from your organisation's balance. Keep an eye on your balance under **Billing**; monitoring pauses when credits run out.
 
 For more on credits, see [Billing and credits](/guides/billing-and-credits).
 

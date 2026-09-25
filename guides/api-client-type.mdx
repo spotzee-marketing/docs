@@ -1,50 +1,45 @@
 ---
 title: "Client type header"
-description: "Reserve x-spotzee-client-type for future per-key rate-limit policy and traffic telemetry."
+description: "Identify SDK, CLI and MCP requests with x-spotzee-client-type."
 keywords: ["x-spotzee-client-type", "client type", "mcp", "mobile", "sdk", "cli", "rate limits", "telemetry"]
 ---
 
-The `x-spotzee-client-type` header tells Spotzee what kind of client made a request. The header is optional, opaque, and reserved for two things.
-
-1. **Rate-limit policy.** Once the per-key sliding-window rate limits ship (see [Rate limits](/guides/api-rate-limits)), MCP and agent traffic gets a doubled budget so parallel tool calls don't run out of headroom mid-task.
-2. **Telemetry.** Spotzee uses the value to break traffic down by client type internally, which informs SDK roadmaps and capacity planning.
+The optional `x-spotzee-client-type` header identifies your client. The Main API uses `mcp` when applying the MCP rate-limit multiplier where per-key enforcement is available. The header does not bypass authentication, credit limits or per-IP limits.
 
 ```http
 x-spotzee-client-type: mcp
 ```
 
-<Note>
-  `x-spotzee-client-type` is accepted on every request today (no error if absent or unknown), but the rate-limit policy that would honour it is rolling out behind a feature flag. Including the header now is forward-compatible. Once enforcement ships, the documented values take effect automatically.
-</Note>
+Check [Rate limits](/guides/api-rate-limits) before relying on extra request capacity. Omitting the header or sending an unrecognised value does not receive the MCP multiplier.
 
 ## Recognised values
 
-Send one of these. Anything else is bucketed as `unknown`.
+Use the value that describes your integration:
 
 | Value | Use for |
 |---|---|
 | `mcp` | MCP servers and agent runtimes that fan out parallel tool calls |
 | `mobile` | Native iOS or Android apps using the official mobile SDKs |
-| `sdk-js` | The official JavaScript SDK (set automatically) |
+| `sdk-js` | JavaScript SDK integrations (set explicitly on the generated client) |
 | `sdk-android` | The official Android SDK (set automatically) |
 | `sdk-ios` | The official iOS SDK (set automatically) |
 | `cli` | Command-line tools (deploy scripts, one-off backfills, your own CLI) |
-| `unknown` | Default when omitted. No future rate-limit boost. |
+| `unknown` | Unspecified client; no MCP multiplier. |
 
 ## When to set it
 
 <Tabs>
   <Tab title="MCP server">
-    Always set `x-spotzee-client-type: mcp`. Once the per-key rate limits ship, this is the only way an agent driving many parallel calls keeps up with its own fan-out.
+    Set `x-spotzee-client-type: mcp` for MCP requests. Keep concurrency bounded and honour rate-limit responses.
   </Tab>
   <Tab title="CLI tool">
-    Set `x-spotzee-client-type: cli` so Spotzee can distinguish ad-hoc CLI traffic from production application traffic in telemetry.
+    Set `x-spotzee-client-type: cli` to identify command-line requests.
   </Tab>
   <Tab title="Custom integration (your own backend)">
-    Leave the header off. Your traffic is treated as `unknown` and gets the standard rate-limit policy for your account. Setting `mcp` from a non-MCP backend just to grab the future boost is unsupported.
+    Leave the header off. Your traffic is treated as `unknown` and gets the standard rate-limit policy for your account. Use `mcp` only for MCP integrations.
   </Tab>
   <Tab title="Official SDK">
-    Don't set it manually. The SDK does this for you. Overriding the value in your own wrapper interferes with Spotzee's ability to attribute traffic correctly.
+    The Android and iOS SDKs set their own values. For the generated JavaScript client, set `x-spotzee-client-type: sdk-js` in the client configuration.
   </Tab>
 </Tabs>
 

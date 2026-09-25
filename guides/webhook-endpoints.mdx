@@ -1,13 +1,13 @@
 ---
 title: "Email delivery event webhooks"
-description: "Configure Enterprise email delivery event webhooks, select delivery events, rotate the signing secret, and run a test from Spotzee."
-keywords: ["webhooks", "events", "subscriptions", "endpoints", "signing", "delivery", "enterprise"]
+description: "Configure email delivery event webhooks, select delivery events, rotate the signing secret, and run a test from Spotzee."
+keywords: ["webhooks", "events", "subscriptions", "endpoints", "signing", "delivery"]
 ---
 
 Webhook endpoints let your systems receive high-deliverability email events from Spotzee instead of polling. Spotzee tracks 27 queue, delivery, and reputation events, records the matching activity on the Contact profile, and can forward each event name with its detail payload to your selected endpoint.
 
 <Info>
-This page only applies to Enterprise customers with Spotzee's high-deliverability email service enabled. It does not apply to non-Enterprise customers or projects using standard provider delivery.
+These endpoints forward selected delivery events when your project's delivery configuration emits them.
 </Info>
 
 <Info>
@@ -30,7 +30,7 @@ Choose **Add endpoint**, then complete:
 </Step>
 
 <Step title="Save">
-Save. Spotzee generates a signing secret and shows it once. Copy the secret into your endpoint's secrets manager. Subsequent reads return the secret in masked form.
+Save. Spotzee generates a signing secret unless you entered one. Store it in your endpoint's secrets manager. The endpoint list masks the secret; project admins can reveal it from the endpoint settings.
 </Step>
 </Steps>
 
@@ -179,7 +179,7 @@ In **Settings** → **Webhook Endpoints**, open the row for the endpoint.
 </Step>
 
 <Step title="Run a test">
-Use the **Send test** action. Spotzee posts a sample payload signed with the test-path scheme: `X-Spotzee-Signature: sha256=<hex>` where the hex is the HMAC-SHA256 of the request body using your endpoint's signing secret.
+Use the **Send test** action. If the endpoint has a signing secret, Spotzee signs the sample payload with `X-Spotzee-Signature: sha256=<hex>`. The hex is the HMAC-SHA256 of the request body using that secret.
 </Step>
 
 <Step title="Verify the signature">
@@ -187,7 +187,7 @@ Your endpoint should compute the same HMAC over the request body and compare it 
 </Step>
 </Steps>
 
-Live event deliveries use the timestamped `Spotzee-Signature: t=...,v1=...` signing envelope. Test deliveries use `X-Spotzee-Signature: sha256=<hex>` so you can verify the endpoint from the Spotzee UI.
+Live event deliveries use the timestamped `Spotzee-Signature: t=...,v1=...` signing envelope. Tests use `X-Spotzee-Signature: sha256=<hex>` when a signing secret is configured. A failed test can disable the endpoint; re-enable it after fixing the receiver.
 
 ## Rotate the signing secret
 
@@ -199,7 +199,7 @@ In **Settings** → **Webhook Endpoints**, open the row for the endpoint.
 </Step>
 
 <Step title="Rotate the secret">
-Use the **Rotate secret** action. Spotzee generates a new signing secret and shows it once. Copy it into your secrets manager.
+Use the **Rotate secret** action. Spotzee generates a new signing secret. Copy it into your secrets manager.
 </Step>
 
 <Step title="Update your verifier">
@@ -215,7 +215,7 @@ Endpoints carry one of three statuses:
 |---|---|
 | `active` | Endpoint accepts events. The default after creation. |
 | `inactive` | Manually paused by an admin. No events are dispatched. |
-| `disabled` | Auto-disabled by Spotzee after persistent delivery failures. Re-enable manually after fixing the endpoint. |
+| `disabled` | Disabled after a failed endpoint test. Re-enable after fixing the endpoint. |
 
 Inactive and disabled endpoints don't dispatch events but their configuration is preserved. Re-enable to resume.
 

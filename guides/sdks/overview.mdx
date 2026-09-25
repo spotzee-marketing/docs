@@ -10,19 +10,19 @@ keywords:
   - client
 ---
 
-Spotzee ships three first-party SDKs. They share the same wire shape, the same publishable-key auth, and the same pinned API version, so a customer running a website plus an iOS app plus an Android app sees one user record across all three.
+Spotzee ships three first-party SDKs for JavaScript, iOS and Android. Use the same external ID when you identify a contact on multiple surfaces so their activity can join the same record.
 
 ## Pick an SDK
 
 | SDK | Distribution | Min target | Notes |
 |---|---|---|---|
-| JavaScript | npm / yarn / pnpm / `<script>` tag | Modern browsers, Node 18+ | Two ergonomic classes plus a typed client generated from the OpenAPI spec |
-| iOS | Swift Package Manager + CocoaPods | iOS 13+, Mac Catalyst 13+, Xcode 14+ | APNs registration, in-app modals, Universal Links |
+| JavaScript | npm / yarn / pnpm | Modern browsers and Node | Two client classes plus a typed client generated from the OpenAPI spec |
+| iOS | Swift Package Manager + CocoaPods | iOS 13+ | APNs registration, in-app modals, Universal Links |
 | Android | JitPack | Android SDK 23+ (Android 6.0 Marshmallow) | FCM registration, in-app dialogs, App Links |
 
 <Columns cols={3}>
   <Card title="JavaScript SDK" href="/guides/sdks/javascript/install" icon="square-code">
-    Install, identify users, track events, and register devices from a browser, Node app, or script tag.
+    Install, identify contacts, track events, and register devices from a browser bundle or Node app.
   </Card>
   <Card title="iOS SDK" href="/guides/sdks/ios/install" icon="apple">
     Install via SPM or CocoaPods, identify users, track events, register for APNs, render in-app notifications, unwrap Universal Links.
@@ -34,18 +34,18 @@ Spotzee ships three first-party SDKs. They share the same wire shape, the same p
 
 ## What every SDK does
 
-- **Identifies users.** Anonymous IDs are minted on first use and persisted locally. Calling `identify` with an `external_id` aliases the anonymous record to the known one.
+- **Identifies contacts.** Mobile SDKs retain their local identity. The JavaScript `BrowserClient` creates an anonymous ID in memory for each instance; calling `identify` sends it with your external ID.
 - **Tracks events.** A single `track` call flows into journeys, segments, and campaign triggers.
-- **Registers devices.** APNs, FCM, or browser push tokens land on the user record so any push channel can target them.
+- **Registers devices.** The SDKs can send device details and mobile push tokens for the relevant channel.
 - **Renders in-app notifications.** Banner, alert, and HTML content types. iOS and Android render natively; the JavaScript SDK fetches and lets you render however you want.
 - **Authenticates with publishable keys** (`pk_…`). These are safe to ship in client builds. Read [Manage API keys](/guides/manage-api-keys) for the key model.
-- **Pins an API version.** Every SDK release sets `Spotzee-Version` to a known release date so a future API change does not break a shipped client.
+- **Pins an API version.** SDK requests use the version set by the installed release.
 
 ## Pick the right surface
 
 | Use case | Reach for |
 |---|---|
-| Browser tracking, web push, simple Node integrations | JavaScript ergonomic surface (`Client` / `BrowserClient` / `Spotzee`) |
+| Browser tracking and simple Node integrations | JavaScript client (`Client` / `BrowserClient` / `Spotzee`) |
 | Server-side, agentic, or full-coverage Node integrations | JavaScript [typed client](/guides/sdks/javascript/typed-client) (`@spotzee/js-sdk/generated`) |
 | Native iOS app | [iOS SDK](/guides/sdks/ios/install) |
 | Native Android app | [Android SDK](/guides/sdks/android/install) |

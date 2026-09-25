@@ -26,9 +26,9 @@ A random string generator creates synthetic identifier, token and code-like valu
 
 String fixtures look simple until a validator, parser or import job sees a value it did not expect. One hand-written ID will not test length limits, casing rules, prefixes, base-number strings, symbol handling or custom character sets.
 
-Synthetic string data gives you controlled variation. And a numeric seed lets you reproduce the same records after a failure without pinning hand-written IDs in fixture files forever.
+Synthetic string data gives you controlled variation. A numeric seed repeats the random sequence. Pin `refDate` for `ulid` or `profile` when identifiers must stay stable across runs.
 
-Generated strings are test data only. They are not credentials, secrets or production identifiers. Each Extended API call deducts a small per-call amount from your Spotzee credit balance. See the [Spotzee pricing page](https://spotzee.com/pricing/) for live per-tool pricing.
+Generated strings are test data only. They are not credentials, secrets or production identifiers. Extended API calls use your Spotzee credit balance. See the [Spotzee pricing page](https://spotzee.com/pricing/) for live per-tool pricing.
 
 ## How it works
 
@@ -107,9 +107,7 @@ Use `profile` when you need many string fields together. Use a field method when
     validation and parser tests.
   </Accordion>
   <Accordion title="Can I reproduce generated string output?">
-    Yes. Set a numeric seed to reproduce output for the same count, locale,
-    method and option values. Leave the seed blank when you want a fresh random
-    batch for exploratory QA.
+    Set a numeric seed to repeat the random sequence. For `ulid` or `profile`, also set `refDate` when you need stable time-dependent identifiers across runs. Leave the seed blank for a fresh batch.
   </Accordion>
   <Accordion title="Can I use this for Java, Python and JavaScript fixtures?">
     Yes. The generated values are plain strings, so they can be pasted into

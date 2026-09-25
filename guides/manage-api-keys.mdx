@@ -7,14 +7,14 @@ keywords: ["api-keys", "publishable", "secret", "rotation", "authentication", "s
 API keys are how anything outside the app talks to Spotzee. The model has three key types: two scoped to a single project, and one scoped to your organisation. Each carries a role that decides what endpoints it can hit.
 
 <Info>
-Project key management requires the project `admin` role. Organisation key management requires organisation `admin` or `owner`. Spotzee shows the full key value **exactly once** at creation time. Save it immediately; later reads only show the prefix and last four characters.
+Project key management requires the project `admin` role. Organisation key management requires the organisation `owner` role. Spotzee shows the full key value **exactly once** at creation time. Save it immediately; later reads only show the prefix and last four characters.
 </Info>
 
 ## The three key types
 
 | Prefix | Scope | Where it works | When to use |
 |---|---|---|---|
-| `pk_` | Project, publishable | `apix.spotzee.com/api/client/*` (allowlisted endpoints only) | Browsers, mobile SDKs, any client where the key is visible to end users |
+| `pk_` | Project, publishable | Selected `apix.spotzee.com/api/client/*` routes, such as identify, devices, events, and notifications | Browsers, mobile SDKs, any client where the key is visible to end users |
 | `sk_` | Project, secret | `apix.spotzee.com/api/client/*` and project subroutes | Server-side integrations, backend code, anywhere the key is kept secret |
 | `ok_` | Organisation, admin | `apix.spotzee.com/api/admin/*` | Organisation-level operations across multiple projects |
 
@@ -46,7 +46,7 @@ Spotzee returns the full key value (e.g. `sk_a1b2c3d4...`) exactly once. Copy it
 
 ## Create an organisation API key
 
-Organisation keys (CD44) target the admin surface and inherit admin scope from the creator's organisation role.
+Organisation keys target the admin surface. An organisation owner creates them and chooses a role no higher than their own.
 
 <Steps>
 <Step title="Open the organisation API page">
@@ -57,7 +57,7 @@ From the organisation menu, open **API**.
 Create a new organisation API key, then complete the form:
 - **Name**. Recognisable label.
 - **Description** (optional).
-- **Role**. Pick from the organisation roles available to you. Owners can issue any organisation role; admins can issue `member` or `admin`.
+- **Role**. Pick the organisation role the key needs. Owners can issue any organisation role.
 </Step>
 
 <Step title="Save the value">
@@ -114,7 +114,7 @@ Use your first key to send a test campaign.
 Push user data into a project with `sk_` keys.
 </Card>
 
-<Card title="Ingest events" icon="activity" href="/guides/event-ingestion">
+<Card title="Ingest events" icon="chart-line" href="/guides/event-ingestion">
 Send events from your backend or SDK.
 </Card>
 </Columns>

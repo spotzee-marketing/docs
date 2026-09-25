@@ -1,6 +1,6 @@
 ---
 title: "Placeholder Image Generator"
-description: "Generate placeholder image URLs and SVG data URIs from one endpoint. Picsum, LoremFlickr, GitHub avatars and Faker portraits with optional size, category, blur and colour controls."
+description: "Generate placeholder image URLs and SVG data URIs from one endpoint. Picsum, LoremFlickr, GitHub avatars and portrait images with optional size, category, blur and colour controls."
 keywords:
   [
     "placeholder image generator",
@@ -15,7 +15,7 @@ keywords:
   ]
 ---
 
-A placeholder image generator returns synthetic image URLs and SVG data URIs for tests, prototypes and design fixtures. Spotzee bundles Picsum, LoremFlickr, GitHub avatar, Faker portrait and SVG data URI output in one endpoint with optional size, category, blur and colour controls.
+A placeholder image generator returns synthetic image URLs and SVG data URIs for tests, prototypes and design fixtures. Spotzee bundles Picsum, LoremFlickr, GitHub avatar, portrait image and SVG data URI output in one endpoint with optional size, category, blur and colour controls.
 
 <Info>
   Generate placeholder image URLs at
@@ -28,7 +28,7 @@ Designers and engineers need image-shaped fixtures every day: avatars in user li
 
 A placeholder image endpoint keeps URL formats in one well-tested place. Pass a numeric seed for reproducible avatars and Picsum URLs across runs. Reach for SVG data URIs when fixtures must work offline, in print, or inside locked-down preview environments.
 
-Each Extended API call deducts a small per-call amount from your Spotzee credit balance. The endpoint returns URLs and data URIs only; image bytes are served by the public CDNs the URLs reference. See the [Spotzee pricing page](https://spotzee.com/pricing/) for live per-tool pricing.
+Extended API calls use your Spotzee credit balance. The endpoint returns URLs and data URIs only; image bytes are served by the public CDNs the URLs reference. See the [Spotzee pricing page](https://spotzee.com/pricing/) for live per-tool pricing.
 
 ## How it works
 
@@ -61,9 +61,9 @@ Each Extended API call deducts a small per-call amount from your Spotzee credit 
 | `url`             | Generic image URL                                   | `width`, `height`                        |
 | `urlPicsumPhotos` | Picsum URL with seed and optional grey/blur         | `width`, `height`, `grayscale`, `blur`   |
 | `urlLoremFlickr`  | LoremFlickr URL with optional category              | `width`, `height`, `category`            |
-| `avatar`          | Faker portrait avatar URL (fixed size)              | none                                     |
+| `avatar`          | Portrait avatar URL (fixed size)                    | none                                     |
 | `avatarGitHub`    | GitHub avatar URL                                    | none                                     |
-| `personPortrait`  | Faker portrait CDN URL                               | `sex`, `size`                            |
+| `personPortrait`  | Portrait image URL                                  | `sex`, `size`                            |
 | `dataUri`         | Inline `data:image/svg+xml` URI                      | `width`, `height`, `color`, `dataUriType` |
 
 Pick `profile` to inspect every output shape at once. Pick a method when fixtures need one URL shape per record.
@@ -96,8 +96,8 @@ Pick `profile` to inspect every output shape at once. Pick a method when fixture
     Avatar and portrait methods use sizes set by the upstream provider.
   </Accordion>
   <Accordion title="Is this a picsum alternative?">
-    It bundles `urlPicsumPhotos` plus LoremFlickr, GitHub avatars, Faker
-    portraits and SVG data URIs into one endpoint. Use it as a picsum
+    It bundles `urlPicsumPhotos` plus LoremFlickr, GitHub avatars, portrait
+    images and SVG data URIs into one endpoint. Use it as a picsum
     alternative when fixtures need more than one URL shape.
   </Accordion>
   <Accordion title="Can I generate offline-friendly placeholder bytes?">

@@ -1,6 +1,6 @@
 ---
-title: "Identify users"
-description: "Link anonymous activity to a known user with identify and alias from the JavaScript SDK."
+title: "Identify contacts"
+description: "Link anonymous activity to a known contact with identify and alias from the JavaScript SDK."
 keywords:
   - javascript
   - sdk
@@ -10,9 +10,9 @@ keywords:
   - traits
 ---
 
-`identify` connects your `external_id` (whatever you call users in your own database) to a Spotzee user record and updates that record's traits. Until you call `identify`, the SDK records activity against an anonymous ID that the browser variants mint and persist for you.
+`identify` connects your external ID to a Spotzee contact and updates its traits. Until you call it, `BrowserClient` sends activity with the anonymous ID held by that client instance.
 
-## Identify a known user
+## Identify a known contact
 
 <CodeGroup>
 
@@ -42,7 +42,7 @@ import { Client } from '@spotzee/js-sdk'
 const spotzee = new Client({ apiKey: process.env.SPOTZEE_API_KEY })
 
 await spotzee.identify({
-  anonymousId: 'anon_xyz',  // Required server-side. Pass the ID you stored.
+  anonymousId: 'anon_xyz',  // Optional. Pass a previously tracked ID to join its activity.
   externalId: 'u_42',
   email: 'sam@example.com',
   traits: {
@@ -54,11 +54,11 @@ await spotzee.identify({
 
 </CodeGroup>
 
-The browser variants reuse the anonymous ID they minted on first use, so you don't pass `anonymousId` yourself. The Node `Client` requires you to pass both IDs explicitly because it can't safely persist them between calls.
+`BrowserClient` reuses its anonymous ID, so you don't need to pass `anonymousId` to each call. The Node `Client` requires an external ID for `identify`; its anonymous ID is optional. Pass a previously tracked anonymous ID when you need to join that activity.
 
 ## How traits flow
 
-Anything you put in `traits` lands as a top-level field on the user record. The set of traits Spotzee accepts is defined by your project's data schema. Read [Define custom user attributes](/guides/data-schema) for how to add, remove, or rename traits.
+The SDK sends `traits` as the contact's `data` fields. Read [Define custom contact attributes](/guides/data-schema) to review discovered attribute paths; project admins can set their visibility there.
 
 A few traits map to specific behaviour:
 
@@ -67,7 +67,7 @@ A few traits map to specific behaviour:
 
 ## Anonymous to known: automatic alias
 
-The first `identify` call after an anonymous session aliases the anonymous ID to your `external_id`. All prior anonymous activity now belongs to the known user. The browser SDK caches the `external_id` after this call, so subsequent `track` and `identify` calls carry both IDs automatically.
+The first `identify` call after an anonymous session aliases the anonymous ID to your `external_id`. All prior anonymous activity now belongs to the known contact. The browser SDK caches the `external_id` after this call, so subsequent `track` and `identify` calls carry both IDs automatically.
 
 For server contexts where you already know the anonymous ID separately (for example, a user signed up server-side with a session you tracked earlier), call `alias` directly:
 
@@ -114,7 +114,7 @@ await spotzee.track({
 
 ## Reset on sign-out
 
-The SDK caches `externalId` for the lifetime of the page. To clear it (for example, on sign-out), drop the page reference to the client and create a new one:
+`BrowserClient` caches `externalId` for the lifetime of its instance. To clear it on sign-out, replace that instance:
 
 ```typescript
 let spotzee = new BrowserClient({ apiKey: 'pk_…' })
@@ -132,7 +132,7 @@ A fresh `BrowserClient` mints a new anonymous ID. Subsequent activity is anonymo
   <Card title="Track events" href="/guides/sdks/javascript/track" icon="bolt">
     Trigger journeys and feed segments with custom events.
   </Card>
-  <Card title="Define custom user attributes" href="/guides/data-schema" icon="table-properties">
-    Decide which traits Spotzee accepts.
+  <Card title="Define custom contact attributes" href="/guides/data-schema" icon="table-columns">
+    Review discovered attributes and their visibility.
   </Card>
 </Columns>

@@ -2,7 +2,7 @@
   "$schema": "https://mintlify.com/docs.json",
   "theme": "almond",
   "name": "Spotzee",
-  "description": "Marketing automation for every business — purpose-built for financial services",
+  "description": "Marketing automation for every business \u2014 purpose-built for financial services",
   "colors": {
     "primary": "#6a75f1",
     "light": "#5a84e9",
@@ -74,6 +74,42 @@
             ]
           },
           {
+            "group": "SDKs",
+            "pages": [
+              "guides/sdks/overview",
+              {
+                "group": "JavaScript",
+                "pages": [
+                  "guides/sdks/javascript/install",
+                  "guides/sdks/javascript/identify",
+                  "guides/sdks/javascript/track",
+                  "guides/sdks/javascript/devices-and-notifications",
+                  "guides/sdks/javascript/typed-client"
+                ]
+              },
+              {
+                "group": "iOS",
+                "pages": [
+                  "guides/sdks/ios/install",
+                  "guides/sdks/ios/identify",
+                  "guides/sdks/ios/track",
+                  "guides/sdks/ios/push-notifications",
+                  "guides/sdks/ios/in-app-and-deeplinks"
+                ]
+              },
+              {
+                "group": "Android",
+                "pages": [
+                  "guides/sdks/android/install",
+                  "guides/sdks/android/identify",
+                  "guides/sdks/android/track",
+                  "guides/sdks/android/push-notifications",
+                  "guides/sdks/android/in-app-and-deeplinks"
+                ]
+              }
+            ]
+          },
+          {
             "group": "Integrate",
             "pages": [
               {
@@ -102,6 +138,13 @@
                   "guides/shopify/troubleshoot"
                 ]
               }
+            ]
+          },
+          {
+            "group": "Reporting",
+            "pages": [
+              "guides/query-events",
+              "guides/campaign-bounce-reporting"
             ]
           },
           {
@@ -220,42 +263,6 @@
             ]
           },
           {
-            "group": "SDKs",
-            "pages": [
-              "guides/sdks/overview",
-              {
-                "group": "JavaScript",
-                "pages": [
-                  "guides/sdks/javascript/install",
-                  "guides/sdks/javascript/identify",
-                  "guides/sdks/javascript/track",
-                  "guides/sdks/javascript/devices-and-notifications",
-                  "guides/sdks/javascript/typed-client"
-                ]
-              },
-              {
-                "group": "iOS",
-                "pages": [
-                  "guides/sdks/ios/install",
-                  "guides/sdks/ios/identify",
-                  "guides/sdks/ios/track",
-                  "guides/sdks/ios/push-notifications",
-                  "guides/sdks/ios/in-app-and-deeplinks"
-                ]
-              },
-              {
-                "group": "Android",
-                "pages": [
-                  "guides/sdks/android/install",
-                  "guides/sdks/android/identify",
-                  "guides/sdks/android/track",
-                  "guides/sdks/android/push-notifications",
-                  "guides/sdks/android/in-app-and-deeplinks"
-                ]
-              }
-            ]
-          },
-          {
             "group": "API conventions",
             "pages": [
               "guides/api-versioning",
@@ -354,6 +361,18 @@
           {
             "group": "Webhooks",
             "tag": "Webhooks"
+          },
+          {
+            "group": "Billing recovery",
+            "tag": "Billing recovery"
+          },
+          {
+            "group": "Form definitions",
+            "tag": "Form definitions"
+          },
+          {
+            "group": "Form submissions",
+            "tag": "Form submissions"
           }
         ]
       },

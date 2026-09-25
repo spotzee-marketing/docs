@@ -14,9 +14,9 @@ Run this generator at [/tools/person-generator](https://spotzee.com/tools/person
 
 Production records do not belong in development databases, demo screens or automated test fixtures. Synthetic person data gives your team realistic profiles without copying customer names, dates of birth or profile attributes into places where they are harder to control.
 
-Hardcoded names like "John Doe" hide layout, sorting and validation problems. As a synthetic data generator endpoint, localised records with optional middle names, prefixes, suffixes and profile fields create better fixtures because they exercise longer strings, diacritics, optional fields and deterministic test runs.
+Hardcoded names like "John Doe" hide layout, sorting and validation problems. As a synthetic data generator endpoint, localised records with optional middle names, prefixes, suffixes and profile fields create better fixtures because they exercise longer strings, diacritics, optional fields and seeded test runs.
 
-Each Extended API call deducts a small per-call amount from your Spotzee credit balance. See live per-tool pricing on the [Spotzee pricing page](https://spotzee.com/pricing/).
+Extended API calls use your Spotzee credit balance. See live per-tool pricing on the [Spotzee pricing page](https://spotzee.com/pricing/).
 
 ## How it works
 
@@ -25,7 +25,7 @@ Each Extended API call deducts a small per-call amount from your Spotzee credit 
 POST to `/generic/data/generate/person` with a `count` from `1` to `100`, plus optional `locale`, `seed`, `gender` and include flags.
 </Step>
 <Step title="Choose generation options">
-Use `locale` for name style, `gender` for male or female name selection, and `seed` when you need deterministic output. Common locale values include `en`, `es`, `fr`, `de`, `pt_BR` and `zh_CN`.
+Use `locale` for name style, `gender` for male or female name selection, and `seed` to repeat the random sequence. Birth dates and ages can change as the current date changes. Common locale values include `en`, `es`, `fr`, `de`, `pt` and `zh`.
 </Step>
 <Step title="Add optional fields">
 Set `includeJobTitle`, `includeJobDetails`, `includeBiography`, `includeMiddleName`, `includePrefixSuffix` or `includePersonalDetails` to `true` when your fixture needs those fields.
@@ -55,7 +55,7 @@ The person data generator always returns name, gender, birth date and age fields
 </Accordion>
 
 <Accordion title="Can I use the person generator online for repeatable fixtures?">
-Yes. Enter a numeric seed to reproduce the same generated output for the same count, locale and option set. Use it as a random person generator by leaving the seed blank when you want exploratory records.
+A numeric seed repeats the random sequence for the same count, locale and options. Birth dates and ages depend on the current date, so do not expect identical profiles across dates. Leave the seed blank for exploratory records.
 </Accordion>
 
 <Accordion title="Can I generate person data with email addresses?">
@@ -63,7 +63,7 @@ The person data generator focuses on profile fields, not email addresses. Use th
 </Accordion>
 
 <Accordion title="How do I generate more than 100 person records?">
-Call the Extended API endpoint in a loop. Each request accepts up to 100 records and can reuse the same options. Change the seed between requests when you need deterministic batches that do not repeat.
+Call the Extended API endpoint in a loop. Each request accepts up to 100 records and can reuse the same options. Change the seed between requests when you need distinct batches; dates and ages can still depend on the current date.
 </Accordion>
 
 <Accordion title="Where can I learn more about person data generation?">

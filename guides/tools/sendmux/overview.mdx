@@ -4,18 +4,18 @@ description: "Connect your Sendmux account to Spotzee, view delivery metrics and
 keywords: ["sendmux", "email-proxy", "delivery", "integration", "metrics"]
 ---
 
-The Sendmux integration is a read-only window into your Sendmux account from inside Spotzee. Connect once with an API key and the Spotzee **Email Proxy** Tool surfaces your Sendmux delivery metrics, provider stats, billing summary, and delivery logs without leaving the project.
+The Sendmux integration shows your account's email activity inside the Spotzee **Email Proxy** Tool. Connect with a Sendmux API key to view delivery metrics, provider status, billing balance, and delivery logs.
 
 <Info>
-This integration is **read-only**. Provider configuration, routing rules, quotas, sending domains, and all account-level Sendmux setup live on `https://sendmux.ai/docs` and are managed from the Sendmux dashboard. Spotzee shows what's there; it doesn't configure it.
+The Spotzee view makes read requests to Sendmux. Provider configuration, routing rules, quotas and sending domains are managed in Sendmux. The `smx_root_` credential is a root key, so store and rotate it with the care you give other account credentials.
 </Info>
 
 ## What you can see in Spotzee
 
 Once connected, the **Email Proxy** Tool inside your project has two tabs:
 
-- **Overview**: delivery metrics over a window you pick, provider statistics, billing balance, and a spend summary.
-- **Logs**: per-message delivery logs with filtering by status, date, and provider. See [Sendmux delivery logs](/guides/tools/sendmux/logs).
+- **Overview**: send activity for the last 24 hours, 7 days, or 30 days; provider counts; billing balance; and 30-day spend.
+- **Logs**: per-message delivery logs with status, provider, and text filters. See [Sendmux delivery logs](/guides/tools/sendmux/logs).
 
 What you can do **only on Sendmux.ai** (not in Spotzee):
 
@@ -30,8 +30,8 @@ For all of those, follow the link from the Spotzee Tool to your Sendmux dashboar
 
 You'll need:
 
-- A **Sendmux account** at [sendmux.ai](https://sendmux.ai) with at least one provider configured.
-- A **Sendmux API key** that starts with `smx_root_`. Generate one in the Sendmux dashboard under your account's API settings.
+- A **Sendmux account** at [sendmux.ai](https://sendmux.ai).
+- A **Sendmux root API key** that starts with `smx_root_`. Generate one in the Sendmux dashboard; Spotzee uses it for read requests.
 - The Spotzee project `admin` role.
 
 ## Connect Sendmux
@@ -56,18 +56,12 @@ If validation fails, the key was rejected. Common causes: wrong key copied (must
 
 | Section | What you see |
 |---|---|
-| **Email metrics** | Sent, delivered, bounced, complained counts over a window (last 24h, 7 days, 30 days, or custom range). With period-over-period change indicators. |
-| **Provider stats** | Per-provider activity: messages sent, success rate, last-seen activity, current status. |
+| **Email metrics** | Sent, failed, total, rejected, and pending counts over the last 24 hours, 7 days, or 30 days. Sent and failed cards include period-over-period change indicators. |
+| **Provider stats** | Active and total provider counts, provider types, and a notice when providers are in an error state. |
 | **Billing balance** | Your Sendmux account's current credit balance. |
-| **Billing summary** | Spend over the past N days. |
+| **Billing summary** | Credit consumption over the past 30 days and auto top-up status. |
 
-The data refreshes when you reload the page. There's also a manual refresh action on each section if you want to pull the latest values without a full page reload.
-
-## Filter by provider
-
-The Overview tab has a provider filter that scopes metrics to a single Sendmux provider. Useful when you want to compare two SMTP servers, or look at just your Gmail-routed traffic.
-
-The full list of providers comes from your Sendmux account; Spotzee doesn't manage providers itself.
+The data refreshes when you reload the page or select **Refresh**. Use the provider filter on the **Logs** tab to narrow individual message rows.
 
 ## Disconnect
 
@@ -83,7 +77,7 @@ Use the disconnect action on the Overview tab. Confirm at the prompt.
 </Step>
 </Steps>
 
-Disconnecting only removes the API key reference inside Spotzee. Your Sendmux account and providers are untouched on the Sendmux side. Reconnect any time by pasting the key back in.
+Disconnecting removes the saved API key from this Spotzee project. Your Sendmux account and providers remain available in Sendmux. Reconnect by entering a key on the setup screen.
 
 ## Rotating the API key
 
@@ -94,8 +88,8 @@ Two-step swap, like any credential rotation:
 On the Sendmux dashboard, generate a new `smx_root_` key.
 </Step>
 
-<Step title="Update Spotzee">
-In the Email Proxy Tool, paste the new key. Spotzee validates and starts using it immediately.
+<Step title="Reconnect Spotzee">
+In the Email Proxy Tool, disconnect the old key, then enter the new key on the setup screen. Spotzee validates it before loading your account data.
 </Step>
 
 <Step title="Revoke the old key">
@@ -114,7 +108,7 @@ Read per-message logs pulled from your Sendmux account.
 Provider setup, routing, sending domains, and account configuration.
 </Card>
 
-<Card title="Set up email delivery" icon="mail" href="/guides/configure-email-delivery">
+<Card title="Set up email delivery" icon="envelope" href="/guides/configure-email-delivery">
 Connect Spotzee directly to SMTP, SendGrid, Mailgun, or Amazon SES.
 </Card>
 

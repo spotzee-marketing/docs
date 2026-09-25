@@ -21,7 +21,7 @@ Beyond raw data sync, the integration:
 
 - Fires 19 event types into Spotzee whenever something changes in Shopify (customer created, order placed, checkout abandoned, fulfilment shipped, and so on). These are journey triggers.
 - Calculates RFM segments and lifetime-value metrics for every Shopify customer automatically. These land as user properties you can segment and personalise on.
-- Detects abandoned checkouts after 60 minutes of inactivity and fires a `shopify_checkout_abandoned` event ready for recovery journeys.
+- Detects eligible abandoned checkouts in a periodic check after 60–75 minutes of inactivity and fires a `shopify_checkout_abandoned` event for recovery journeys.
 
 ## Multi-store
 
@@ -49,7 +49,7 @@ OAuth flow, single and multi-store setup.
 The five categories of data flowing from Shopify into Spotzee.
 </Card>
 
-<Card title="Sync settings" icon="settings" href="/guides/shopify/sync-settings">
+<Card title="Sync settings" icon="gear" href="/guides/shopify/sync-settings">
 Configure toggles, customer list, and start the initial sync.
 </Card>
 

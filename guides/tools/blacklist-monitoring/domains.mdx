@@ -51,7 +51,7 @@ Locate the row in the Domains tab.
 </Step>
 
 <Step title="Open the row menu">
-Use the row's overflow action to pick **Edit**.
+Use the row's overflow action to pick **Change group**.
 </Step>
 
 <Step title="Change the group">
@@ -61,7 +61,7 @@ Pick a different group from the dropdown, or clear it to make the domain ungroup
 
 ## Run a check on demand
 
-Domains are checked automatically on their group's schedule. Force an immediate check when you want to verify a fix or investigate a specific listing.
+Domains are checked automatically on their group's schedule. Queue an on-demand check when you want to verify a fix or investigate a specific listing.
 
 <Steps>
 <Step title="Open the row menu">
@@ -69,11 +69,11 @@ Use the row's overflow action.
 </Step>
 
 <Step title="Choose Check now">
-Pick **Check now**. The domain is queued for an immediate check.
+Pick **Check now**. The domain is queued for a check; its status changes when that job completes.
 </Step>
 
 <Step title="Wait for the result">
-The status updates within a few minutes. Refresh the page to pull the latest state.
+The status updates after the check completes. Refresh the page to pull the latest state.
 </Step>
 </Steps>
 
@@ -88,7 +88,7 @@ Same four statuses as IPs:
 | **Clean** | Green | Not listed on any of the configured DBLs |
 | **Blacklisted** | Red | Listed on one or more DBLs; the count tells you how many |
 | **Pending** | Amber | Queued for first check |
-| **Error** | Grey | Most recent check failed |
+| **Disabled** | Grey | Checks are paused for this resource |
 
 Hover the **Blacklisted** count to see the specific DBLs where the domain is listed.
 
@@ -104,11 +104,11 @@ Pick **Delete**. Confirm at the prompt.
 </Step>
 </Steps>
 
-Deletion stops monitoring for that domain and removes the record. The 30-day history removes too.
+Deletion stops monitoring and removes the domain record. Historical check records remain until the configured retention cleanup.
 
 ## What's checked
 
-For each domain, Spotzee queries every DBL included in your configured **Domain RBL type** (Standard or Comprehensive, set under **Settings**). A listing on any one of them flips the domain to **Blacklisted** and triggers an alert.
+For each domain, Spotzee queries every DBL included in your configured **Domain RBL type** (Popular or Full, set under **Settings**). A listing on any one of them flips the domain to **Blacklisted** and leaves a result for the next hourly digest when recipients are configured.
 
 Like IP checks, domain checks are purely DNS-based and don't touch your sending infrastructure.
 
@@ -123,7 +123,7 @@ The same flow for sending IPs.
 Per-group check frequency and notification recipients.
 </Card>
 
-<Card title="Bulk actions" icon="list-checks" href="/guides/tools/blacklist-monitoring/bulk">
+<Card title="Bulk actions" icon="list-check" href="/guides/tools/blacklist-monitoring/bulk">
 CSV import and bulk operations across many domains.
 </Card>
 

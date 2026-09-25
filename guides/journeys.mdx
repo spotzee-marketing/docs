@@ -20,7 +20,7 @@ A journey can have multiple entrance nodes for the same flow (e.g. one entrance 
 
 | Step | Purpose |
 |---|---|
-| `action` | Deliver a message via a configured channel |
+| `action` | Send a campaign through its configured provider |
 | `delay` | Wait a fixed duration, until a specific time, or for a templated date |
 | `gate` | Conditional split based on user attributes or behaviour |
 | `experiment` | Weighted random A/B/n split |
@@ -39,7 +39,7 @@ A journey can have multiple entrance nodes for the same flow (e.g. one entrance 
     Choose **event** for behaviour-driven journeys, **schedule** for recurring sweeps, or **none** for journeys triggered from the API or another journey.
   </Step>
   <Step title="Add an action step">
-    Pick a channel and template. The template can pull user attributes and event data via merge tags.
+    Select a campaign with the channel and template you want. The template can pull user attributes and event data via merge tags.
   </Step>
   <Step title="Add branching where needed">
     Use `gate` to send different content to different cohorts. Use `experiment` to test variants.

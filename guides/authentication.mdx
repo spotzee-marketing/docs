@@ -16,9 +16,9 @@ Spotzee issues three API key types, each with a different prefix and scope.
 
 | Prefix | Type | Scope | Where it's used |
 |---|---|---|---|
-| `sk_` | **Secret** | One project | Server-to-server integrations. Full read + write within the issued project. |
-| `pk_` | **Publishable** | One project, allowlisted endpoints only | Browser, mobile, or any untrusted client. Safe to embed because each endpoint must explicitly allow `pk_`. |
-| `ok_` | **Organisation** | One organisation | Cross-project administration: create, list, and update projects under your organisation, and manage team API keys. |
+| `sk_` | **Secret** | One project | Server-to-server integrations. Access depends on the key's project role. |
+| `pk_` | **Publishable** | One project, client endpoints | Browser, mobile, or any untrusted client. Use in clients for routes available to publishable keys. |
+| `ok_` | **Organisation** | One organisation | Cross-project administration, such as creating, listing, and updating projects. Cannot manage other API keys. |
 
 <Warning>
   Treat `sk_` and `ok_` keys as secrets. Never commit them to source control or embed in clients you do not control. Rotate immediately if you suspect a leak.
@@ -28,19 +28,13 @@ Spotzee issues three API key types, each with a different prefix and scope.
 
 <Tabs>
   <Tab title="Server backend">
-    Use a `sk_` project key. It can call every endpoint in the project surface and is the primary integration path for sync, automation, and admin scripts.
+    Use a `sk_` project key with the role required by your endpoints. It is the primary integration path for sync, automation, and project scripts.
   </Tab>
   <Tab title="Browser or mobile app">
-    Use a `pk_` publishable key. It works only for endpoints explicitly allowlisted for browser use:
-
-    - `POST /events`: capture behaviour from your front-end
-    - `GET /users/me`: read the current user's preferences (requires a user session token)
-    - `PATCH /subscriptions/me`: let the user update their own opt-ins (requires a user session token)
-
-    Any other endpoint returns `401 authentication_required` when called with a `pk_` key.
+    Use a `pk_` publishable key for client routes such as identifying users, registering devices, sending events, and reading notifications. Project management, user preference API routes, and other secret-key routes reject publishable keys. Use your server for `GET /users/{userId}/subscriptions` and `PATCH /users/{userId}/subscriptions`.
   </Tab>
   <Tab title="Cross-project automation">
-    Use an `ok_` organisation key. These authenticate against the organisation surface (`https://apix.spotzee.com/api/admin`) and let you create projects, mint new `sk_` and `pk_` keys, and read organisation-level metadata.
+    Use an `ok_` organisation key. These authenticate against the organisation surface (`https://apix.spotzee.com/api/admin`) and let you manage projects and read organisation-level metadata. Organisation keys cannot manage other API keys.
   </Tab>
 </Tabs>
 

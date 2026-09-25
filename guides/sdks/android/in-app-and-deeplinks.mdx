@@ -155,17 +155,14 @@ Add an `intent-filter` to the Activity that should receive Spotzee deeplinks. Us
         <category android:name="android.intent.category.DEFAULT" />
         <category android:name="android.intent.category.BROWSABLE" />
         <data
-            android:host="apix.spotzee.com"
+            android:host="track.yourcompany.com"
             android:pathPrefix="/c"
             android:scheme="https" />
     </intent-filter>
 </activity>
 ```
 
-| Setup | `android:host` |
-|---|---|
-| Default Spotzee tracking | `apix.spotzee.com` |
-| Custom tracking domain | `track.yourcompany.com` |
+Replace `track.yourcompany.com` with your configured tracking domain.
 
 For App Links to verify, the `assetlinks.json` for your domain must be served from `https://<host>/.well-known/assetlinks.json` and list your app's package name and SHA-256 fingerprint. Read [Android's Verify Android App Links guide](https://developer.android.com/training/app-links/verify-android-applinks).
 

@@ -38,7 +38,7 @@ In the IPs tab, locate the row for the IP.
 </Step>
 
 <Step title="Open the row menu">
-Use the row's overflow action to pick **Edit**.
+Use the row's overflow action to pick **Change group**.
 </Step>
 
 <Step title="Change the group">
@@ -50,7 +50,7 @@ The new group's frequency and notifications apply on the next scheduled check.
 
 ## Run a check on demand
 
-Resources are checked automatically on their group's schedule, but you can trigger an immediate check.
+Resources are checked automatically on their group's schedule, but you can queue an on-demand check.
 
 <Steps>
 <Step title="Open the row menu">
@@ -58,11 +58,11 @@ Use the row's overflow action on the IP.
 </Step>
 
 <Step title="Choose Check now">
-Pick **Check now**. The IP is queued for an immediate check.
+Pick **Check now**. The IP is queued for a check; its status changes when that job completes.
 </Step>
 
 <Step title="Wait for the result">
-The status updates within a few minutes once the check completes. Refresh the page if you want to see the result without waiting for an automatic refresh.
+The status updates after the check completes. Refresh the page if you want to see the result without waiting for an automatic refresh.
 </Step>
 </Steps>
 
@@ -77,7 +77,7 @@ Each IP shows one of four statuses:
 | **Clean** | Green | Not listed on any of the configured blacklists |
 | **Blacklisted** | Red | Listed on one or more blacklists; the count tells you how many |
 | **Pending** | Amber | Queued for first check, hasn't completed yet |
-| **Error** | Grey | Most recent check failed (DNS error, RBL unreachable, transient infrastructure issue) |
+| **Disabled** | Grey | Checks are paused for this resource |
 
 Hover the **Blacklisted** count to see the specific blacklist names where the IP is listed.
 
@@ -93,11 +93,11 @@ Pick **Delete**. Confirm at the prompt.
 </Step>
 </Steps>
 
-Deletion stops monitoring for that IP and removes the record. The 30-day history for the IP also removes. To re-monitor later, add the IP back; it starts as **Pending** with no history.
+Deletion stops monitoring and removes the IP record. Historical checks remain until retention cleanup and can still affect the history chart. To monitor the IP again, add it as a new resource.
 
 ## What's checked
 
-For each IP, Spotzee runs a query against every blacklist included in your configured **IP RBL type** (Standard or Comprehensive, set under **Settings**). A listing on any one of them flips the IP to **Blacklisted** and triggers an alert if alerts are configured.
+For each IP, Spotzee runs a query against every blacklist included in your configured **IP RBL type** (Popular or Full, set under **Settings**). A listing on any one of them flips the IP to **Blacklisted** and leaves a listing result for the next hourly digest when recipients are configured.
 
 The check is purely DNS-based and doesn't touch your sending infrastructure. Spotzee never sends test mail through your IP to check it; we only query the RBLs themselves.
 
@@ -112,7 +112,7 @@ The same flow for domains, with DBL-specific notes.
 Per-group check frequency and notification recipients.
 </Card>
 
-<Card title="Bulk actions" icon="list-checks" href="/guides/tools/blacklist-monitoring/bulk">
+<Card title="Bulk actions" icon="list-check" href="/guides/tools/blacklist-monitoring/bulk">
 CSV import and bulk operations across many IPs.
 </Card>
 

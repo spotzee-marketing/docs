@@ -37,7 +37,7 @@ A common shape:
 | Production senders | Daily | Engineering on-call, deliverability lead |
 | Marketing senders | Daily | Marketing ops, deliverability lead |
 | Backup senders | Weekly | Engineering on-call |
-| Test senders | Weekly | (no recipients; check only) |
+| Test senders | Weekly | Default notification recipients if its group list is empty |
 
 ## Create a group
 
@@ -91,9 +91,7 @@ Pick **Delete** and confirm. Resources that were in the group revert to default 
 
 ## Move resources between groups
 
-To move a resource into a different group, edit the resource (not the group). Open the row menu on the IP or domain, pick **Edit**, and choose the new group.
-
-To bulk-move many resources at once, see [Bulk actions](/guides/tools/blacklist-monitoring/bulk).
+To move a resource into a different group, open its row menu on the **IPs** or **Domains** tab, choose **Change group**, and select the new group.
 
 ## Group check schedules
 
@@ -105,7 +103,7 @@ Groups run on fixed UTC schedules. The exact times:
 | **Weekly** | Every Monday at 06:00 UTC |
 | **Ungrouped** | Daily by default |
 
-Manual checks via **Check now** ignore the schedule and run immediately. The last-checked timestamp on each resource reflects whichever was most recent: scheduled or manual.
+Manual checks via **Check now** ignore the schedule and queue a check job. The last-checked timestamp on each resource reflects whichever was most recent: scheduled or manual.
 
 ## Next steps
 
@@ -118,8 +116,8 @@ Add IPs and assign them to groups.
 Add domains and assign them to groups.
 </Card>
 
-<Card title="Bulk actions" icon="list-checks" href="/guides/tools/blacklist-monitoring/bulk">
-Move many resources at once via bulk operations.
+<Card title="Bulk actions" icon="list-check" href="/guides/tools/blacklist-monitoring/bulk">
+Import resources and run actions across an entire IP or domain list.
 </Card>
 
 <Card title="Understand alerts" icon="bell" href="/guides/tools/blacklist-monitoring/alerts">

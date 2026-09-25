@@ -12,7 +12,7 @@ Most segments are best authored in the Spotzee UI. Operators iterate quickly, pr
 
 ## What you'll build
 
-A script that creates a dynamic list with a rule tree, then walks its members.
+A script that creates a dynamic list with a rule tree, then verifies membership in the Spotzee app.
 
 ## Prerequisites
 
@@ -22,16 +22,16 @@ You'll need a `sk_` project key with write access. See [Authentication](/guides/
 
 <Steps>
   <Step title="Decide what membership means">
-    A segment is a boolean rule that yields true or false for any user. Common shapes:
+    A segment is a boolean rule that yields true or false for any contact. Common shapes:
 
     - **Attribute filter**: `data.plan = "professional"`
-    - **Behavioural filter**: users who triggered `order_placed` in the last 30 days
+    - **Behavioural filter**: contacts who triggered `order_placed` in the last 30 days
     - **Combined**: `plan = "professional"` AND triggered `order_placed` in the last 30 days
 
     Sketch the rule as plain language first; the JSON shape follows from there.
   </Step>
   <Step title="Build the rule tree">
-    Spotzee rules are a tree of nodes. The root is a `wrapper` node that combines its children with `and` / `or`; leaves are typed comparisons against a user field (`group: "user"`) or event payload (`group: "event"`).
+    Spotzee rules are a tree of nodes. The root is a `wrapper` node that combines its children with `and` / `or`; leaves are typed comparisons against a contact field (`group: "user"`) or event payload (`group: "event"`).
 
     Every node carries:
 
@@ -39,14 +39,14 @@ You'll need a `sk_` project key with write access. See [Authentication](/guides/
     |---|---|
     | `uuid` | Stable client-supplied UUID, preserved across edits. Generate one per node. |
     | `type` | `wrapper` for groups; `string` / `number` / `boolean` / `date` / `array` for leaves. |
-    | `group` | `user` (compare against the user) or `event` (compare against an event). Use `parent` to inherit. |
-    | `path` | Dotted path on the user or event payload (e.g. `data.plan`, `name`). Empty on wrappers. |
+    | `group` | `user` (compare against the contact) or `event` (compare against an event). Use `parent` to inherit. |
+    | `path` | Dotted path on the contact or event payload (e.g. `data.plan`, `name`). Empty on wrappers. |
     | `operator` | `=`, `!=`, `<`, `<=`, `>`, `>=`, `and`, `or`, etc. |
     | `value` | Leaf comparison value. Omitted on wrappers. |
     | `frequency` | Optional event-frequency window: `{ period, operator, count }`. |
     | `children` | Array of child nodes (present on wrappers). |
 
-    Example: users on the Pro plan who triggered `order_placed` at least once in the last 30 days.
+    Example: contacts on the Professional plan who triggered `order_placed` at least once in the last 30 days.
 
     ```json
     {
@@ -69,9 +69,13 @@ You'll need a `sk_` project key with write access. See [Authentication](/guides/
           "type": "wrapper",
           "group": "event",
           "path": "name",
-          "operator": "=",
+          "operator": "and",
           "value": "order_placed",
-          "frequency": { "period": "days", "operator": ">=", "count": 1 }
+          "frequency": {
+            "period": { "type": "rolling", "unit": "day", "value": 30 },
+            "operator": ">=",
+            "count": 1
+          }
         }
       ]
     }
@@ -83,7 +87,7 @@ You'll need a `sk_` project key with write access. See [Authentication](/guides/
     `POST /lists` with `type: "dynamic"`:
 
     ```http
-    POST /lists HTTP/1.1
+    POST /api/client/lists HTTP/1.1
     Host: apix.spotzee.com
     Authorization: Bearer sk_…
     Idempotency-Key: segment-pro-monthly
@@ -91,19 +95,52 @@ You'll need a `sk_` project key with write access. See [Authentication](/guides/
     Content-Type: application/json
 
     {
-      "name": "Pro plan, active in last 30 days",
+      "name": "Professional plan, active in last 30 days",
       "type": "dynamic",
-      "rule": { /* the tree from step 2 */ }
+      "rule": {
+        "uuid": "11111111-1111-1111-1111-111111111111",
+        "type": "wrapper",
+        "group": "user",
+        "path": "",
+        "operator": "and",
+        "children": [
+          {
+            "uuid": "22222222-2222-2222-2222-222222222222",
+            "type": "string",
+            "group": "user",
+            "path": "data.plan",
+            "operator": "=",
+            "value": "professional"
+          },
+          {
+            "uuid": "33333333-3333-3333-3333-333333333333",
+            "type": "wrapper",
+            "group": "event",
+            "path": "name",
+            "operator": "and",
+            "value": "order_placed",
+            "frequency": {
+              "period": {
+                "type": "rolling",
+                "unit": "day",
+                "value": 30
+              },
+              "operator": ">=",
+              "count": 1
+            }
+          }
+        ]
+      }
     }
     ```
 
     The response includes the list `id`. Save it. That's how you'll reference the segment from journeys, campaigns, and member-listing endpoints.
   </Step>
   <Step title="Verify membership">
-    Members are computed asynchronously, so give Spotzee a moment after creation. The current public API does not expose a "members of a list" endpoint. Verify the list resolved as expected by inspecting it in the Spotzee UI, or by issuing a representative `GET /users?q=…` query that exercises the same attributes the rule depends on.
+    A new dynamic list starts as a draft. Inspect its matching contacts in the Spotzee app, then publish the intended rule before using the segment. A contact search does not evaluate the list's complete rule tree and is not a substitute for checking membership.
   </Step>
   <Step title="Update the rule">
-    `PATCH /lists/{listId}` with a new `rule` block. Spotzee re-computes membership in the background. Existing members are reconciled: those who still match stay, those who don't drop out.
+    `PATCH /lists/{listId}` with a new `rule` block. The updated rule determines which contacts match when the segment is evaluated. For a draft list, include `published: true` when you are ready to publish it.
   </Step>
 </Steps>
 
@@ -113,13 +150,13 @@ You'll need a `sk_` project key with write access. See [Authentication](/guides/
   Don't build a hot loop that recreates the same segment every minute. Recomputation is cheap but not free. Update the rule in place with `PATCH` rather than deleting and recreating.
 </Warning>
 
-- **Don't filter on fields you haven't populated yet.** A rule on `data.plan` returns zero members until at least one user has that field. Sync your users first ([Sync users](/guides/sync-users)), then build segments.
+- **Don't filter on fields you haven't populated yet.** A rule on `data.plan` returns zero members until at least one contact has that field. Sync your contacts first ([Sync contacts](/guides/sync-users)), then build segments.
 - **Don't bury the rule in too many layers.** Spotzee accepts deeply nested groups, but a rule that spans more than two `and`/`or` layers is hard for operators to read in the UI.
 
 ## Reference
 
 - API surface: see [Main API → Lists](/main-api/introduction)
 - Rule node schema: see **RuleNode** in the [API reference](/main-api/introduction)
-- Sync users first: see [Sync users from your CRM](/guides/sync-users)
+- Sync contacts first: see [Sync contacts from your CRM](/guides/sync-users)
 - Pagination: see [Pagination](/guides/api-pagination)
 - Conceptual overview: see [Segments](/guides/segments)

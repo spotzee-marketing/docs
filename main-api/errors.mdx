@@ -4,10 +4,10 @@ description: "HTTP status codes, error body shape, and the full code catalogue f
 keywords: ["errors", "http status", "error codes", "rfc 7807", "problem details", "request id"]
 ---
 
-The Main API returns standard HTTP status codes and a structured error body for every non-2xx response. The body is the [RFC 7807 Problem Details](https://www.rfc-editor.org/rfc/rfc7807) envelope with a few Spotzee-specific extensions, served with `Content-Type: application/problem+json`.
+Use the HTTP status and the string `code` field to handle Main API errors. The documented error shape follows [RFC 7807 Problem Details](https://www.rfc-editor.org/rfc/rfc7807) with Spotzee-specific fields. Clients must also handle responses that omit optional fields or use `application/json` during the conventions rollout.
 
 <Note>
-  The canonical envelope is live for every error on `apix.spotzee.com/api/client/*`, `apix.spotzee.com/api/admin/*`, and the Extended API. Edge rate-limit `429` responses also use this envelope. Build your client around the string `code` field — it's the stable, machine-readable identifier.
+  Use the HTTP status as a fallback when a response has no recognised string `code`. Include `X-Request-Id` when reporting a failed request.
 </Note>
 
 <Warning>
@@ -74,7 +74,7 @@ When `code` is `validation_failed`, the `errors` array lists every offending fie
 | `422 Unprocessable Entity` | Validation failed | One or more fields failed schema validation |
 | `429 Too Many Requests` | Rate limited | Honour the `Retry-After` header before retrying |
 | `500 Internal Server Error` | Unexpected error | Retry with backoff; if persistent, include the `request_id` when contacting support |
-| `503 Service Unavailable` | Temporary capacity issue | Retry with backoff |
+| `503 Service Unavailable` | Temporary capacity issue | Honour `Retry-After` when present, then retry with backoff |
 
 ## Code catalogue
 
@@ -85,6 +85,8 @@ The `code` field is stable and documented. Add new codes to your switch statemen
 | `resource_missing` | `404` | The referenced resource does not exist or isn't visible to this key |
 | `resource_already_exists` | `409` | Unique-constraint violation on create |
 | `state_conflict` | `409` | Resource state does not permit the requested operation |
+| `archived_user_conflict` | `409` | The contact is archived; resolve its recovery state before retrying |
+| `user_capacity_exhausted` | `409` | The organisation has no capacity for another active contact |
 | `parameter_missing` | `400` | A required field is absent |
 | `parameter_invalid_empty` | `400` | A required field is present but empty |
 | `parameter_invalid_format` | `400` | A field is present but malformed |
@@ -105,8 +107,8 @@ The `code` field is stable and documented. Add new codes to your switch statemen
 
 ## Retry guidance
 
-- **Idempotent reads** (`GET`): retry freely on `5xx` and `429`.
-- **Mutations** (`POST` / `PATCH`): include an [`Idempotency-Key`](/guides/api-idempotency) header so retries are safe. Retry on `5xx` and `429`; do not retry `4xx` (with the exception of `idempotency_in_progress`, which is explicitly retryable).
+- **Reads** (`GET`): use bounded retries with backoff on `5xx` and `429`. Honour `Retry-After` when present.
+- **Mutations** (`POST` / `PATCH`): check [idempotency availability and limits](/guides/api-idempotency) before retrying. A timed-out request may have taken effect. Resolve validation or permission errors before retrying; `idempotency_in_progress` explicitly permits a delayed retry.
 
 ## Reporting bugs
 

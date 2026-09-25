@@ -1,6 +1,6 @@
 ---
-title: "Identify users"
-description: "Link anonymous iOS activity to a known user with identify and alias from the iOS SDK."
+title: "Identify contacts"
+description: "Link anonymous iOS activity to a known contact with identify and alias from the iOS SDK."
 keywords:
   - ios
   - sdk
@@ -10,9 +10,9 @@ keywords:
   - traits
 ---
 
-`identify` joins your `external_id` (whatever you call users in your own database) to a Spotzee user record and updates that record's traits. Until you call it, the SDK records activity against an anonymous ID it minted on first launch and persisted to `UserDefaults`.
+`identify` joins your `external_id` (the identifier you use in your own database) to a Spotzee contact and updates that contact's traits. Until you call it, the SDK records activity against an anonymous ID it minted on first launch and persisted to `UserDefaults`.
 
-## Identify a known user
+## Identify a known contact
 
 ```swift
 import Spotzee
@@ -34,37 +34,18 @@ The `id` parameter is your `external_id`. `email`, `phone`, and `traits` are all
 
 ## How traits flow
 
-Anything in the `traits` dictionary lands as a top-level field on the user record. The set of accepted traits is defined by your project's data schema. Read [Define custom user attributes](/guides/data-schema) for how to add or rename traits.
+The SDK sends the `traits` dictionary as the contact's `data` fields. Read [Define custom contact attributes](/guides/data-schema) to review discovered attribute paths; project admins can set their visibility there.
 
 A few traits map to specific behaviour:
 
 - **`email`** and **`phone`**: top-level fields the email and SMS channels read from. Pass them as arguments to `identify` rather than nesting them in `traits` so the SDK puts them in the right place.
-- **`timezone`** and **`locale`**: drive personalisation and send-time logic. Set them via `identify(identity:)` overload (below) or via `track(event:properties:user:)` inline updates.
+- **`timezone`** and **`locale`**: drive personalisation and send-time logic. Set them with `track(event:properties:user:)` inline updates.
 
 The trait dictionary accepts `[String: Any]`. Values serialise as JSON: strings, numbers, booleans, arrays, nested dictionaries.
 
-## The Identity overload
-
-For when you need to set the anonymous ID explicitly (for example, restoring a session after a crash) or pass `timezone` / `locale`, use the `Identity` initialiser overload:
-
-```swift
-let identity = Identity(
-    anonymousId: Spotzee.shared.anonymousId,
-    externalId: "u_42",
-    phone: nil,
-    email: "sam@example.com",
-    traits: [
-        "timezone": "Australia/Sydney",
-        "locale": "en-AU",
-        "plan": "starter",
-    ]
-)
-Spotzee.shared.identify(identity: identity)
-```
-
 ## Anonymous to known: automatic alias
 
-The first `identify` after an anonymous session aliases the anonymous ID to your `external_id`. All prior anonymous activity now belongs to the known user. Subsequent `track` and `identify` calls carry both IDs automatically.
+The first `identify` after an anonymous session aliases the anonymous ID to your `external_id`. All prior anonymous activity now belongs to the known contact. Subsequent `track` and `identify` calls carry both IDs automatically.
 
 For server-side flows where you already know an anonymous ID separately, call `alias` directly:
 
@@ -120,7 +101,7 @@ Spotzee.shared.reset()
   <Card title="Track events" href="/guides/sdks/ios/track" icon="bolt">
     Trigger journeys and feed segments with custom events.
   </Card>
-  <Card title="Define custom user attributes" href="/guides/data-schema" icon="table-properties">
-    Decide which traits Spotzee accepts.
+  <Card title="Define custom contact attributes" href="/guides/data-schema" icon="table-columns">
+    Review discovered attributes and their visibility.
   </Card>
 </Columns>

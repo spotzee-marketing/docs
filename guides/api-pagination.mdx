@@ -1,97 +1,64 @@
 ---
 title: "Pagination"
-description: "Cursor pagination, sort directions, and result counts for Main API list endpoints."
+description: "Follow the pagination contract for contact lists, event queries, and campaign messages."
 keywords: ["pagination", "cursor", "nextCursor", "prevCursor", "list", "sort"]
 ---
 
-Every Main API list endpoint uses cursor pagination. Cursors are stable across inserts and deletes, so you never miss or duplicate a record while paging.
+Read the endpoint's pagination fields before walking a collection. Main API lists do not all use the same cursor names, defaults, or sort options. Keep filters and ordering unchanged while following a cursor.
 
-<Note>
-  Pagination applies to the Main API only. The Extended API exposes utility endpoints (validation, lookups, dispatch) and has no list endpoints.
-</Note>
+## Choose the endpoint contract
 
-## Request parameters
+| Collection | Default page size | Next and previous fields | Ordering |
+| --- | --- | --- | --- |
+| Contact lists and other lists using the common pagination contract | 25 | `nextCursor`, `prevCursor` | Endpoint-specific `sort` and `direction=asc` or `desc`; `page=next` or `prev` selects traversal |
+| Events | 50 | `nextCursor`, `prevCursor` | `direction=desc` by default; `asc` is supported |
+| Event aggregation groups | 50 | `nextCursor`, `prevCursor` | Determined by the requested grouping |
+| Campaign recipient messages | 25 | `next`, `prev` | `sort=send_at`, `direction=desc` by default; `asc` is supported |
 
-| Parameter | Default | Notes |
-|---|---|---|
-| `limit` | `25` | 1 – 100 inclusive |
-| `cursor` | _none_ | Opaque cursor returned by a previous page |
-| `direction` | `forward` | `forward` (older → newer) or `backward` |
-| `sort` | endpoint-specific | Field to sort on. Prefix with `-` for descending, e.g. `-created_at` |
-| `q` | _none_ | Free-text search where the endpoint supports it |
+These contracts allow pages up to 100 results. The common pagination schema also exposes `limit=-1`; prefer bounded pages for bulk work. Event queries and campaign recipient messages require a positive page size and do not support that option.
 
-## Response shape
+Use a returned cursor as the next request's `cursor`. Common lists also use `page=prev` when traversing backwards. Event and campaign-recipient cursors encode their traversal information. Treat a missing or `null` next cursor as the end of the collection.
 
-```json
-{
-  "results": [ /* up to `limit` records */ ],
-  "nextCursor": "eyJpZCI6Mzg2OTI1fQ",
-  "prevCursor": "eyJpZCI6Mzg2ODk2fQ",
-  "limit": 25
-}
-```
+## Walk a contact list
 
-| Field | Meaning |
-|---|---|
-| `results` | The records on this page |
-| `nextCursor` | Cursor for the next page; `null` when you've reached the end |
-| `prevCursor` | Cursor for the previous page; `null` on the first page |
-| `limit` | Echoes the limit you asked for |
-
-`has_more` is derivable: it's `nextCursor !== null`.
-
-## Response headers
-
-For convenience, list endpoints also emit:
-
-| Header | Meaning |
-|---|---|
-| `X-Total-Count` | Total records that match the query (best-effort; large collections may return an estimate) |
-| `X-Page` | Page index when one is meaningful |
-| `X-Limit` | Echoes the `limit` query parameter |
-
-## Walking a list
+Fetch each page before requesting the next one:
 
 ```javascript
-async function* listAllUsers(token) {
-  let cursor = null
+async function* listContacts(token) {
+  let cursor
   do {
     const url = new URL('https://apix.spotzee.com/api/client/users')
     url.searchParams.set('limit', '100')
     if (cursor) url.searchParams.set('cursor', cursor)
 
-    const res = await fetch(url, { headers: { Authorization: `Bearer ${token}` } })
-    const page = await res.json()
+    const response = await fetch(url, {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+    if (!response.ok) throw new Error(`Request failed: ${response.status}`)
+    const page = await response.json()
     yield* page.results
-
     cursor = page.nextCursor
   } while (cursor)
 }
 ```
 
-## Sort
+Pass your project secret API key as `token`. The `/users` path names contact records, not team members. This generator yields each page's contacts and stops when no next cursor is returned.
 
-Pass `sort` as a single field name. Prefix with `-` for descending order:
+## Sort and filter
 
-```http
-GET /users?sort=-created_at
-```
+Use separate `sort` and `direction` parameters where the endpoint supports them. For example, contact lists default to `sort=id` and `direction=desc`. Do not prefix a sort field with `-` or use `forward` and `backward` as sort directions.
 
-Endpoints document their valid sort fields. Sorting on a non-indexed field returns `400 parameter_invalid_format`.
+Filters are endpoint-specific. Event queries require a bounded time window and at least one supported selective filter. Campaign recipient queries accept a `bounce_category` filter; event queries do not. Use the generated endpoint reference for the accepted parameters.
 
-## Filtering
+## Interpret changing results
 
-Use simple `?key=value` filters where supported. The fielded query language (AIP-160 syntax) is on the roadmap.
+Pagination does not freeze the collection. Records can arrive, change, or disappear between requests. A cursor is a continuation token, not a guarantee that a changing collection cannot produce gaps or repeated records. Persist record identifiers when your integration needs to reconcile repeated reads.
 
-## Limits in practice
-
-- Use `limit=100` for bulk processing. Fewer round-trips, predictable headers.
-- Use `limit=25` (the default) for interactive UIs.
-- Going above `100` returns `400 parameter_invalid_format`.
+Do not assume every endpoint returns total-count or page-index headers. Follow the response body and the endpoint's documented fields. Event aggregate `count` values count occurrences; campaign bounced-message totals count messages.
 
 ## Next steps
 
 <Columns cols={2}>
-  <Card title="Rate limits" icon="gauge" href="/guides/api-rate-limits">Stay under per-IP rate limits while paging.</Card>
-  <Card title="Errors" icon="circle-exclamation" href="/main-api/errors">Status codes and the `code` catalogue.</Card>
+  <Card title="Query events" icon="list" href="/guides/query-events">Inspect events or count occurrences and contacts.</Card>
+  <Card title="Campaign bounce reporting" icon="chart-column" href="/guides/campaign-bounce-reporting">Follow message-level causes and diagnostics.</Card>
 </Columns>

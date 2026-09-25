@@ -1,6 +1,6 @@
 ---
 title: "Devices and in-app notifications"
-description: "Register a browser or web push token, fetch in-app notifications, and mark them read with the JavaScript SDK."
+description: "Register a browser device, fetch in-app notifications, and mark them read with the JavaScript SDK."
 keywords:
   - javascript
   - sdk
@@ -10,11 +10,11 @@ keywords:
   - registerdevice
 ---
 
-The JavaScript SDK covers two related surfaces: device registration (so you can target the user with push) and in-app notifications (so you can render messages inside the page).
+The JavaScript SDK can register browser device details and fetch in-app notifications for rendering inside your page.
 
 ## Register a device
 
-`registerDevice` records a device against the current user. The `os` field tells Spotzee what kind of surface this is. For browser tracking you can register without a push token; for [web push](#web-push) you pass the subscription token.
+`registerDevice` records a device against the current contact. The `os` field identifies the device platform. A browser can register without a push token.
 
 ```typescript
 import { Spotzee } from '@spotzee/js-sdk'
@@ -27,7 +27,6 @@ await Spotzee.registerDevice({
   model: 'Chrome',
   appBuild: '2026.4.30',
   appVersion: '2.4.0',
-  // token is optional. Pass it once you have a web push subscription.
 })
 ```
 
@@ -41,21 +40,9 @@ Required fields:
 | `appBuild` | Free-form. Often a calendar version or commit SHA. |
 | `appVersion` | Free-form. Often a semver string. |
 
-`token` is optional. Without it, the call still records the device against the user (useful for cross-device tracking and per-device journey logic) but won't deliver push to it.
+`token` is optional. Registering a browser device without a token does not enable push delivery.
 
 You must have called `identify`, or pass `anonymousId` / `externalId` explicitly, before `registerDevice` succeeds.
-
-## Web push
-
-The SDK does not implement the Web Push API itself. You wire up the standard browser primitives, ask the user for permission, subscribe to a service worker, and pass the resulting subscription endpoint into `registerDevice` as `token`. The full flow:
-
-1. Register a service worker that handles `push` events.
-2. Call `Notification.requestPermission()` from a user gesture.
-3. Subscribe via `serviceWorkerRegistration.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: '<your VAPID public key>' })`.
-4. Send the subscription's endpoint, keys, and `auth` to your backend.
-5. Pass that subscription identifier as `token` into `Spotzee.registerDevice({ os: 'web', token, … })`.
-
-Configure the corresponding push provider under **Settings** → **Integrations** before tokens you register can deliver. Read [Set up push notifications](/guides/configure-push-notifications) for the provider side.
 
 ## Fetch in-app notifications
 

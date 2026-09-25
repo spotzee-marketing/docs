@@ -47,7 +47,7 @@ Common causes:
 
 - The Spotzee app was uninstalled and reinstalled in Shopify.
 - Shopify revoked the app's access tokens.
-- Required scopes changed (you turned on a sync-back toggle that needs a scope you didn't grant initially) and need re-approval.
+- The granted scopes no longer match the integration's requirements.
 
 **Fix.** Open the store card menu and choose **Reconnect**. Re-approve permissions on Shopify. Sync settings, customer list, and history are preserved.
 
@@ -142,12 +142,12 @@ If you've worked through the patterns above and the integration still won't beha
 - Read the most recent failure detail in the **Store details** drawer.
 - Try **Reconnect** to refresh OAuth credentials.
 - Pause the integration via **Disconnect** to stop retry storms while you investigate, then reconnect once the underlying cause is fixed.
-- For data-corruption-style issues, **Delete** and start fresh. Note that delete is irreversible; see [Disconnect, delete, reconnect](/guides/shopify/disconnect).
+- Before deleting an integration, review what [Disconnect, delete, reconnect](/guides/shopify/disconnect) removes. Delete is irreversible.
 
 ## Next steps
 
 <Columns cols={2}>
-<Card title="Sync operations" icon="activity" href="/guides/shopify/sync-operations">
+<Card title="Sync operations" icon="chart-line" href="/guides/shopify/sync-operations">
 Statuses, retries, and the re-sync flow.
 </Card>
 
@@ -155,7 +155,7 @@ Statuses, retries, and the re-sync flow.
 The five-item readiness checklist.
 </Card>
 
-<Card title="Disconnect, delete, reconnect" icon="unplug" href="/guides/shopify/disconnect">
+<Card title="Disconnect, delete, reconnect" icon="plug-circle-xmark" href="/guides/shopify/disconnect">
 The three actions and what each does to your data.
 </Card>
 
