@@ -5,7 +5,8 @@
   "existingPages": 137,
   "newPages": 2,
   "sourceIncomplete": [],
-  "releaseStatus": "held: operator deployment and deployed verification pending",
+  "releaseStatus": "ready for publication: deployed API contracts, reporting checks and rate-limit configuration verified",
+  "pageVerificationNote": "Per-page deployedVerification fields retain the original audit snapshot. Subsequent release-level checks are recorded in evidence/reporting-consistency-20260926.md; they do not imply every workflow was exercised in production.",
   "recordScope": "Public disposition record. Detailed source review and release evidence are retained privately.",
   "pages": [
     {
@@ -1403,21 +1404,21 @@
     {
       "reference": "Main API",
       "specUrl": "https://apix.spotzee.com/api/openapi.json",
-      "capturedLiveSpecSha256": "4ec5ae34c1412ad4751c4c95312dc26ea4d14d3a046cffd5bd186be0e1732bf9",
+      "capturedLiveSpecSha256": "9c26d50d9d997e93741d54967a4abd4a296fae3d19b657326b65baab15af8abe",
       "paths": 70,
       "operations": 109,
       "navigationCoverage": "complete",
-      "deployedCandidateMatch": "pending",
+      "deployedCandidateMatch": "verified",
       "publication": "held"
     },
     {
       "reference": "Extended API",
       "specUrl": "https://apix.spotzee.com/api/ext/openapi.json",
-      "capturedLiveSpecSha256": "e699fd25657df68c5bee4ea4dbe5658eb2820034429c0e4958c2489743f2f271",
+      "capturedLiveSpecSha256": "628442aa99de5ad4c9ede2d8737f6c20ac6acebfdcd07a07975c92b69ccabefd",
       "paths": 56,
       "operations": 56,
       "navigationCoverage": "complete",
-      "deployedCandidateMatch": "pending",
+      "deployedCandidateMatch": "verified",
       "publication": "held"
     }
   ]

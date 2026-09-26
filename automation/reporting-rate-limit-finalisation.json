@@ -1,6 +1,6 @@
 {
   "createdAt": "2026-09-26",
-  "status": "finalised locally; deployed verification and publication pending",
+  "status": "finalised and verified; publication pending",
   "recordScope": "Public-safe hash-bound supplement for the rate-limit factual correction; private source evidence retained by the release owner.",
   "pages": {
     "guides/api-rate-limits.mdx": "95341a7f36b2dd0ef91b588e596002719bc9f54da68e44293a56879ee2446849",

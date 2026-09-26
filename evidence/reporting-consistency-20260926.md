@@ -1,6 +1,6 @@
 # Documentation validation — 26 September 2026
 
-Status: validated locally; publication held until deployed API contracts and current rate limits are verified.
+Status: ready for documentation review and publication; deployed API contracts and current rate limits are verified.
 
 ## Coverage
 
@@ -22,11 +22,17 @@ The public hash and disposition record is `automation/reporting-humanisation-led
 
 The Rate limits guide and Extended API introduction now document the current per-IP limits and block durations. The guide clarifies that `/api/client/*` requests count towards both overlapping rules and that a suggested 60-second backoff cap applies only when `Retry-After` is absent.
 
-All 139 page hashes and seven rate-limit prose-unit hashes match the current files. Mintlify validation and internal-link checks passed using saved API reference specifications. Both corrected pages rendered in the local preview with no console errors or document overflow; the guide was also checked at mobile width. Publication remains held pending the release gate below.
+All 139 page hashes and seven rate-limit prose-unit hashes match the current files. Mintlify validation and internal-link checks passed using saved post-deployment API reference specifications. Both corrected pages rendered in the local preview with no console errors or document overflow; the guide was also checked at mobile width.
+
+## Deployed contract verification — 27 September 2026
+
+Both live API specifications match the reviewed contracts. Current rate-limit configuration and the configured error body were confirmed. Read-only reporting checks returned a classification with `category: unknown` and `reason: unmatched`, consistent with the documented fallback. Campaign recipient pagination returned non-overlapping first and second pages.
+
+The sampled event day contained one result, so live event pagination was not exercised. Local pagination contract tests remain the evidence for that case. These release checks do not claim that every guide workflow was exercised in production, or that production query latency was measured.
 
 ## Release gate
 
-Publish after deployed behaviour matches both API references and current rate limits are confirmed. Then verify:
+The deployed contract and rate-limit gates are satisfied. After documentation review and publication, verify:
 
 - <https://docs.spotzee.com/guides/query-events>
 - <https://docs.spotzee.com/guides/campaign-bounce-reporting>
