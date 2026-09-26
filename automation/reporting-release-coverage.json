@@ -4,9 +4,7 @@
   "docsBase": "b6df2bf",
   "existingPages": 137,
   "newPages": 2,
-  "sourceIncomplete": [
-    "guides/api-rate-limits.mdx"
-  ],
+  "sourceIncomplete": [],
   "releaseStatus": "held: operator deployment and deployed verification pending",
   "recordScope": "Public disposition record. Detailed source review and release evidence are retained privately.",
   "pages": [
@@ -33,7 +31,7 @@
     {
       "page": "extended-api/introduction.mdx",
       "disposition": "correct",
-      "candidateSha256": "b5b9be0010ca65227b702d672c719c13a4b53f0d870edd94787af1b8fb8da277",
+      "candidateSha256": "9ce7afd27824940d1d43d0180b9c7363e9946282c9a750a0736ed122a937909c",
       "url": "/extended-api/introduction",
       "newPage": false,
       "sourceComplete": true,
@@ -73,10 +71,10 @@
     {
       "page": "guides/api-rate-limits.mdx",
       "disposition": "correct",
-      "candidateSha256": "a410d4197a57ad590eb3c5d15ae2eb2b0124b6f88489173332295ff2ceb5d654",
+      "candidateSha256": "95341a7f36b2dd0ef91b588e596002719bc9f54da68e44293a56879ee2446849",
       "url": "/guides/api-rate-limits",
       "newPage": false,
-      "sourceComplete": false,
+      "sourceComplete": true,
       "deployedVerification": "pending",
       "publication": "held"
     },

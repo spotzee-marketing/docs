@@ -18,6 +18,12 @@ The new Query events and Campaign bounce reporting guides cover the four existin
 
 The public hash and disposition record is `automation/reporting-humanisation-ledger.json`. Detailed source citations, provider output and review records remain private. These files are excluded from the website but remain public in this repository.
 
+## Rate-limit correction verification — 27 September 2026
+
+The Rate limits guide and Extended API introduction now document the current per-IP limits and block durations. The guide clarifies that `/api/client/*` requests count towards both overlapping rules and that a suggested 60-second backoff cap applies only when `Retry-After` is absent.
+
+All 139 page hashes and seven rate-limit prose-unit hashes match the current files. Mintlify validation and internal-link checks passed using saved API reference specifications. Both corrected pages rendered in the local preview with no console errors or document overflow; the guide was also checked at mobile width. Publication remains held pending the release gate below.
+
 ## Release gate
 
 Publish after deployed behaviour matches both API references and current rate limits are confirmed. Then verify:

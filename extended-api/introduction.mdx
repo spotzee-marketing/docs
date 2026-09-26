@@ -56,7 +56,7 @@ https://apix.spotzee.com/api/ext/openapi.json
 
 Two separate gates apply to Extended API traffic.
 
-**Edge rate limit.** Spotzee's edge network enforces a per-source-IP cap of 1,000 requests per 10 seconds across `apix.spotzee.com/api/*`. Over-limit traffic receives `429 Too Many Requests` with the canonical error envelope. The cap counts every request, authenticated or not.
+**Edge rate limit.** Spotzee's edge network enforces a per-source-IP cap of 4,000 requests per 10 seconds across `apix.spotzee.com/api/*`, with a 10-second block when exceeded. Over-limit traffic receives `429 Too Many Requests` with the canonical error envelope. The cap counts every request, authenticated or not.
 
 **Credit-based quota.** Metered endpoints require available credits, and the cost varies by route. Check your balance in the Spotzee app before high-volume runs; the generated Extended API reference does not expose a public Quota endpoint.
 
