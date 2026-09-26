@@ -1,13 +1,13 @@
 ---
 title: "Set up email delivery"
-description: "Connect SMTP, SendGrid, Mailgun, or Amazon SES so Spotzee can send the email your campaigns and journeys produce, and verify with a test send."
+description: "Connect SMTP, SendGrid, Mailgun, or Amazon SES and test the provider connection."
 keywords: ["email", "providers", "smtp", "sendgrid", "mailgun", "ses", "delivery"]
 ---
 
-Spotzee doesn't ship its own email transport. You bring an email provider, give Spotzee credentials, and we route your sends through it. Four providers are supported: SMTP, SendGrid, Mailgun, and Amazon SES.
+To use your own email delivery account, connect a provider and give Spotzee its credentials. Spotzee routes your sends through that account. The supported options are SMTP, SendGrid, Mailgun, and Amazon SES.
 
 <Info>
-Provider configuration lives under **Settings** → **Integrations** and requires the project `admin` role. You can add more than one provider; mark one as the default and use the others as fallbacks.
+Provider configuration lives under **Settings** → **Integrations** and requires the project `admin` role. You can add more than one provider; select the one to use when configuring each campaign. Journey sends use that campaign's provider.
 </Info>
 
 ## Pick a provider
@@ -38,15 +38,15 @@ In **Settings** → **Integrations**, add a new email provider and pick **SMTP**
 <Step title="Enter connection details">
 Fill in the credentials your relay gave you:
 - **Host**. The SMTP server hostname.
-- **Port**. Typically `587` for STARTTLS, `465` for SSL, `25` for plain.
-- **Protocol**. Pick `starttls` (recommended), `ssl`, `tls`, or `plain`. STARTTLS is the modern default.
+- **Port**. Typically `587` for STARTTLS or `465` for SSL.
+- **Protocol**. Pick `starttls` (the default), `ssl`, or `tls`.
 - **Username** and **Password**.
 - **Auth type** (optional). Defaults to `AUTO`. Switch to `LOGIN` or `PLAIN` only if your server requires it.
 - **Custom headers** (optional). Add tracking headers your downstream analytics needs.
 </Step>
 
 <Step title="Save and test">
-Save the provider, then send a test message (see [Test the connection](#test-the-connection) below).
+Save the provider, then use **Test connection** (see [Test the connection](#test-the-connection) below).
 </Step>
 </Steps>
 
@@ -95,7 +95,7 @@ Fill in:
 </Step>
 
 <Step title="Save and configure feedback URL">
-Save the provider. Spotzee shows a **Feedback URL** in the provider's setup metadata. Add that URL to Mailgun's webhook configuration so delivery events flow back.
+Save the provider. Spotzee shows a **Webhook URL** in the provider's setup metadata. Add that URL to Mailgun's webhook configuration so delivery events flow back.
 </Step>
 </Steps>
 
@@ -130,25 +130,25 @@ Save. Spotzee shows a **Feedback URL** in the provider's setup metadata. Configu
 
 ## Test the connection
 
-Each provider has a test-send affordance. Run one before you point real campaigns at the provider.
+Each listed email provider supports **Test connection**. Run it before you point real campaigns at the provider.
 
 <Steps>
 <Step title="Open the provider you just saved">
 In **Settings** → **Integrations**, open the provider's row.
 </Step>
 
-<Step title="Send a test email">
-Use the test-send action and supply a destination address you can read.
+<Step title="Test the connection">
+Choose **Test connection** in the provider form.
 </Step>
 
 <Step title="Check the result">
-A successful send confirms credentials, network access, and DNS auth (SPF/DKIM/DMARC) are healthy. A failure surfaces the underlying error message.
+A successful test confirms the provider connection. It does not verify inbox delivery or your domain's DNS authentication. A failed test shows an error to investigate.
 </Step>
 </Steps>
 
 ## Set the default provider
 
-Spotzee picks the **default** email provider for any send that doesn't name one. Mark one provider as default after you save it. Add more providers as fallbacks; the routing layer prefers the default and only falls back when the default fails or is disabled.
+You can mark an email provider as the default in **Settings** → **Integrations**. When you create a campaign, check its selected provider before sending. A campaign needs an explicit provider selection.
 
 For sending domain configuration (DKIM records, link wrapping, deliverability hardening), use **Settings** → **Domains**.
 
@@ -157,7 +157,7 @@ For sending domain configuration (DKIM records, link wrapping, deliverability ha
 Spotzee uses provider-specific webhooks to receive delivery events (delivered, bounced, complained, opened, clicked). Each provider exposes its own callback URL in the setup metadata after you save the provider:
 
 - **SendGrid**: a single **Webhook URL** for the Event Webhook.
-- **Mailgun**: a **Feedback URL** for delivery events. Use the optional **webhook signing key** to verify inbound payloads.
+- **Mailgun**: a **Webhook URL** for delivery events. Use the optional **webhook signing key** to verify inbound payloads.
 - **Amazon SES**: a **Feedback URL** for SNS-published events (bounces, complaints, deliveries).
 
 SMTP doesn't have webhook callbacks. Open and click tracking still works through Spotzee's tracking domain regardless of provider.

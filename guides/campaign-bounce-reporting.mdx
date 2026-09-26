@@ -1,0 +1,66 @@
+---
+title: "Campaign bounce reporting"
+description: "Read campaign bounce totals, filter affected messages by cause, and inspect delivery diagnostics."
+keywords: ["campaign bounce reporting", "bounce categories", "bounced messages", "unclassified", "delivery diagnostics"]
+---
+
+Start with the campaign summary to see how many messages bounced and which causes were identified. Filter its recipient messages by a cause, then inspect the diagnostic for an individual send. Event queries give you a separate view of occurrences, unique-contact counts, and trends.
+
+## Before you begin
+
+Use a project secret API key with the project `editor` role or higher. The campaign must belong to that project. Set `SPOTZEE_API_KEY` to the key and `CAMPAIGN_ID` to the campaign identifier in these examples.
+
+## Read totals and causes
+
+```bash
+curl "https://apix.spotzee.com/api/client/campaigns/$CAMPAIGN_ID" \
+  --header "Authorization: Bearer $SPOTZEE_API_KEY"
+```
+
+Read `delivery.bounced` for the number of messages in the bounced state. `delivery.bounce_categories` splits that total across the 12 categories. `delivery.classification_coverage` reports classified, unclassified, and total bounced messages. Repeated sends to the same contact are separate messages.
+
+The summary can be reused for 30 seconds. `delivery.calculated_at` records when it was calculated. Delivery processing can add further delay before an outcome appears. Compare timestamps when reconciling a summary with freshly requested message details.
+
+## Find affected messages
+
+```bash
+curl --get "https://apix.spotzee.com/api/client/campaigns/$CAMPAIGN_ID/recipients" \
+  --header "Authorization: Bearer $SPOTZEE_API_KEY" \
+  --data-urlencode 'bounce_category=mailbox_full' \
+  --data-urlencode 'limit=25'
+```
+
+`bounce_category` selects bounced messages with that cause. Use `bounce_category=unknown` for unclassified bounces, including historical messages with no recognised stored category. Without a cause filter, `segment` accepts `all`, `sent`, `opened`, or `bounced`.
+
+The response has one row per message, including repeated sends to the same contact. Read `bounce_classification` for its diagnostic, severity, finality, and evidence reason; it can be `null` when no valid classification is stored. `email` is the destination recorded for that send and can be `null` when the original destination was not retained.
+
+Pages default to 25 messages, with a maximum of 100. They sort by `send_at` descending, with contact and reference identifiers breaking ties. Use `direction=asc` for ascending order. Pass `next` or `prev` as the next request's `cursor`, retaining the same filters and direction. These cursor field names differ from the Events API's `nextCursor` and `prevCursor`.
+
+## Category identifiers and UI labels
+
+Use the identifier in API filters. The UI displays its corresponding label:
+
+| API identifier | UI label |
+| --- | --- |
+| `invalid_recipient` | Invalid recipient |
+| `mailbox_unavailable` | Mailbox unavailable |
+| `mailbox_full` | Mailbox full |
+| `authentication_failed` | Authentication failed |
+| `policy_blocked` | Policy blocked |
+| `spam_rejected` | Spam rejected |
+| `reputation_blocked` | Reputation blocked |
+| `rate_limited` | Rate limited |
+| `content_rejected` | Content rejected |
+| `dns_routing_error` | DNS or routing error |
+| `transport_error` | Transport error |
+| `unknown` | Unclassified |
+
+Unclassified means the available evidence does not identify a cause. It does not mean the message was delivered. Classification coverage depends on the delivery path and retained evidence; other configured providers do not have the same guaranteed classification coverage as managed delivery.
+
+## Reconcile message and event reports
+
+A bounced-message report describes message outcomes. Event queries describe occurrences during a time window. One message can have several temporary failure events before its final outcome, and `email_failed` can include a submission failure. The resulting counts answer different questions and need not match.
+
+Historical events can receive response-only enrichment from retained evidence. That does not rewrite stored events or fill missing classifications on campaign messages. Keep unclassified messages in your totals, and use the diagnostic evidence before deciding whether to retry or correct contact details.
+
+See the generated **Campaigns** reference in the [Main API](/main-api/introduction) for complete campaign and recipient response contracts.

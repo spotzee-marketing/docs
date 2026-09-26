@@ -16,7 +16,7 @@ This guide is for the API audience. Each call to `POST /generic/dns/dns-record-l
 
 DNS records are the source of truth for how a domain behaves on the internet. An incorrect A record sends visitors to the wrong server. A missing TXT record causes SPF to fail. A stale CNAME alias after a migration causes intermittent failures. A misconfigured CAA record blocks TLS certificate issuance entirely.
 
-These are live production problems — every one of them is visible from a DNS lookup before they become incidents. And the tool queries the live resolver, not a stale cache, so what you see is what mail servers and browsers see right now.
+These are live production problems — every one of them is visible from a DNS lookup before they become incidents. Results can be cached, so allow for DNS propagation and the returned TTL before treating a new value as settled.
 
 For regulated firms, DNS records are also an audit surface. Querying and documenting the DNS state of your own domains and counterparty domains is part of infrastructure due diligence — particularly TXT records for SPF and domain ownership, MX records for inbound mail routing, and CAA records for TLS certificate authority authorisation.
 
@@ -39,13 +39,13 @@ For regulated firms, DNS records are also an audit surface. Querying and documen
 
 <Steps>
 <Step title="Submit the query">
-Send a `POST` to `/generic/dns/dns-record-lookup` with `hostname` and `type`. The API forwards a live DNS query to a resolver — not a cache — and returns the raw response.
+Send a `POST` to `/generic/dns/dns-record-lookup` with `hostname` and `type`. The API returns a normalised DNS response. Repeated queries may be served from the DNS cache.
 </Step>
 <Step title="Read the Answer section">
 Each record in the `Answer` array contains the record `data` value and `TTL` (time-to-live in seconds). If the Answer array is empty and Status is 0 (NOERROR), the hostname exists but has no records of that type. If Status is 3 (NXDOMAIN), the hostname does not exist in DNS.
 </Step>
 <Step title="Check the TTL">
-TTL tells you how long resolvers are allowed to cache the record. A low TTL (under 300 seconds) means the record is changing soon — or that a migration is in progress. A very high TTL (86400 seconds or more) means changes will take up to 24 hours to propagate globally.
+TTL tells you how long a resolver may cache a record. A low TTL allows a resolver to refresh sooner; a high TTL can keep an older value in caches longer.
 </Step>
 </Steps>
 
@@ -82,7 +82,7 @@ TTL tells you how long resolvers are allowed to cache the record. A low TTL (und
 
 - **Empty Answer on a NOERROR response.** The hostname exists but has no record of that type. Check you queried the correct hostname and record type.
 - **NXDOMAIN on a hostname you expect to exist.** The hostname is either misspelled, not yet published, or was deleted. Check your DNS provider's dashboard.
-- **Very low TTL.** A TTL under 60 seconds suggests a live migration. The record may change again before you act on what you see.
+- **Very low TTL.** A TTL under 60 seconds permits a short cache lifetime. Check again before acting on a recent DNS change.
 - **Multiple A records.** Normal for load-balanced services. But if you see an unexpected IP alongside the known one, it may be a misconfiguration or an unauthorised change.
 - **TXT records you don't recognise.** Third-party verification tokens from services you no longer use stay in DNS indefinitely unless manually removed. Audit TXT records periodically to remove stale tokens.
 
@@ -90,7 +90,7 @@ TTL tells you how long resolvers are allowed to cache the record. A low TTL (und
 
 <AccordionGroup>
 <Accordion title="What is a DNS lookup?">
-A DNS lookup queries the Domain Name System to retrieve specific records for a hostname. Each record type answers a different question: A records return IPv4 addresses, TXT records return SPF and verification strings, MX records return mail servers. The tool queries the live resolver and returns whatever the authoritative nameserver currently publishes.
+A DNS lookup queries the Domain Name System to retrieve specific records for a hostname. Each record type answers a different question: A records return IPv4 addresses, TXT records return SPF and verification strings, MX records return mail servers. The tool returns a DNS response that may be cached; compare its TTL when checking a recent change.
 </Accordion>
 
 <Accordion title="What is the difference between an A record and a CNAME record?">

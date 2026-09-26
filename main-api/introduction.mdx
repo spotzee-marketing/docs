@@ -12,16 +12,17 @@ The Main API is the primary way to integrate Spotzee with your own systems. Use 
 https://apix.spotzee.com/api
 ```
 
-The public surface is split across two prefixes:
+The generated reference identifies the base URL and authentication for each operation:
 
 | Prefix | Key prefix | Use |
 |---|---|---|
 | `/client/*` | `sk_` (secret), `pk_` (publishable) | Third-party integrations, agent workloads, browser/mobile clients (publishable on an explicit allowlist) |
 | `/admin/*` | `ok_` (organisation) | Cross-project administration |
+| `/forms/{publicToken}/submissions` | Form token in the URL | Submit to a published form using its public token |
 
 ## Authentication
 
-All requests require a bearer token. See the [Authentication](/guides/authentication) guide for key types, scopes, and rotation.
+Project and organisation operations require a bearer token. Public form submissions use the form token in the URL; follow that endpoint's generated contract. See the [Authentication](/guides/authentication) guide for key types, scopes, and rotation.
 
 ```http
 Authorization: Bearer YOUR_API_KEY
@@ -29,21 +30,21 @@ Authorization: Bearer YOUR_API_KEY
 
 ## Conventions
 
-The Main API is rolling out a set of wire-level conventions in stages. Per-IP edge rate limits, cursor pagination, and the `X-Request-Id` correlation header are live today. Per-key rate limits with read/write split, the MCP boost, `Idempotency-Key` enforcement, full `Spotzee-Version` validation, and the RFC 7807 error envelope ship in a future release. Each guide flags the live-vs-rolling-out state for its concern.
+Main API conventions have different rollout states. Cursor pagination and the `X-Request-Id` correlation header are available. Check the linked guides before relying on per-key rate limits, idempotency enforcement, strict version validation, or a particular error media type.
 
 | Concern | Read |
 |---|---|
 | Versioning | [API versioning](/guides/api-versioning): `Spotzee-Version` header |
 | Rate limits | [Rate limits](/guides/api-rate-limits): per-IP edge limits today, per-key budgets rolling out |
 | Idempotency | [Idempotency](/guides/api-idempotency): `Idempotency-Key` rolling out on Main API |
-| Pagination | [Pagination](/guides/api-pagination): cursor-based with `nextCursor` / `prevCursor` |
-| Webhooks | [Webhooks](/guides/api-webhooks): subscriptions configurable today; outbound delivery on the roadmap |
+| Pagination | [Pagination](/guides/api-pagination): endpoint-specific cursor fields and limits |
+| Webhooks | [Webhooks](/guides/api-webhooks): endpoint configuration, enabled event subscriptions, and signed deliveries |
 | Correlation | Every response includes `X-Request-Id`. Quote it when reporting issues. |
 
 ## Endpoints
 
 <Info>
-  Endpoint pages are auto-generated from the OpenAPI specification. See the sidebar for the full list, grouped by resource (Users, CRM, Lists, Subscriptions, Campaigns, Journeys, Templates, Events, Tags, Projects, API keys, Organisation).
+  Endpoint pages are auto-generated from the OpenAPI specification. See the sidebar for the full list, grouped by resource (Users, CRM, Lists, Subscriptions, Campaigns, Journeys, Templates, Events, Tags, Projects, API keys, Organisation, Webhooks, Billing recovery, Form definitions and Form submissions).
 </Info>
 
 CRM endpoints are part of the generated Main API reference. Use the **CRM** group to read contacts, companies, activities, pipeline stages, properties, and saved views for the project authenticated by your API key.

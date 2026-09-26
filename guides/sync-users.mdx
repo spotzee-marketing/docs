@@ -1,18 +1,18 @@
 ---
-title: "Sync users from your CRM"
-description: "Push users from your existing customer system into Spotzee in batches with idempotent retries."
-keywords: ["users", "sync", "crm", "import", "batch", "idempotency", "external_id"]
+title: "Sync contacts from your CRM"
+description: "Push contacts from your customer system into Spotzee in batches and reconcile processing results."
+keywords: ["contacts", "sync", "crm", "import", "batch", "idempotency", "external_id"]
 ---
 
-Use this flow when you already have a customer record system (a CRM, a billing platform, your own database) and want Spotzee to mirror those users so you can market to them.
+Use this flow when you already have a customer record system (a CRM, a billing platform, your own database) and want Spotzee to mirror those contacts so you can market to them.
 
 ## What you'll build
 
 A repeatable job that:
 
-1. Reads a batch of users from your source system.
+1. Reads a batch of contacts from your source system.
 2. Sends them to Spotzee with `external_id` set to your stable customer ID.
-3. Uses an `Idempotency-Key` so timeouts and retries are safe.
+3. Retains a stable batch identity and checks idempotency availability before retrying.
 4. Walks through every page of source data without re-importing what's already in.
 
 ## Prerequisites
@@ -25,12 +25,12 @@ A repeatable job that:
 
 <Steps>
   <Step title="Pick a stable identifier">
-    Choose the field in your source system that uniquely identifies a customer and never changes. Usually the primary key from your customers table. Pass it to Spotzee as `external_id` on every user.
+    Choose the field in your source system that uniquely identifies a customer and never changes. Usually the primary key from your customers table. Pass it to Spotzee as `external_id` on every contact.
 
-    Spotzee uses `external_id` as the upsert key: re-syncing the same external id updates the existing user rather than creating a duplicate.
+    Spotzee uses `external_id` as the upsert key: re-syncing the same external id updates the existing contact rather than creating a duplicate.
   </Step>
   <Step title="Map your fields to Spotzee's schema">
-    Spotzee users have a small set of first-class fields (`external_id`, `email`, `phone`, `timezone`, `locale`) and a flexible `data` object for anything else, including `first_name`, `last_name`, and any custom attributes. Map your CRM columns to first-class fields where they line up; put everything else into `data`.
+    Spotzee contacts have a small set of first-class fields (`external_id`, `email`, `phone`, `timezone`, `locale`) and a flexible `data` object for anything else, including `first_name`, `last_name`, and any custom attributes. Map your CRM columns to first-class fields where they line up; put everything else into `data`.
 
     | Your column | Spotzee field |
     |---|---|
@@ -42,7 +42,7 @@ A repeatable job that:
     | _everything else_ | `data.<your_key>` |
   </Step>
   <Step title="Pick the batch endpoint that fits">
-    Two batch endpoints are available. Both accept up to 100 users per call as a bare JSON array:
+    Two batch endpoints are available. Both accept up to 100 contacts per call as a bare JSON array:
 
     | Endpoint | Behaviour | Use when |
     |---|---|---|
@@ -52,13 +52,13 @@ A repeatable job that:
     100 per call is the sweet spot for throughput; smaller batches limit the blast radius of a partial failure when using the synchronous form.
   </Step>
   <Step title="Send each batch with an idempotency key">
-    Generate a unique key per batch. A deterministic key derived from the first and last `external_id` works well, since a retry from a queue then uses the same key.
+    Generate a unique key per batch. Include the batch version or a digest of its complete contents in that identity. The same first and last contact identifiers can occur in batches with different updates.
 
     ```http
-    POST /users/batch HTTP/1.1
+    POST /api/client/users/batch HTTP/1.1
     Host: apix.spotzee.com
     Authorization: Bearer sk_…
-    Idempotency-Key: sync-batch-cust_001-cust_100
+    Idempotency-Key: sync-batch-cust_001-cust_100-v1
     Spotzee-Version: 2026-04-28
     Content-Type: application/json
 
@@ -78,7 +78,7 @@ A repeatable job that:
     The body is a bare JSON array, not wrapped in an object. Each item must include either `external_id` or `anonymous_id` (or both, to link them).
   </Step>
   <Step title="Handle partial failures">
-    The synchronous endpoint (`POST /users/batch`) returns a per-item result array. Items that succeeded are committed; failed items are returned with their identifier and a `code` from the [error catalogue](/main-api/errors). Retry only the failed items in a fresh request.
+    The synchronous endpoint (`POST /users/batch`) returns `results`, `succeeded`, and `failed`. Each `results` entry contains either the saved `user` or an `error`. Items that succeeded are committed; failed items are returned with their identifier and an `error.code` from the [error catalogue](/main-api/errors). Retry only the failed items in a fresh request.
 
     The async endpoint (`PATCH /users`) returns `204` immediately and does not surface per-item errors. Use the synchronous form when you need that visibility.
   </Step>
@@ -90,12 +90,12 @@ A repeatable job that:
 ## Pitfalls to avoid
 
 <Warning>
-  Don't use the user's email address as `external_id`. Emails change. A stable, immutable customer ID (like the primary key of your customers table) is the right shape.
+  Don't use the contact's email address as `external_id`. Emails change. A stable, immutable customer ID (like the primary key of your customers table) is the right shape.
 </Warning>
 
-- **Don't loop one user at a time.** The user upsert endpoints are batch-only (`POST /users/batch` synchronous, `PATCH /users` async). Both accept up to 100 per call. Pack your batches.
-- **Don't reuse the same idempotency key for two different batches.** Spotzee returns `409 idempotency_key_mismatch` if you do. See [Idempotency](/guides/api-idempotency) for the exact semantics.
-- **Don't write back to your source from the response.** Spotzee returns its own `id` for each user, but you should key off `external_id` on your side. That way a re-import doesn't break.
+- **Don't loop one contact at a time.** The contact upsert endpoints are batch-only (`POST /users/batch` synchronous, `PATCH /users` async). Both accept up to 100 per call. Pack your batches.
+- **Don't reuse the same idempotency key for two different batches.** Where enforcement is enabled, reuse with a different body returns `409 idempotency_key_mismatch`. See [Idempotency](/guides/api-idempotency) for the exact semantics.
+- **Don't write back to your source from the response.** Spotzee returns its own `id` for each contact, but you should key off `external_id` on your side. That way a re-import doesn't break.
 
 ## Reference
 

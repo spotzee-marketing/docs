@@ -1,13 +1,13 @@
 ---
 title: "Configure subscription preferences"
-description: "Define opt-in subscription types per channel, then let users manage their own preferences via a publishable preference centre or via the API."
+description: "Define subscription types per channel, then manage preferences through hosted links or server-side API calls."
 keywords: ["subscriptions", "opt-in", "opt-out", "preferences", "unsubscribe", "channels"]
 ---
 
 A subscription is a named opt-in channel a user can subscribe to or unsubscribe from. Most projects need at least one per delivery channel (Marketing email, Transactional SMS, Product push) and many add topic-level subscriptions on top. Spotzee separates **subscription types** (configured by admins) from **subscription states** (per-user values).
 
 <Info>
-Subscription types live under **Settings** → **Subscriptions** and require the project `admin` role. Per-user state changes can come from the in-product preference centre, the public `PATCH /subscriptions/me` endpoint, or the server-side bulk toggle endpoint.
+Subscription types live under **Settings** → **Subscriptions** and require the project `admin` role. Per-user state changes can come from hosted preference links, `PATCH /users/{userId}/subscriptions`, or the server-side bulk toggle endpoint.
 </Info>
 
 ## What a subscription type is
@@ -32,9 +32,9 @@ Per-user, each subscription has one of three states:
 |---|---|---|
 | `subscribed` | User has opted in | Yes |
 | `unsubscribed` | User has opted out | No |
-| `opted_in` | User actively confirmed (double opt-in) | Yes (some flows treat this stricter than plain `subscribed`) |
+| `opted_in` | Explicit opt-in value accepted by the API | Yes; treated like `subscribed` for sends |
 
-Default state for a new user is unset, which Spotzee treats as `subscribed` for non-public subscription types (so internal flows reach everyone) and as no-state for public types until the user actively opts in.
+If a user has no recorded opt-out for a subscription type, Spotzee treats that user as `subscribed`. Public visibility controls whether the type appears in the preference centre; it does not change the default send state.
 
 ## Create a subscription type
 
@@ -57,34 +57,9 @@ Save. The new type appears in the table with the channel badge and visibility fl
 
 ## Let users manage their own preferences
 
-The `PATCH /subscriptions/me` endpoint is purpose-built for browser-side preference centres. It accepts a publishable key and a user session token, so the call is safe to make from a customer's browser without exposing a secret key.
+Spotzee's hosted preference link shows public subscription types and lets a user update their own choices. Include `{{preferencesUrl}}` in an email template to give the recipient a route to that page.
 
-<Steps>
-<Step title="Mint a user session token">
-From your server, call `POST /users/{userId}/sessions` with a secret key (`sk_…`) to mint a short-lived user session token bound to the user.
-</Step>
-
-<Step title="Hand the token to your front-end">
-Pass the token to your preference-centre page along with your publishable key (`pk_…`).
-</Step>
-
-<Step title="Toggle subscriptions from the browser">
-Call `PATCH /subscriptions/me` with `Authorization: Bearer pk_...`, `X-Spotzee-User-Token: <session token>`, and a body of toggle items:
-
-```json
-[
-  { "subscription_id": 12, "state": 1 },
-  { "subscription_id": 13, "state": 0 }
-]
-```
-
-State values follow the encoding above: `0` for unsubscribed, `1` for subscribed, `2` for opted-in. Up to 100 toggles per request. Toggling to the current state is a no-op.
-</Step>
-
-<Step title="Re-render the centre with the response">
-The endpoint returns the user's full set of subscription states, refreshed. Use it to re-render your preference centre without an extra round trip.
-</Step>
-</Steps>
+To build your own preference centre, keep a secret project key on your server. Use `GET /users/{userId}/subscriptions` to read the user's states and `PATCH /users/{userId}/subscriptions` to update them. Do not expose the secret key in the browser.
 
 ## Bulk-toggle from your server
 
@@ -104,9 +79,9 @@ Up to 100 toggles per request. Spotzee returns a per-item outcome list so you ca
 
 Some opt-out flows happen automatically:
 
-- **Email unsubscribe links.** Spotzee inserts a one-click unsubscribe link into outbound HTML emails when the recipient is subscribed to a `Public` email subscription. Clicking the link records `unsubscribed` for that subscription.
-- **SMS keywords.** Replies of `STOP`, `UNSUBSCRIBE`, `CANCEL`, `END`, or `QUIT` mark the user as `unsubscribed` for the project's primary SMS subscription. Spotzee then sends back the configured **SMS opt-out message** (set under **Settings** → **General** → **Push and SMS**).
-- **Help keywords.** Replies of `HELP` send back the configured **SMS help message**. Help responses don't change subscription state.
+- **Email unsubscribe links.** Spotzee adds a `List-Unsubscribe` header to outbound email. Templates can render an unsubscribe link with `{{unsubscribeEmailUrl}}`. Following the link records `unsubscribed` for the campaign subscription.
+- **SMS keywords.** Inbound replies containing `STOP` unsubscribe the user from every SMS subscription in the project. Replies containing `START` resubscribe them. These handlers require an SMS provider with an inbound callback configured.
+- **Help keywords.** Replies containing `HELP` send the configured **SMS help message** when one is set. Help responses do not change subscription state.
 
 These flows mean you don't need to wire up unsubscribe handling yourself for the common cases. Reach for the API only when you're building a richer preference centre or processing opt-outs from another source.
 
@@ -122,7 +97,7 @@ Push user data into a project.
 </Card>
 
 <Card title="Manage API keys" icon="key" href="/guides/manage-api-keys">
-Issue publishable and secret keys for preference-centre flows.
+Issue a secret project key for server-side preference-centre calls.
 </Card>
 
 <Card title="Authentication" icon="lock" href="/guides/authentication">

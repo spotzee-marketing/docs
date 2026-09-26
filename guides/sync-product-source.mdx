@@ -66,7 +66,7 @@ Send `Spotzee-Version: 2026-04-28` on each request so payload behaviour stays pi
     Create a property manifest before sending source-managed CRM properties. Property keys must start with your source namespace plus an underscore.
 
     ```http
-    POST /source-systems/property-manifests HTTP/1.1
+    POST /api/client/source-systems/property-manifests HTTP/1.1
     Host: apix.spotzee.com
     Authorization: Bearer sk_...
     Spotzee-Version: 2026-04-28
@@ -109,7 +109,7 @@ Send `Spotzee-Version: 2026-04-28` on each request so payload behaviour stays pi
     Send each known person with your source ID, the email-hash `external_id`, and any useful contact data.
 
     ```http
-    POST /source-systems/identities HTTP/1.1
+    POST /api/client/source-systems/identities HTTP/1.1
     Host: apix.spotzee.com
     Authorization: Bearer sk_...
     Idempotency-Key: acmeapp-identity-user_123-v1
@@ -138,7 +138,7 @@ Send `Spotzee-Version: 2026-04-28` on each request so payload behaviour stays pi
     Send each account, team, or workspace as a CRM company. Put source-managed fields in `properties`.
 
     ```http
-    POST /source-systems/companies HTTP/1.1
+    POST /api/client/source-systems/companies HTTP/1.1
     Host: apix.spotzee.com
     Authorization: Bearer sk_...
     Idempotency-Key: acmeapp-company-workspace_456-v1
@@ -166,7 +166,7 @@ Send `Spotzee-Version: 2026-04-28` on each request so payload behaviour stays pi
     Create a membership after both the identity and company exist. Mark one membership as `primary` when that company should become the contact's primary company in the CRM.
 
     ```http
-    POST /source-systems/memberships HTTP/1.1
+    POST /api/client/source-systems/memberships HTTP/1.1
     Host: apix.spotzee.com
     Authorization: Bearer sk_...
     Idempotency-Key: acmeapp-membership-member_789-v1
@@ -194,7 +194,7 @@ Send `Spotzee-Version: 2026-04-28` on each request so payload behaviour stays pi
     Send journey-triggering events through the Events API using the same email-hash `external_id`.
 
     ```http
-    POST /events HTTP/1.1
+    POST /api/client/events HTTP/1.1
     Host: apix.spotzee.com
     Authorization: Bearer sk_...
     Idempotency-Key: acmeapp-event-user_123-workspace_created-v1
@@ -229,7 +229,7 @@ For an existing product, backfill in this order:
 4. Memberships.
 5. High-value historical events, if you want journeys and reporting to see past milestones.
 
-After the backfill, send changes as they happen: profile updates, company updates, role changes, and product events. Use deterministic `Idempotency-Key` values for retries and replays.
+After the backfill, send changes as they happen: profile updates, company updates, role changes, and product events. Use a stable `Idempotency-Key` for the same logical operation and body. Check [idempotency availability and limits](/guides/api-idempotency) before relying on replay protection.
 
 ## Pitfalls to avoid
 

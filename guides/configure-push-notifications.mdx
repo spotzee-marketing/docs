@@ -27,7 +27,7 @@ Before you start, gather:
 
 - A **Firebase project** linked to your Android app.
 - A **Service account key** (JSON file) from the Firebase project's service accounts page. Download it; the key is shown once.
-- The **App name** as configured in Firebase. Pick something stable; Spotzee uses it as the FCM app identifier.
+- An **App name** for the provider form. The FCM send path uses the service account project ID.
 
 ## Add the push provider
 
@@ -67,7 +67,7 @@ Firebase Cloud Messaging uses a service account key for auth.
 
 | Field | Where to find it |
 |---|---|
-| **App name** | The app name in Firebase. Match this exactly to what your client SDK uses |
+| **App name** | A label for the FCM configuration |
 | **Project ID** | From the service account JSON: `project_id` |
 | **Private key** | From the service account JSON: `private_key`. Includes the BEGIN/END lines and embedded newlines |
 | **Client email** | From the service account JSON: `client_email` |
@@ -76,19 +76,19 @@ The easiest path is to copy the three values directly out of the JSON file Fireb
 
 ## Test the connection
 
-Send a test push to verify each platform works end to end.
+Use a controlled campaign to verify that each configured platform can receive a push.
 
 <Steps>
-<Step title="Open the provider">
-In **Settings** → **Integrations**, open the push provider's row.
+<Step title="Prepare a test device">
+Register an iOS or Android device to a contact in your project.
 </Step>
 
-<Step title="Pick a test device">
-Pick a Spotzee user whose device is registered, then run the test-send action. You can scope the test to APN, FCM, or both.
+<Step title="Send a controlled campaign">
+Create a push campaign for that contact and send it.
 </Step>
 
 <Step title="Verify on the device">
-The test push should land within seconds. A failure surfaces the underlying error (invalid bundle ID, expired key, FCM service-account permission denied, and so on) so you can fix the credential.
+Confirm delivery on the device and review the campaign result for failures.
 </Step>
 </Steps>
 
@@ -99,7 +99,6 @@ A few rules of thumb to keep push working long-term:
 - **One provider per environment**, not per platform. APN and FCM credentials sit together in the same provider so a single provider covers a single iOS-and-Android app pair.
 - **Production toggle matters.** If your app is running an App Store or TestFlight build, the **Production** toggle must be on. Sandbox-only builds need it off. A mismatch silently swallows notifications.
 - **Bundle ID must match.** Apple checks the topic claim in every push request. A mismatch returns `BadDeviceToken` from APN.
-- **Service account scopes.** The Firebase service account needs the **Firebase Messaging Admin** role at minimum. Tighter scopes (custom roles) work as long as `cloudmessaging.messages.create` is allowed.
 - **Rotating credentials.** APN keys can be rotated by uploading a new `.p8` and updating the Key ID. FCM service accounts can be rotated by generating a new JSON key and replacing the three fields.
 
 ## Next steps
@@ -109,11 +108,11 @@ A few rules of thumb to keep push working long-term:
 Compare providers across email, SMS, push, webhook, and in-app.
 </Card>
 
-<Card title="Set up email delivery" icon="mail" href="/guides/configure-email-delivery">
+<Card title="Set up email delivery" icon="envelope" href="/guides/configure-email-delivery">
 Connect SMTP, SendGrid, Mailgun, or Amazon SES.
 </Card>
 
-<Card title="Set up SMS delivery" icon="message-circle" href="/guides/configure-sms-delivery">
+<Card title="Set up SMS delivery" icon="comment" href="/guides/configure-sms-delivery">
 Connect Twilio, Plivo, Telnyx, Vonage, or httpSMS.
 </Card>
 

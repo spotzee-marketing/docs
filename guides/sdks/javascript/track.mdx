@@ -94,7 +94,7 @@ const spotzee = new BrowserClient({ apiKey: 'pk_…' })
 await spotzee.track({ event: 'Product viewed', properties: { sku: 'SHIRT-AU-12' } })
 
 // Sign-up. Anonymous events are aliased to u_42.
-await spotzee.identify({ externalId: 'u_42', email: 'sam@example.com' })
+await spotzee.identify({ externalId: 'u_42', email: 'sam@example.com', traits: {} })
 ```
 
 ## Errors and retries

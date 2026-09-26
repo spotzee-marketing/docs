@@ -1,6 +1,6 @@
 ---
-title: "Identify users"
-description: "Link anonymous Android activity to a known user with identify and alias from the Android SDK."
+title: "Identify contacts"
+description: "Link anonymous Android activity to a known contact with identify and alias from the Android SDK."
 keywords:
   - android
   - sdk
@@ -10,9 +10,9 @@ keywords:
   - traits
 ---
 
-`identify` joins your `external_id` (whatever you call users in your own database) to a Spotzee user record and updates that record's traits. Until you call it, the SDK records activity against a persisted anonymous ID it minted on first use.
+`identify` joins your `external_id` (the identifier you use in your own database) to a Spotzee contact and updates that contact's traits. Until you call it, the SDK records activity against a persisted anonymous ID it minted on first use.
 
-## Identify a known user
+## Identify a known contact
 
 `identify` is a `suspend` function. Call it from a coroutine (typically `lifecycleScope` in a Fragment or Activity, or a long-lived `CoroutineScope` you manage in your DI container).
 
@@ -45,18 +45,18 @@ class SignInActivity : AppCompatActivity() {
 
 ## How traits flow
 
-Anything in the `traits` map lands as a top-level field on the user record. The set of accepted traits is defined by your project's data schema. Read [Define custom user attributes](/guides/data-schema) for how to add or rename traits.
+Anything in the `traits` map lands in the contact's custom data. Read [Define custom contact attributes](/guides/data-schema) to review discovered attribute paths; project admins can set their visibility there.
 
 A few traits map to specific behaviour:
 
 - **`email`** and **`phone`**: top-level fields the email and SMS channels read from. Pass them as arguments to `identify` rather than nesting them in `traits` so the SDK puts them in the right place.
-- **`timezone`** and **`locale`**: drive personalisation and send-time logic. Set them via the `Identity` overload (below) or via `track(event, properties, user)` inline updates.
+- **`timezone`** and **`locale`**: use `track(event, properties, user)` inline updates to set these top-level fields. Values in the `traits` map remain custom attributes.
 
 The trait map accepts `Map<String, Any>`. Values serialise to JSON: strings, numbers, booleans, lists, nested maps.
 
 ## The Identity overload
 
-For when you need to set the anonymous ID explicitly (for example, restoring a session after a crash) or pass `timezone` / `locale`, use the `Identity` overload:
+To set the anonymous ID explicitly, use the `Identity` overload:
 
 ```kotlin
 import com.spotzee.android.Identity
@@ -68,8 +68,6 @@ lifecycleScope.launch {
         phone = null,
         email = "sam@example.com",
         traits = mapOf(
-            "timezone" to "Australia/Sydney",
-            "locale" to "en-AU",
             "plan" to "starter",
         )
     )
@@ -79,7 +77,7 @@ lifecycleScope.launch {
 
 ## Anonymous to known: automatic alias
 
-The first `identify` after an anonymous session aliases the anonymous ID to your `external_id`. All prior anonymous activity now belongs to the known user. Subsequent `track` and `identify` calls carry both IDs automatically.
+The first `identify` after an anonymous session aliases the anonymous ID to your `external_id`. All prior anonymous activity now belongs to the known contact. Subsequent `track` and `identify` calls carry both IDs automatically.
 
 For server-flow contexts where you already know the anonymous ID, call `alias` directly:
 
@@ -149,7 +147,7 @@ MainApplication.analytics.reset()
   <Card title="Track events" href="/guides/sdks/android/track" icon="bolt">
     Trigger journeys and feed segments with custom events.
   </Card>
-  <Card title="Define custom user attributes" href="/guides/data-schema" icon="table-properties">
-    Decide which traits Spotzee accepts.
+  <Card title="Define custom contact attributes" href="/guides/data-schema" icon="table-columns">
+    Review discovered attributes and their visibility.
   </Card>
 </Columns>

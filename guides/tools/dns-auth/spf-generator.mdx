@@ -16,7 +16,7 @@ This guide is for the API audience. Each call to `POST /generic/email/spf-genera
 
 SPF is the first layer of the email-authentication baseline. Without it, any sender can forge your domain in the envelope sender and pass basic delivery checks. A correctly formatted SPF record, paired with DKIM and DMARC, closes that door.
 
-For regulated firms, a misconfigured SPF record is a compliance risk, not just a deliverability one. Mailbox providers may junk or reject unauthenticated mail, the customer never sees it, and the firm has no audit trail of what was delivered. The FCA forced 19,766 financial promotions to be amended or withdrawn in 2024 — a 97.5% increase from 2023. Sender authentication is part of the evidence regulators expect to see.
+For regulated firms, a misconfigured SPF record is a compliance risk, not just a deliverability one. Mailbox providers may junk or reject unauthenticated mail, the customer never sees it, and the firm has no audit trail of what was delivered. Retain your published record and change history as part of your domain-control review.
 
 And the mechanics bite harder than most teams expect. The RFC 7208 limit of ten DNS lookups applies per message evaluation, not per record. Each `include:` your record references resolves to its own mechanisms, which may include further `include:` entries. A record with five `include:` entries can consume ten or more lookups during evaluation. The generator counts your direct mechanisms and flags the risk.
 
@@ -30,7 +30,7 @@ Before generating, list every service that sends mail as your domain: your MX se
 Send a `POST` to `/generic/email/spf-generator` with at minimum `domain` and `policy`. Add your senders via the optional parameters — `ipv4`, `ipv6`, `hostnames_to_send_email`, `other_includes`, and the `allow_mx_to_send_email` / `allow_ip_to_send_email` flags.
 </Step>
 <Step title="Check the DNS lookup count">
-The response includes `lookupCount`. If it is at or above 7, reconsider whether every `include:` is necessary. At 10 or above, the record will cause a `permerror` during evaluation — receivers treat the message as if it had no SPF record at all. Flatten lookup-heavy chains using IP-based mechanisms where possible.
+The response includes `lookupCount`. If it is at or above 7, reconsider whether every `include:` is necessary. Above 10 DNS lookups during evaluation, SPF returns `permerror`. The response count is an estimate of direct mechanisms; nested includes can add more. Flatten lookup-heavy chains using IP-based mechanisms where possible.
 </Step>
 <Step title="Choose your policy qualifier">
 Use `~all` (soft fail) while DMARC is at `p=none` and you are still discovering senders. Switch to `-all` (hard fail) once DMARC is enforcing and every legitimate sender is confirmed. Never use `+all` in production — it accepts mail from any sender and disables SPF entirely.
@@ -75,7 +75,7 @@ Copy the `spfString` from the response and add it as a TXT record at your domain
 
 ## What to watch for
 
-- **Lookup count at or above 7.** At 10 the record `permerror`s. Keep well below the limit — each `include:` you reference may expand to further lookups during live evaluation.
+- **Lookup count at or above 7.** Above 10 DNS lookups during evaluation, SPF returns `permerror`. Keep well below the limit — each `include:` you reference may expand to further lookups during live evaluation.
 - **Missing senders.** Every ESP, transactional provider, billing platform and internal app that sends as your domain must be represented. A missing sender silently fails SPF for that traffic.
 - **`+all` policy.** Accepts mail from any sender and disables all SPF protection. Replace with `~all` (monitoring) or `-all` (enforcing).
 - **Two SPF records at the domain apex.** Only one `v=spf1` TXT record is allowed. Adding a second causes an immediate `permerror`. Edit the existing record using `keep_existing=true` rather than generating a fresh one alongside it.
@@ -101,7 +101,7 @@ Yes. Pass their SPF `include:` domains as a comma-separated string in `other_inc
 </Accordion>
 
 <Accordion title="What does keep_existing do?">
-When `keep_existing=true`, the generator fetches your domain's current SPF record and merges its existing mechanisms into the output alongside any new senders you specify. Deprecated `ptr` mechanisms are automatically removed. Use this when adding a new sender without losing existing configuration.
+When `keep_existing=true`, the generator reads your domain's current SPF record and merges supported existing mechanisms with new senders. Review the generated output before replacing the published record. Use this when adding a new sender without losing existing configuration.
 </Accordion>
 
 <Accordion title="Where can I learn more about SPF?">

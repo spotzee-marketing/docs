@@ -66,7 +66,7 @@ A few rules of thumb:
 
 - **High-velocity sales orgs** (lots of leads converting fast) tend toward 15-30 minute syncs so changes propagate quickly.
 - **Stable customer bases** (low daily change) tend toward 4-12 hour syncs to conserve API calls.
-- **Small Salesforce orgs** can afford 5-minute syncs because the incremental delta is tiny.
+- **Small Salesforce orgs** can use 15-minute syncs when they need fresher data.
 - **Large enterprise orgs** with API limits in mind run hourly or every few hours.
 
 The default of 60 minutes is a sensible middle ground.
@@ -92,8 +92,8 @@ Spotzee runs four automated health checks against every Salesforce integration:
 |---|---|---|
 | **Credentials** | The OAuth tokens still authorise calls to Salesforce | Reconnect to refresh the OAuth grant |
 | **Field mappings** | Every mapped Salesforce field still exists on the object | A field was renamed, deleted, or the user lost permission to read it |
-| **API limits** | Remaining Salesforce API quota is above 10% | You're running low on Salesforce API calls; check usage in Salesforce Setup |
-| **Sync staleness** | Most recent successful sync is within twice the configured frequency | Syncs are failing or stuck; investigate the logs |
+| **API limits** | Remaining Salesforce API quota is at least 10% | A lower level raises a warning; check usage in Salesforce Setup |
+| **Sync staleness** | Most recent successful sync is within twice the configured frequency | A stale sync raises a warning; investigate the logs |
 
 The integration's overview page surfaces the latest health-check result. Drilling in shows which specific check passed or failed and the timestamp.
 
@@ -148,11 +148,11 @@ To resume, re-activate from the same card. Sync rules, field mappings, and OAuth
 ## Next steps
 
 <Columns cols={2}>
-<Card title="Troubleshoot" icon="life-buoy" href="/guides/salesforce/troubleshoot">
+<Card title="Troubleshoot" icon="life-ring" href="/guides/salesforce/troubleshoot">
 Solutions for OAuth failures, missing records, duplicates.
 </Card>
 
-<Card title="Map fields" icon="arrow-right-left" href="/guides/salesforce/field-mapping">
+<Card title="Map fields" icon="right-left" href="/guides/salesforce/field-mapping">
 Adjust field mappings when fields rename or new ones land.
 </Card>
 

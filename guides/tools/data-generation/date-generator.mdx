@@ -28,7 +28,7 @@ Hardcoded dates go stale. A fixture value that was safely in the future can beco
 
 Calendar logic also fails in quiet ways. Month labels overflow small UI cells. Date-only inputs get rejected by APIs that require a time-zone offset. And time-zone identifiers need to be valid IANA strings if they feed scheduling settings.
 
-Each Extended API call deducts a small per-call amount from your Spotzee credit balance. See the [Spotzee pricing page](https://spotzee.com/pricing/) for live per-tool pricing.
+Extended API calls use your Spotzee credit balance. See the [Spotzee pricing page](https://spotzee.com/pricing/) for live per-tool pricing.
 
 ## How it works
 
@@ -99,8 +99,7 @@ Generated date methods return ISO 8601 date-time strings in UTC. Boundary inputs
 </Accordion>
 
 <Accordion title="Can I reproduce random date generator output?">
-  Yes. Set a numeric seed to reproduce the same random date generator output for
-  the same option set. Leave the seed blank when you want a fresh random batch.
+  A numeric seed repeats the random sequence when the date range is fixed. For `anytime`, `birthdate`, `future`, `past`, `recent` and `soon`, also set `refDate`: when you omit it, the current time affects the result. Leave the seed blank when you want a fresh batch.
 </Accordion>
 
 <Accordion title="Is this useful for calendar UI test data?">

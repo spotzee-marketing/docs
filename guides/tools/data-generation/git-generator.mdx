@@ -28,7 +28,7 @@ Repository dashboards, changelog previews, CI parsers and import tools all need 
 
 Git fields also expose small parser and UI issues. Commit entries include line endings and author blocks. SHA values may need shorter display variants. Branch names wrap. But hand-written sample logs get stale fast.
 
-Generated values are test fixtures only. They do not prove real commits, branches, authors or repository activity. Each Extended API call deducts a small per-call amount from your Spotzee credit balance. See the [Spotzee pricing page](https://spotzee.com/pricing/) for live per-tool pricing.
+Generated values are test fixtures only. They do not prove real commits, branches, authors or repository activity. Extended API calls use your Spotzee credit balance. See the [Spotzee pricing page](https://spotzee.com/pricing/) for live per-tool pricing.
 
 ## How it works
 
@@ -57,7 +57,7 @@ Generated values are test fixtures only. They do not prove real commits, branche
 
 | Method          | Output                         | Main parameters                                              |
 | --------------- | ------------------------------ | ------------------------------------------------------------ |
-| `profile`       | Expanded source-control record | `count`, `locale`, `seed`, `eol`, `merge`, `commitShaLength` |
+| `profile`       | Expanded source-control record | `count`, `locale`, `seed`, `refDate`, `eol`, `merge`, `commitShaLength` |
 | `branch`        | Branch-name fixture            | `count`, `locale`, `seed`                                    |
 | `commitDate`    | Commit date fixture            | `count`, `locale`, `seed`, `refDate`                         |
 | `commitEntry`   | Commit log-entry fixture       | `count`, `locale`, `seed`, `refDate`, `eol`, `merge`         |
@@ -87,12 +87,10 @@ Use `profile` when you need fuller git test data. Use a field method when your f
   <Accordion title="Can I use this as a random commit generator?">
     Yes. Choose `commitEntry` when you need a full log-entry fixture, or
     `commitMessage` when you only need message-shaped text. Use a numeric seed
-    when the same random commit generator output must repeat in tests.
+    and pin `refDate` when date-bearing output must repeat in tests.
   </Accordion>
   <Accordion title="Can I reproduce git data generator output?">
-    Yes. Set a numeric seed to reproduce output for the same count, locale,
-    method and option values. Leave the seed blank when you want a fresh random
-    batch for exploratory testing.
+    Set a numeric seed to repeat the random sequence. For `profile`, `commitDate` or `commitEntry`, also set `refDate` to keep date-dependent output stable across runs. Leave the seed blank for a fresh batch.
   </Accordion>
   <Accordion title="Can I use this as a commit SHA generator?">
     Choose `commitSha` when you need SHA-only fixture values, then set

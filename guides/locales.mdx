@@ -36,10 +36,7 @@ The new locale appears in the table with its key and human-readable label.
 
 ## Locale key format
 
-Spotzee accepts BCP-47 language tags. The format is:
-
-- Two- or three-letter language code, lower-case (`en`, `es`, `zh`, `pt`).
-- Optional dash plus two-letter region code, upper-case (`-AU`, `-MX`, `-CN`, `-BR`).
+Use a language code, optionally with a region, for predictable template matching. Common values include `en`, `en-AU`, `es-MX`, and `zh-CN`. The create form requires a value but does not enforce a specific locale format.
 
 Examples:
 
@@ -48,26 +45,27 @@ Examples:
 - `es-MX` matches Mexican Spanish specifically.
 - `zh-CN` matches Simplified Chinese (mainland China).
 
-The CD37 validation rule rejects keys that don't match `^[a-z]{2,3}(-[A-Z]{2})?$`. Capitalisation matters: `en-au` is rejected, `en-AU` is accepted.
+Use consistent capitalisation across users, project settings, and templates because exact matching compares the stored strings.
 
 ## How locale fallback works
 
 Send time: Spotzee picks a template variant for the user using this rule:
 
-1. Match the user's locale exactly to a template variant locale.
-2. If no exact match, fall back to the **project default locale's** variant.
-3. If that doesn't exist either, the send fails with a missing-template error.
+1. Match the user's locale exactly to a template variant.
+2. Try a variant with the same language as the user's locale.
+3. Match the project default locale exactly, then by language.
+4. If none match, use the first available template.
 
 A few worked examples:
 
 | User locale | Template variants | Project default | Picked variant |
 |---|---|---|---|
 | `en-AU` | `en-AU`, `en-US` | `en-US` | `en-AU` (exact match) |
-| `en-NZ` | `en-AU`, `en-US` | `en-US` | `en-US` (project default) |
+| `en-NZ` | `en-AU`, `en-US` | `en-US` | `en-AU` (first English variant) |
 | `es-MX` | `en-AU`, `en-US` | `en-US` | `en-US` (project default) |
 | (none) | `en-AU`, `en-US` | `en-US` | `en-US` (project default) |
 
-To support a wider audience, author at the language level (`en`, `es`) rather than the regional level (`en-AU`, `es-MX`). Regional variants override the language-level variant only when both exist on the same template.
+To support a wider audience, author at the language level (`en`, `es`) rather than the regional level (`en-AU`, `es-MX`). An exact regional match wins. Without one, Spotzee selects the first variant with the same language.
 
 ## Set a user's locale
 
@@ -81,7 +79,7 @@ If a user has no locale set and your project has a default locale, that's what g
 
 ## Delete a locale
 
-You can delete a locale from **Settings** → **Locales** that no longer has template variants pointing at it. Spotzee blocks deletion when active templates still reference the locale; remove or migrate those template variants first.
+You can delete a locale from **Settings** → **Locales**. Check templates that use it before deleting it; the locale deletion route does not check for those variants.
 
 ## Next steps
 

@@ -36,7 +36,7 @@ Same idea for SMS. Spotzee respects the SMS marketing consent state from Shopify
 Order history, in-progress checkouts, and abandoned carts. This unlocks:
 
 - Per-order events (`shopify_order_placed`, `shopify_order_paid`, `shopify_order_fulfilled`, and so on).
-- Abandoned cart detection and the `shopify_checkout_abandoned` event after 60 minutes of inactivity.
+- Abandoned cart detection and the `shopify_checkout_abandoned` event when the periodic check finds a checkout inactive for 60–75 minutes.
 - Total spend and order count properties on each customer.
 - RFM scoring, which depends on order recency, frequency, and monetary value.
 
@@ -77,7 +77,7 @@ A few things Spotzee deliberately doesn't pull:
 The four optional toggles that push data from Spotzee back to your store.
 </Card>
 
-<Card title="Sync settings" icon="settings" href="/guides/shopify/sync-settings">
+<Card title="Sync settings" icon="gear" href="/guides/shopify/sync-settings">
 Configure toggles and start the initial sync.
 </Card>
 

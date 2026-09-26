@@ -1,6 +1,6 @@
 ---
 title: "Music Data Generator"
-description: "Generate album, artist, genre and song name fixtures from one endpoint for music app prototypes, catalog screens and search-index seeds."
+description: "Generate album, artist, genre and song name fixtures from one endpoint for music app prototypes, catalogue screens and search-index seeds."
 keywords:
   [
     "music genre generator",
@@ -24,11 +24,11 @@ A music data generator creates synthetic album, artist, genre and song name valu
 
 ## Why this matters
 
-Music apps, podcast clones, social-radio products and recommendation flows all rely on catalog rows. Tests, demos and screenshots need believable album titles, artist names and song names. They should not embed real licensed catalog rows in fixtures, marketing mocks or seed scripts.
+Music apps, podcast clones, social-radio products and recommendation flows all rely on catalogue rows. Tests, demos and screenshots need believable album titles, artist names and song names. They should not embed real licensed catalogue rows in fixtures, marketing mocks or seed scripts.
 
-Synthetic music data gives engineering and QA teams a controlled lorem-ipsum-alternative for catalog content. A numeric seed reproduces the same record set after a failed test. Method-specific output keeps fixtures focused on the field shape under test.
+Synthetic music data gives engineering and QA teams a controlled lorem-ipsum-alternative for catalogue content. A numeric seed reproduces the same record set after a failed test. Method-specific output keeps fixtures focused on the field shape under test.
 
-Generated values are placeholder strings. Each Extended API call deducts a small per-call amount from your Spotzee credit balance. See the [Spotzee pricing page](https://spotzee.com/pricing/) for live per-tool pricing.
+Generated values are placeholder strings. Extended API calls use your Spotzee credit balance. See the [Spotzee pricing page](https://spotzee.com/pricing/) for live per-tool pricing.
 
 ## How it works
 
@@ -62,13 +62,13 @@ Generated values are placeholder strings. Each Extended API call deducts a small
 | `artist`   | Single artist or band name            | `count`, `locale`, `seed` |
 | `genre`    | Single music genre                    | `count`, `locale`, `seed` |
 
-Pick `profile` when a screen needs related catalog fields together. Pick a single method when a parser, tag or column expects one shape per record.
+Pick `profile` when a screen needs related catalogue fields together. Pick a single method when a parser, tag or column expects one shape per record.
 
 ## What to watch for
 
 - **Count outside `1` to `100`.** One request returns up to 100 records. Call the endpoint again for larger datasets.
 - **Method not matching the field under test.** Use `profile` for related fields together, or pick one method when a parser expects a single value shape.
-- **Treating fixtures as licensed catalog rows.** Generated values are synthetic strings. Replace them before publishing marketing copy, app store listings or production catalog data.
+- **Treating fixtures as licensed catalogue rows.** Generated values are synthetic strings. Replace them before publishing marketing copy, app store listings or production catalogue data.
 - **Locale assumptions.** Most vocabulary is English-coded today. Send a non-English locale only after confirming upstream support for the words you need.
 - **Unseeded snapshots.** Send a numeric `seed` when tests assert exact strings or snapshot the rendered output.
 
@@ -97,7 +97,7 @@ Pick `profile` when a screen needs related catalog fields together. Pick a singl
   <Accordion title="Are these real albums, artists or songs?">
     No. Generated values are synthetic placeholder strings built from common
     music vocabulary. Treat them as fixture copy and replace them before
-    shipping documentation, marketing or production catalog data.
+    shipping documentation, marketing or production catalogue data.
   </Accordion>
   <Accordion title="Where can I learn more about music data generation?">
     Read the [music data generator
@@ -110,4 +110,4 @@ Pick `profile` when a screen needs related catalog fields together. Pick a singl
 
 ## Try it
 
-Generate sample music data in the browser at [spotzee.com/tools/music-generator](https://spotzee.com/tools/music-generator/), or call the Extended API when you need music fixtures inside catalog screens, search seeds, recommendation flows and demo libraries.
+Generate sample music data in the browser at [spotzee.com/tools/music-generator](https://spotzee.com/tools/music-generator/), or call the Extended API when you need music fixtures inside catalogue screens, search seeds, recommendation flows and demo libraries.

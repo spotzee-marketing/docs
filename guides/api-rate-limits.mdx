@@ -6,21 +6,19 @@ keywords: ["rate limits", "throttling", "429", "retry-after", "backoff"]
 
 The Spotzee API enforces per-source-IP rate limits at the edge today. Two rules apply across `apix.spotzee.com`.
 
-| Rule | Surface | Limit | Action |
-|---|---|---|---|
-| Client API limit | `/api/client/*` | 8,000 requests per minute per IP | Block (HTTP 429) |
-| General API limit | `/api/*` (covers `/api/client/*`, `/api/admin/*`, `/api/ext/*`) | 1,000 requests per 10 seconds per IP | Block (HTTP 429) |
+| Rule | Surface | Limit | Action | Block duration |
+|---|---|---|---|---|
+| Client API limit | `/api/client/*` | 8,000 requests per minute per IP | Block (HTTP 429) | 120 seconds |
+| General API limit | `/api/*` (covers `/api/client/*`, `/api/admin/*`, `/api/ext/*`) | 4,000 requests per 10 seconds per IP | Block (HTTP 429) | 10 seconds |
 
-The general rule's tighter window is the one bursty traffic hits first. The 8,000-per-minute cap on `/api/client/*` is the umbrella ceiling. Both rules count every request, authenticated or not.
+Requests to `/api/client/*` count towards both limits. Either rule can block an IP, depending on its traffic. Both rules count matching requests from each source IP, authenticated or not.
 
 ## Response on a block
 
-Over-limit requests receive `429 Too Many Requests` with a `Retry-After` header and a JSON body matching the canonical Spotzee error envelope:
+Over-limit requests receive `429 Too Many Requests` with this JSON body:
 
 ```http
 HTTP/1.1 429 Too Many Requests
-Retry-After: 10
-Content-Type: application/problem+json
 ```
 
 ```json
@@ -29,21 +27,21 @@ Content-Type: application/problem+json
   "code": "rate_limited",
   "title": "Rate limit exceeded",
   "message": "Rate limit exceeded. Slow down and retry after the period in `Retry-After`.",
-  "type": "https://spotzee.com/docs/main-api/errors#rate_limited"
+  "type": "https://docs.spotzee.com/main-api/errors#rate_limited"
 }
 ```
 
 ## Retry strategy
 
 <Steps>
-  <Step title="Honour Retry-After first">
-    Wait at least the number of seconds in `Retry-After` before retrying. The block windows are short (10 seconds for the general rule), and the next attempt almost always succeeds.
+  <Step title="Honour Retry-After when present">
+    If the response includes `Retry-After`, wait at least that long before retrying. Otherwise, use exponential backoff. Another request can still receive `429` while a block remains active.
   </Step>
   <Step title="Add jitter when fanning out">
-    If you're driving many requests in parallel from a single host, add 0–500 ms of jitter on top of `Retry-After` so retries don't synchronise.
+    If you're driving many requests in parallel from a single host, add 0–500 ms of jitter on top of your delay so retries don't synchronise.
   </Step>
   <Step title="Back off on repeats">
-    If you see a second `429` after honouring `Retry-After`, double your delay (exponential backoff) up to a sensible cap, for example 60 seconds.
+    If you see a second `429`, honour `Retry-After` when present. Otherwise, double your delay (exponential backoff) up to a sensible cap, for example 60 seconds.
   </Step>
   <Step title="Cap concurrency per IP">
     Both limits count by source IP. Outbound traffic from a single host is the one to pace.
@@ -53,26 +51,30 @@ Content-Type: application/problem+json
 ## Self-throttling example
 
 ```javascript
-async function callApi(path, init) {
-  const res = await fetch(`https://apix.spotzee.com/api/client${path}`, init)
-
-  if (res.status === 429) {
-    const retryAfter = Number(res.headers.get('Retry-After') ?? '10')
-    await new Promise(r => setTimeout(r, retryAfter * 1000))
-    return callApi(path, init)
+async function readApi(path, token) {
+  for (let attempt = 0; attempt < 3; attempt++) {
+    const response = await fetch(`https://apix.spotzee.com/api/client${path}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+    if (response.status !== 429 || attempt === 2) return response
+    const header = response.headers.get('Retry-After')
+    const seconds = Number(header)
+    const wait = header && Number.isFinite(seconds)
+      ? seconds * 1000
+      : Date.parse(header ?? '') - Date.now()
+    const delay = Number.isFinite(wait) ? Math.max(0, wait) : 1000 * 2 ** attempt
+    await new Promise(resolve => setTimeout(resolve, delay + Math.random() * 500))
   }
-
-  return res
 }
 ```
 
 ## Quota-metered endpoints
 
-The Extended API charges credits on certain operations (validation, scoring, lookups, generation) on top of the per-IP rate limit. Hitting your credit balance returns `402 quota_exceeded` even when the rate-limit window shows capacity remaining. Inspect remaining credits via the `Quota` endpoints before high-volume runs.
+The Extended API meters certain operations separately from request rate limits. Insufficient credits can return `402` even when request capacity remains available. Check your balance in the Spotzee app before high-volume runs; no public Quota endpoint appears in the generated Extended API reference.
 
 ## Rolling out
 
-Per-API-key sliding-window rate limits with a read/write split, an `X-RateLimit-*` header set, and a doubled budget for MCP traffic are wired in code and ship behind a feature flag. They are not active in production today. Once enabled, they will sit on top of the per-IP edge limits described above. The self-throttling pattern (honour `Retry-After`, add jitter, exponential backoff) works against either layer.
+Per-key read/write budgets, `X-RateLimit-*` headers and a doubled MCP budget depend on rollout availability. Do not use them to exceed the per-IP limits or assume that setting a client-type header grants extra capacity. The self-throttling pattern (honour `Retry-After` when present, add jitter, exponential backoff) works against either layer.
 
 ## Next steps
 

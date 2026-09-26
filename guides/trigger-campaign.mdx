@@ -1,6 +1,6 @@
 ---
 title: "Trigger a one-off campaign"
-description: "Send a campaign on demand from your backend. The API equivalent of clicking Send in the UI."
+description: "Trigger an existing campaign for one contact and inspect its delivery outcome."
 keywords: ["campaigns", "trigger", "send", "blast", "transactional", "broadcast"]
 ---
 
@@ -11,36 +11,36 @@ Use this flow when you've already authored a campaign in the Spotzee UI (audienc
 A backend call that:
 
 1. Looks up an existing campaign by ID.
-2. Triggers a send for a single user, with an optional event payload that flows into the template.
+2. Triggers a send for a single contact, with an optional event payload that flows into the template.
 3. Captures the response so you can correlate the send with downstream delivery events.
 
 ## Prerequisites
 
 <Info>
-  You'll need a `sk_` project key. The campaign must already exist in Spotzee. The API triggers existing campaigns rather than authoring new ones from scratch.
+  You'll need a `sk_` project key. The campaign must already exist in Spotzee. This procedure triggers an existing campaign; creating a campaign is a separate API operation.
 </Info>
 
 ## Walkthrough
 
 <Steps>
   <Step title="Find the campaign ID">
-    `GET /campaigns?limit=100` returns every campaign in the project with its `id`. In production, store the IDs you need in your config rather than looking them up on every send.
+    `GET /campaigns?limit=100` returns up to 100 campaigns with their identifiers. Follow pagination to inspect further campaigns. In production, store the IDs you need in your config rather than looking them up on every send.
 
-    A campaign in `state: "draft"` cannot be triggered. Promote it via the UI, or `PATCH /campaigns/{id}` to set `state: "scheduled"`.
+    Use the campaign prepared for this per-contact trigger. Scheduling a blast campaign is a different operation and requires its audience and send-time configuration.
   </Step>
-  <Step title="Identify the user and event payload">
-    The trigger endpoint fires a `trigger`-type campaign for **one user at a time**. The body has two required fields:
+  <Step title="Identify the contact and event payload">
+    The trigger endpoint queues a campaign send for **one contact at a time**. Acceptance does not confirm delivery; recipient eligibility and subscription checks run during processing. The body has two required fields:
 
     | Field | Shape | Notes |
     |---|---|---|
-    | `user` | object | Identifies the user. `external_id` is required; `email`, `phone`, `device_token`, `timezone`, `locale` are optional, and any additional custom attributes you include flow through to the user record. |
+    | `user` | object | Identifies the contact. `external_id` is required; `email`, `phone`, `device_token`, `timezone`, `locale` are optional, and any additional custom attributes you include flow through to the contact record. |
     | `event` | object | Free-form JSON, exposed to the campaign template as `{{event}}` (so `{{event.order_id}}` etc. resolve as template variables). May be `{}` if your template doesn't reference event data. |
 
-    To send to multiple users, call the endpoint once per user (typically from your queue/worker layer).
+    To send to multiple contacts, call the endpoint once per contact (typically from your queue/worker layer).
   </Step>
   <Step title="Trigger the send">
     ```http
-    POST /campaigns/{campaignId}/trigger HTTP/1.1
+    POST /api/client/campaigns/{campaignId}/trigger HTTP/1.1
     Host: apix.spotzee.com
     Authorization: Bearer sk_…
     Idempotency-Key: launch-2026-04-28
@@ -63,19 +63,19 @@ A backend call that:
     On success the response is `{ "success": true }` and the send is enqueued for the standard delivery lifecycle.
   </Step>
   <Step title="Track delivery downstream">
-    Once enqueued, a campaign send progresses through the standard delivery lifecycle. Watch progress on the campaign detail page in the Spotzee app, where send, delivery, and engagement counts update in real time. Enterprise high-deliverability projects can also forward enabled delivery events from **Settings** → **Webhook Endpoints**.
+    Once enqueued, a campaign send progresses through the standard delivery lifecycle. Watch progress on the campaign detail page in the Spotzee app, where message outcomes and engagement counts update after processing. Enterprise high-deliverability projects can also forward enabled delivery events from **Settings** → **Webhook Endpoints**.
   </Step>
 </Steps>
 
 ## Pitfalls to avoid
 
 <Warning>
-  Don't reuse a campaign as a transactional template. Campaigns are designed for one-shot sends to a stable audience. For per-event transactional messages (welcome emails, password resets, receipt confirmations), trigger a journey instead. See [Trigger a journey](/guides/journey-trigger).
+  Use a triggered campaign for a single per-contact message. Use a journey when you need several steps, waits, or branches. See [Trigger a journey](/guides/journey-trigger).
 </Warning>
 
-- **Don't trigger the same campaign twice in a row.** Spotzee will happily send twice. That's what the API is for. Use an `Idempotency-Key` so a network retry doesn't double-send. See [Idempotency](/guides/api-idempotency).
-- **Don't expect templates to render with arbitrary data.** Template variables resolve against the user attributes (`{{user.…}}`) and the event payload (`{{event.…}}`). Anything not in either shows up as blank.
-- **Don't trigger in a tight loop without batching.** Each call fires one send for one user; if you're sending to a large audience, queue and pace the calls (or use a `blast`-type campaign against a list instead).
+- **Prevent duplicate logical triggers.** Keep a stable request identity and check whether a timed-out call was accepted before retrying. An `Idempotency-Key` protects retries only where enforcement is enabled; see [Idempotency](/guides/api-idempotency).
+- **Don't expect templates to render with arbitrary data.** Template variables resolve against the contact attributes (`{{user.…}}`) and the event payload (`{{event.…}}`). Anything not in either shows up as blank.
+- **Don't trigger in a tight loop without batching.** Each call fires one send for one contact; if you're sending to a large audience, queue and pace the calls (or use a `blast`-type campaign against a list instead).
 
 ## Reference
 

@@ -1,0 +1,117 @@
+{
+  "createdAt": "2026-09-26",
+  "status": "finalised and verified; publication pending",
+  "recordScope": "Public-safe hash-bound supplement for the rate-limit factual correction; private source evidence retained by the release owner.",
+  "pages": {
+    "guides/api-rate-limits.mdx": "95341a7f36b2dd0ef91b588e596002719bc9f54da68e44293a56879ee2446849",
+    "extended-api/introduction.mdx": "9ce7afd27824940d1d43d0180b9c7363e9946282c9a750a0736ed122a937909c"
+  },
+  "counts": {
+    "ineligible-technical": 7,
+    "excluded-frozen": 1
+  },
+  "frozenContent": [
+    "Rate-limit table, HTTP/JSON examples, JavaScript example, Step labels and structural markup: preserved except authorised factual corrections to table values, block durations and JSON type."
+  ],
+  "units": [
+    {
+      "id": "guides/api-rate-limits.mdx#line-14",
+      "page": "guides/api-rate-limits.mdx",
+      "sourceStartLine": 14,
+      "sourceSha256": "eb1d0feec2f12b10b9740ffdbfd8ccef2efbb63d8c09198d0312e08b923925d1",
+      "finalSha256": "eb1d0feec2f12b10b9740ffdbfd8ccef2efbb63d8c09198d0312e08b923925d1",
+      "eligibility": "ineligible-technical",
+      "disposition": "ineligible-technical",
+      "sourcePreserved": true,
+      "manualChecks": [
+        "source-backed assertions or reader instructions only",
+        "technical tokens, numbers, qualifications and Australian spelling preserved"
+      ]
+    },
+    {
+      "id": "guides/api-rate-limits.mdx#line-18",
+      "page": "guides/api-rate-limits.mdx",
+      "sourceStartLine": 18,
+      "sourceSha256": "badb6397884717ae874687228ae3d9569bd111c878ef13e2d5c42c3da5369284",
+      "finalSha256": "badb6397884717ae874687228ae3d9569bd111c878ef13e2d5c42c3da5369284",
+      "eligibility": "ineligible-technical",
+      "disposition": "ineligible-technical",
+      "sourcePreserved": true,
+      "manualChecks": [
+        "source-backed assertions or reader instructions only",
+        "technical tokens, numbers, qualifications and Australian spelling preserved"
+      ]
+    },
+    {
+      "id": "guides/api-rate-limits.mdx#line-38",
+      "page": "guides/api-rate-limits.mdx",
+      "sourceStartLine": 38,
+      "sourceSha256": "5caf7381318e23f473d19480dfe67fb7ef4b684c66dc190b2d4f98dae5e7e2b9",
+      "finalSha256": "5caf7381318e23f473d19480dfe67fb7ef4b684c66dc190b2d4f98dae5e7e2b9",
+      "eligibility": "ineligible-technical",
+      "disposition": "ineligible-technical",
+      "sourcePreserved": true,
+      "manualChecks": [
+        "source-backed assertions or reader instructions only",
+        "technical tokens, numbers, qualifications and Australian spelling preserved"
+      ]
+    },
+    {
+      "id": "guides/api-rate-limits.mdx#line-41",
+      "page": "guides/api-rate-limits.mdx",
+      "sourceStartLine": 41,
+      "sourceSha256": "b1f8b8da949559d0f3598be2d72afbe87911037b73e9930257f942b1dfba055d",
+      "finalSha256": "b1f8b8da949559d0f3598be2d72afbe87911037b73e9930257f942b1dfba055d",
+      "eligibility": "ineligible-technical",
+      "disposition": "ineligible-technical",
+      "sourcePreserved": true,
+      "manualChecks": [
+        "source-backed assertions or reader instructions only",
+        "technical tokens, numbers, qualifications and Australian spelling preserved"
+      ]
+    },
+    {
+      "id": "guides/api-rate-limits.mdx#line-44",
+      "page": "guides/api-rate-limits.mdx",
+      "sourceStartLine": 44,
+      "sourceSha256": "02a31791fe195634bd060fb3dbb987a4b9c72c1ce587f916ff8f95bf910567af",
+      "finalSha256": "02a31791fe195634bd060fb3dbb987a4b9c72c1ce587f916ff8f95bf910567af",
+      "eligibility": "ineligible-technical",
+      "disposition": "ineligible-technical",
+      "sourcePreserved": true,
+      "manualChecks": [
+        "source-backed assertions or reader instructions only",
+        "technical tokens, numbers, qualifications and Australian spelling preserved"
+      ]
+    },
+    {
+      "id": "guides/api-rate-limits.mdx#line-77",
+      "page": "guides/api-rate-limits.mdx",
+      "sourceStartLine": 77,
+      "sourceSha256": "e94d00dc070d2cb9485e9ec56bfda5dc6e9515adf9c9133691896496cb1420dd",
+      "finalSha256": "e94d00dc070d2cb9485e9ec56bfda5dc6e9515adf9c9133691896496cb1420dd",
+      "eligibility": "ineligible-technical",
+      "disposition": "ineligible-technical",
+      "sourcePreserved": true,
+      "manualChecks": [
+        "source-backed assertions or reader instructions only",
+        "technical tokens, numbers, qualifications and Australian spelling preserved"
+      ]
+    },
+    {
+      "id": "extended-api/introduction.mdx#line-59",
+      "page": "extended-api/introduction.mdx",
+      "sourceStartLine": 59,
+      "sourceSha256": "7b206e31f21596e5d03d66f16b7b6f0e5a37efd5fa0abebae8c6536f0db1eb17",
+      "finalSha256": "7b206e31f21596e5d03d66f16b7b6f0e5a37efd5fa0abebae8c6536f0db1eb17",
+      "eligibility": "ineligible-technical",
+      "disposition": "ineligible-technical",
+      "sourcePreserved": true,
+      "manualChecks": [
+        "source-backed assertions or reader instructions only",
+        "technical tokens, numbers, qualifications and Australian spelling preserved"
+      ]
+    }
+  ],
+  "blockedManualReview": 0
+}

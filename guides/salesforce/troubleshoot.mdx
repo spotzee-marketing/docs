@@ -103,9 +103,9 @@ Save and run a manual sync. The health check should clear on the next pass.
 
 **Check.**
 
-1. **Mapping exists.** Confirm `HasOptedOutOfEmail` is mapped to a Spotzee opt-out property.
-2. **Property type.** The destination Spotzee property must be `boolean`. A string property won't drive the opt-out logic.
-3. **Subscription wired up.** Spotzee subscriptions read from the property to decide unsubscribed state. Check **Settings** → **Subscriptions** to confirm a subscription type is bound to the opt-out property.
+1. **Opt-out field.** Select `HasOptedOutOfEmail` in **Email opt-out field**.
+2. **Field type.** Select a Salesforce boolean field in **Email opt-out field**. A regular field mapping does not update subscription state.
+3. **Email subscriptions.** Confirm the project has an email subscription to update.
 4. **Sync ran.** Check the logs for a recent `sync_completed` event. Opt-outs only propagate on the next sync after the change in Salesforce.
 
 If everything looks correct but the opt-out still hasn't moved, run a manual sync and re-test. If it still doesn't propagate, drop a row in the logs to confirm the field value Spotzee is reading.
@@ -122,11 +122,11 @@ If you've worked through the patterns above and still have a stuck sync:
 ## Next steps
 
 <Columns cols={2}>
-<Card title="Operations" icon="activity" href="/guides/salesforce/operations">
+<Card title="Operations" icon="chart-line" href="/guides/salesforce/operations">
 Health checks, status badges, and the logs view.
 </Card>
 
-<Card title="Map fields" icon="arrow-right-left" href="/guides/salesforce/field-mapping">
+<Card title="Map fields" icon="right-left" href="/guides/salesforce/field-mapping">
 Repair broken mappings and add new ones.
 </Card>
 

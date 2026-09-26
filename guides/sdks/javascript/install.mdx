@@ -1,6 +1,6 @@
 ---
 title: "Install the JavaScript SDK"
-description: "Add @spotzee/js-sdk to a Node app, a browser bundle, or a script tag, and initialise it with a publishable key."
+description: "Add @spotzee/js-sdk to a Node app or browser bundle and initialise it with a publishable key."
 keywords:
   - javascript
   - sdk
@@ -10,7 +10,7 @@ keywords:
   - publishable key
 ---
 
-The JavaScript SDK ships three classes for three runtimes. Pick the one that matches where your code runs, install with your usual package manager, and initialise once with a publishable key.
+The JavaScript SDK provides `Client` for explicit identity and `BrowserClient` for an in-memory browser identity. `Spotzee` wraps `BrowserClient` as a singleton.
 
 ## Install
 
@@ -28,10 +28,6 @@ yarn add @spotzee/js-sdk
 pnpm add @spotzee/js-sdk
 ```
 
-```html script tag
-<script src="https://unpkg.com/@spotzee/js-sdk/lib/esm/index.js"></script>
-```
-
 </CodeGroup>
 
 The package ships dual CJS + ESM builds. Static types ship with the package.
@@ -42,7 +38,7 @@ The package ships dual CJS + ESM builds. Static types ship with the package.
 |---|---|---|
 | `Client` | Node, edge runtimes, server jobs | You pass `anonymousId` and / or `externalId` on every call |
 | `BrowserClient` | Web browsers (modern bundlers) | Mints an anonymous ID on first use, caches `externalId` after `identify` |
-| `Spotzee` | Browser script tag (`window.Spotzee`) | Static singleton wrapper around `BrowserClient` |
+| `Spotzee` | Browser bundle | Static singleton wrapper around `BrowserClient` |
 
 ## Initialise
 
@@ -62,16 +58,15 @@ import { BrowserClient } from '@spotzee/js-sdk'
 const spotzee = new BrowserClient({ apiKey: 'pk_…' })
 ```
 
-```javascript Script tag
-<script src="https://unpkg.com/@spotzee/js-sdk/lib/esm/index.js"></script>
-<script>
-  Spotzee.initialize({ apiKey: 'pk_…' })
-</script>
+```typescript Browser singleton
+import { Spotzee } from '@spotzee/js-sdk'
+
+Spotzee.initialize({ apiKey: 'pk_…' })
 ```
 
 </CodeGroup>
 
-The browser variants persist the anonymous ID for the duration of the page session. To carry an anonymous ID across page loads, pass it explicitly into `track` / `identify` from your own storage.
+`BrowserClient` creates an anonymous ID for each instance. It does not persist that ID across page loads. To retain one across loads, keep it in your own storage and pass it to `track` and `identify`.
 
 ## What every request carries
 

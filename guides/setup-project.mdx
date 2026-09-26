@@ -17,7 +17,7 @@ You can create a project two ways: through the onboarding wizard the first time 
 <Tabs>
 <Tab title="First-time onboarding">
 
-The onboarding wizard runs after you create or join an organisation. It walks through three steps and creates the project on the final step.
+The onboarding wizard runs after you create or join an organisation. It walks through three steps and creates the project when you finish the last one.
 
 <Steps>
 <Step title="Name your project and add a website">
@@ -29,17 +29,15 @@ Pick whether you plan to use Shopify or WooCommerce, choose your industry, and t
 </Step>
 
 <Step title="Choose your locale and timezone">
-Defaults come from your browser. Change them if you ship from a different region or send to a different audience.
+The wizard starts with your browser's language and timezone. Change them if you send from a different region or to a different audience.
 
-- **Locale.** Drives default formatting in templates (dates, numbers, currency). Use a BCP-47 tag like `en-AU`, `en-GB`, `es-MX`, or `zh-CN`. Per-template variants override the project default.
+- **Locale.** Drives default formatting in templates (dates, numbers, currency). Use a two- or three-letter language code, optionally followed by a dash and a two-letter uppercase region code, such as `en-AU`, `en-GB`, `es-MX`, or `zh-CN`. Per-template variants override the project default.
 - **Timezone.** Drives journey-delay scheduling, time-of-day actions, and time-window throttles. Pick the timezone your sends should anchor to.
 
 You'll also opt in or out of a 30-minute onboarding consultation and Spotzee marketing email on this step.
 </Step>
 
-<Step title="Confirm and create the project">
-Confirm to finish the wizard. You land on the new project's dashboard with sensible defaults applied: link wrapping on for email, off for push, and open tracking on.
-</Step>
+
 </Steps>
 
 </Tab>
@@ -79,7 +77,7 @@ Edit the project name, website URL, and a free-text description. The description
 Change the default locale or timezone any time. Existing scheduled sends keep the timezone they were created with. New sends and journey delays inherit the current value.
 
 <Note>
-Locales must be valid BCP-47 tags. Adding additional locales for template variants is a separate flow under **Settings** → **Locales**.
+Locales use a two- or three-letter lowercase language code, optionally followed by a dash and a two-letter uppercase region code. Add locales for template variants under **Settings** → **Locales**.
 </Note>
 
 ### Email tracking

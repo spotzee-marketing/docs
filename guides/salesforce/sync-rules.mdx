@@ -7,7 +7,7 @@ keywords: ["salesforce", "sync", "rules", "filters", "operators", "objects"]
 Sync rules decide what comes through. Pick the object types you want, then layer filters on top so only the records you actually need flow into Spotzee.
 
 <Info>
-Sync rules live on each Salesforce integration record. Open the integration from your project's **Integrations** menu and configure rules from there. Saving rules schedules the next sync to use them.
+Sync rules live on each Salesforce integration record. Open the integration from your project's **Integrations** menu and configure rules from there. Changing rules resets the next run to a full sync so newly matching records are included.
 </Info>
 
 ## Pick objects to sync
@@ -42,9 +42,9 @@ Both work. Pick the one that matches the audience you're sending to:
 
 ### CampaignMember
 
-CampaignMember syncs people who belong to specific Salesforce campaigns. The targeting is already done in Salesforce, so you don't need filter rules on top.
+CampaignMember syncs Salesforce campaign membership. Add a rule on `CampaignId` when you want members of a specific campaign.
 
-A common pattern: sales runs a `Q1 Product Launch` campaign in Salesforce. You sync only that campaign's members into Spotzee, name the resulting Spotzee list after the campaign, and trigger your launch journey from there.
+For example, filter by the Salesforce campaign ID for a product launch. Spotzee attaches campaign membership to the matching Lead or Contact record and emits a campaign event that can trigger a journey.
 
 ## Filter records with sync rules
 
@@ -109,15 +109,15 @@ If a sync returns zero records, the most common cause is rules that are too rest
 ## Next steps
 
 <Columns cols={2}>
-<Card title="Map fields" icon="arrow-right-left" href="/guides/salesforce/field-mapping">
+<Card title="Map fields" icon="right-left" href="/guides/salesforce/field-mapping">
 Decide which Salesforce fields land on which Spotzee user property.
 </Card>
 
-<Card title="Operations" icon="activity" href="/guides/salesforce/operations">
+<Card title="Operations" icon="chart-line" href="/guides/salesforce/operations">
 Manual sync, frequency, and monitoring.
 </Card>
 
-<Card title="Troubleshoot" icon="life-buoy" href="/guides/salesforce/troubleshoot">
+<Card title="Troubleshoot" icon="life-ring" href="/guides/salesforce/troubleshoot">
 What to do when no records come through.
 </Card>
 

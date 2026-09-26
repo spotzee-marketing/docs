@@ -4,7 +4,7 @@ description: "How to make POST and PATCH requests safely retryable with Idempote
 keywords: ["idempotency", "idempotency-key", "retries", "duplicate prevention", "409"]
 ---
 
-Network failures, timeouts, and retries are unavoidable. Spotzee supports idempotency keys so a retried `POST` or `PATCH` returns the original response instead of running the operation twice.
+Where enforcement is enabled, an idempotency key lets a repeated `POST` or `PATCH` replay its cached response. Check availability and caching limits before relying on it to prevent duplicate work.
 
 <Note>
   Idempotency-Key enforcement is live on the Extended API today and rolling out to the Main API. Including the header on Main API requests is forward-compatible: today it has no effect, and once the rollout completes, retries with the same key replay the cached response.
@@ -23,12 +23,12 @@ Network failures, timeouts, and retries are unavoidable. Spotzee supports idempo
     If the request times out or fails partially, retry with the exact same key and exact same body.
   </Step>
   <Step title="Receive the cached response">
-    Spotzee replays the original response. Same status, same body, same `request_id`.
+    Where idempotency enforcement is enabled, Spotzee replays the cached status and body. The response header `Idempotent-Replayed: true` confirms a replay; do not rely on the request's correlation header staying the same.
   </Step>
 </Steps>
 
 ```http
-PATCH /users HTTP/1.1
+PATCH /api/client/users HTTP/1.1
 Host: apix.spotzee.com
 Authorization: Bearer sk_…
 Idempotency-Key: 1f6f4f7c-7a44-4cf6-9b3e-3b8a3a3b3a3a
@@ -41,7 +41,7 @@ Content-Type: application/json
 
 ## Scope and TTL
 
-- **Scope**: keys are scoped per API key, so you can reuse the same key string across keys without collision.
+- **Scope**: keys are scoped per API key, so distinct API keys have separate replay caches. Within one API key, use a unique idempotency key across all paths and methods; changing the URL does not create a separate replay scope.
 - **Per-surface scope**: the Main API and Extended API maintain independent caches. The same `Idempotency-Key` sent to both surfaces is treated as two distinct requests. Pick a fresh key per surface if you want isolation, or reuse it deliberately knowing each surface will replay independently.
 - **TTL**: cached responses live for 24 hours. After that, a request with the same key runs as a brand-new operation.
 - **Eligible methods**: `POST` and `PATCH`. `GET`, `HEAD`, and `DELETE` are idempotent by definition and ignore the header.
@@ -70,13 +70,14 @@ Content-Type: application/json
 
 | HTTP | `code` | When |
 |---|---|---|
-| `400` | `idempotency_key_invalid` | Empty or longer than 255 characters |
+| `400` | `idempotency_key_invalid` | Invalid Main API key when enforcement is enabled: whitespace-only or longer than 255 characters |
+| `400` | `parameter_invalid_format` | Invalid Extended API key: whitespace-only or longer than 255 characters |
 | `409` | `idempotency_key_mismatch` | Same key reused with a different body |
 | `409` | `idempotency_in_progress` | Original request still running. Retry after `Retry-After`. Main API only (once enforcement ships). |
 
 ## Generating keys
 
-Any opaque string up to 255 characters works. Pick a generator that suits your platform:
+Use a non-empty opaque string of up to 255 characters. Pick a generator that suits your platform:
 
 <CodeGroup>
 ```javascript JavaScript
@@ -96,7 +97,7 @@ uuid.NewString()
 
 ## When not to reuse a key
 
-Reuse a key for the same logical operation. For example, retrying the same "create user" request after a timeout. Mint a fresh key when:
+Reuse a key for the same logical operation. For example, retrying the same contact upsert after a timeout. Mint a fresh key when:
 
 - The user submits the form a second time after deciding to change a field.
 - You're processing a queue and each message is a distinct operation.
@@ -105,12 +106,13 @@ Reuse a key for the same logical operation. For example, retrying the same "crea
 ## Caching rules
 
 - `2xx` responses are cached.
-- `4xx` responses are cached (your retry would have failed the same way).
-- `5xx` and `429` responses are not cached so retries can succeed when the platform recovers.
+- `4xx` responses are eligible for caching except `408`, `425`, and `429`.
+- `5xx`, `408`, `425`, and `429` responses are not cached so retries can succeed when the platform recovers.
+- Oversized or unreadable response bodies are not cached. The Main API also excludes responses carrying `Retry-After`.
 
 ## Next steps
 
 <Columns cols={2}>
-  <Card title="Rate limits" icon="gauge" href="/guides/api-rate-limits">Per-key budgets and headers.</Card>
+  <Card title="Rate limits" icon="gauge" href="/guides/api-rate-limits">Request limits and retry headers.</Card>
   <Card title="Errors" icon="circle-exclamation" href="/main-api/errors">Status codes and the `code` catalogue.</Card>
 </Columns>

@@ -4,7 +4,7 @@ description: "Define dynamic audiences that update as customer data and behaviou
 keywords: ["segments", "audiences", "filtering", "behavioural targeting"]
 ---
 
-A **segment** is a query that resolves to a set of users. Membership is recalculated continuously. You do not maintain it by hand.
+A **segment** is a query that resolves to a set of users. Its membership reflects matching user data when the segment is evaluated. You do not maintain it by hand.
 
 ## What you can segment on
 
@@ -21,15 +21,14 @@ Each rule node has a typed comparison. Operators are scoped to the rule type.
 
 | Rule type | Operators |
 |---|---|
-| `string` | `=`, `!=`, `contains`, `not contain`, `starts with`, `not start with`, `ends with`, `is set`, `is not set`, `empty` |
-| `number` | `=`, `!=`, `<`, `<=`, `>`, `>=` |
-| `date` | `=`, `!=`, `<`, `<=`, `>`, `>=`, `is same day` |
-| `boolean` | `=`, `!=`, `is set`, `is not set` |
-| `array` | `any`, `none`, `empty`, `is set`, `is not set` |
+| `string` | `=`, `!=`, `contains`, `not contain`, `starts with`, `not start with`, `is set`, `is not set`, `empty` |
+| `number` | `=`, `!=`, `<`, `<=`, `>`, `>=`, `is set`, `is not set` |
+| `date` | `=`, `!=`, `<`, `<=`, `>`, `>=`, `is same day`, `is set`, `is not set` |
+| `boolean` | `=`, `!=` |
+| `array` | `=`, `!=`, `contains`, `empty`, `is set`, `is not set` |
 | `wrapper` (combinator) | `and`, `or` |
-| `shopify_purchase` | `has_purchased`, `has_not_purchased`, `any`, `none`, `is set`, `is not set` |
 
-`shopify_purchase` rules are available when the Shopify integration is connected on Professional and Enterprise plans.
+The API also recognises `shopify_purchase` rules for synced Shopify product or collection IDs. The segment builder does not currently expose that rule type.
 
 ## Event frequency
 

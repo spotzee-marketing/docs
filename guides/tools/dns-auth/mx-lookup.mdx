@@ -7,14 +7,14 @@ keywords: ["mx lookup", "mx record lookup", "check mx records", "free mx lookup"
 An MX lookup resolves the Mail Exchanger records published for a domain. MX records tell the internet which mail servers are responsible for receiving inbound email. Each record carries a hostname and a priority value — lower numbers are tried first. When any server wants to deliver email to `you@example.com`, it performs an MX lookup on `example.com`, connects to the highest-priority server, and falls back to lower-priority entries if the first is unreachable.
 
 <Info>
-Run a one-off check at [spotzee.com/tools/mx-lookup](https://spotzee.com/tools/mx-lookup/) — enter any domain, get the full MX record list with priorities and the primary server identified. No signup.
+Run a one-off check at [spotzee.com/tools/mx-lookup](https://spotzee.com/tools/mx-lookup/) — enter any domain, get the MX record list and priority values. No signup.
 </Info>
 
 This guide is for the API audience. Each call to `POST /generic/email/mx-lookup` deducts a small per-call amount from your Spotzee credit balance. See the [Spotzee pricing page](https://spotzee.com/pricing/) for live figures.
 
 ## Why this matters
 
-MX records are the first thing a sending server checks when delivering email. No MX records means no inbound delivery — any send attempt bounces immediately. Records pointing at a decommissioned server after a migration means inbound email silently disappears. Neither failure is obvious on the sender's side.
+MX records are the first thing a sending server checks when delivering email. Missing MX records can indicate an inbound-mail configuration issue, although address-record fallback can apply. Records pointing at a decommissioned server after a migration means inbound email silently disappears. Neither failure is obvious on the sender's side.
 
 For deliverability work, MX records are also an intelligence signal. The primary MX hostname usually reveals the email service provider — Google Workspace, Microsoft 365, Proofpoint, Mimecast, or a custom server. That matters when segmenting outbound lists, diagnosing provider-specific delivery rates, or vetting counterparties before onboarding.
 
@@ -27,16 +27,16 @@ And for regulated firms, verifying inbound infrastructure is part of counterpart
 The API performs a DNS query for the domain's MX records. All returned records are collected regardless of priority.
 </Step>
 <Step title="Sort by priority">
-Records are sorted by their numeric priority value, ascending. The lowest number is the primary server — tried first by sending mail servers. Equal values indicate load-balanced peers.
+The response preserves the MX records returned by DNS. Compare their numeric priority values yourself; lower values have higher preference.
 </Step>
 <Step title="Return the full list">
-The response includes every MX record, the primary hostname, and a flag for whether any records exist at all. A domain with no MX records cannot receive standard SMTP email.
+The response contains `exists` and, when records are found, an `mxRecords` array of `priority` and `hostname` values. It does not identify a primary hostname.
 </Step>
 </Steps>
 
 ## What to watch for
 
-- **No MX records.** The domain cannot receive email. Common causes: records were never set up, accidentally deleted during a DNS migration, or the domain is website-only with no email infrastructure.
+- **No MX records.** The API found no MX records. Check whether the domain intentionally uses address-record fallback or a Null MX record before drawing a delivery conclusion.
 - **Stale records after migration.** Old providers' hostnames still in the MX list can cause partial delivery to decommissioned servers, which then bounce or silently drop messages. Remove old records promptly after cutover.
 - **Single MX record with no fallback.** Any downtime on that server blocks all inbound email. Critical domains should have at least one fallback record at a higher priority number.
 - **Primary host doesn't match expected provider.** If SPF says Sendgrid but MX says a legacy on-premises host, the inbound and outbound paths are from different eras of the infrastructure. Likely a migration that wasn't completed.
@@ -54,7 +54,7 @@ Lower priority numbers are tried first. A domain with records at priority 10 and
 </Accordion>
 
 <Accordion title="Why does a domain have no MX records?">
-Common causes: the domain was never configured for email, the MX records were deleted during a DNS migration, or the domain is a subdomain that relies on the parent domain's records. A domain with no MX records cannot receive email via standard SMTP delivery. Any send attempt will bounce with a "no MX record" or "host not found" error.
+Common causes: the domain was never configured for email, the MX records were deleted during a DNS migration, or the queried subdomain has no mail configuration of its own. A domain with no MX records may still receive mail through an address-record fallback, unless it publishes a Null MX record. Check the domain before treating an empty MX result as a delivery failure.
 </Accordion>
 
 <Accordion title="How do I identify the email provider from MX records?">

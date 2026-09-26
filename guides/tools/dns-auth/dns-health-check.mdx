@@ -14,7 +14,7 @@ Run a one-off check at [spotzee.com/tools/dns-health-check](https://spotzee.com/
 
 DNS is the entry point to your domain. An attacker who controls your DNS can redirect email, intercept web traffic, and obtain fraudulent TLS certificates — all without touching your servers. Controls like DNSSEC prevent record tampering in transit, CAA records prevent unauthorised certificate issuance, and registry lock prevents registrar-level hijacking through social engineering.
 
-For financial services firms, DNS security posture is an operational resilience requirement. The FCA PS21/3, PRA supervisory statements, and the EU DORA regulation each require demonstrable evidence of domain security controls. An auditor asking for DNS security evidence expects DNSSEC, CAA records restricting certificate issuance, and registry lock on critical domains. The tool produces an A–F grade with evidence-ready subscores for each control.
+For domain reviews, the result groups observed controls, category scores and recommendations. Save the result with the domain and check mode you submitted; a score alone does not establish regulatory compliance.
 
 Calls to the Extended API version of this tool deduct a small per-call amount from your Spotzee credit balance. See the [Spotzee pricing page](https://spotzee.com/pricing/) for live figures.
 
@@ -28,7 +28,7 @@ Pass `domain` and an optional `check_mode` (`quick` or `full`, default `quick`) 
 The API resolves the domain's DNS records across the required namespaces — DS records for DNSSEC, TLSA records for DANE, CAA records, and NS/A records for infrastructure checks.
 </Step>
 <Step title="Score each category">
-Each of the 13 categories earns points based on which controls are present and correctly configured. Categories are weighted by risk severity. DNSSEC carries the highest weight (25 points max in quick mode).
+Each of the 13 categories earns points based on which controls are present and correctly configured. Categories are weighted by risk severity. The response gives a category score and recommendations; compare the returned values and data completeness before prioritising a change.
 </Step>
 <Step title="Calculate the grade">
 Scores are combined into a weighted average from 0 to 100. The grade maps as: A = 85–100, B = 70–84, C = 55–69, D = 40–54, F = 0–39.
@@ -42,10 +42,10 @@ The response includes the overall grade, per-category subscores, and prioritised
 
 Five result patterns require immediate action.
 
-- **Grade F or D.** A failing grade means critical controls like DNSSEC are absent. Start with the top recommendation — typically enabling DNSSEC and publishing CAA records — as these carry the highest score weight.
-- **DNSSEC score: 0.** DNSSEC is not enabled. Enable it at your DNS registrar or provider and verify propagation with an [SPF lookup](https://spotzee.com/tools/spf-lookup/) or [DNS lookup](https://spotzee.com/tools/dns-lookup/).
-- **CAA score below maximum.** Your CAA record exists but is missing the `issuewild` or `iodef` tags, or does not restrict to specific CAs. Add the missing tags. A minimal CAA record with only the `issue` tag partially covers mis-issuance risk.
-- **Registry lock: 0.** Contact your registrar to enable registry lock. It adds an out-of-band verification step before nameserver changes or domain transfers can proceed — protecting against social engineering attacks targeting the registrar.
+- **Grade F or D.** A low grade indicates gaps in the assessed controls. Check the returned recommendations and data completeness before deciding what to change.
+- **DNSSEC score: 0.** Inspect the DNSSEC detail and data completeness before concluding the control is absent. Verify DNS changes with a [DNS lookup](https://spotzee.com/tools/dns-lookup/).
+- **CAA score below maximum.** Read the CAA detail and recommendation to see which checks affected the score before changing the record.
+- **Registry lock: 0.** Check the registry-lock detail and whether the registrar supports it before drawing a conclusion from a zero score.
 - **Authentication and infrastructure: low.** These categories often fail when SPF, DKIM, or DMARC are absent, or when nameserver redundancy requirements are not met. Use the [SPF lookup](https://spotzee.com/tools/spf-lookup/), [DMARC lookup](https://spotzee.com/tools/dmarc-lookup/), and [MX lookup](https://spotzee.com/tools/mx-lookup/) tools to address these in sequence.
 
 ## FAQs
@@ -56,7 +56,7 @@ It grades up to 13 categories: DNSSEC, DANE, CAA records, registry lock, DNS coo
 </Accordion>
 
 <Accordion title="What is DNSSEC and why does it matter?">
-DNSSEC (DNS Security Extensions) adds cryptographic signatures to DNS records. Resolvers can verify the records have not been tampered with in transit. Without DNSSEC, an attacker can poison a DNS cache and redirect your domain's traffic — including email — to a server they control. It is the single highest-impact control in the score.
+DNSSEC (DNS Security Extensions) adds cryptographic signatures to DNS records. Resolvers can verify the records have not been tampered with in transit. Without DNSSEC, an attacker can poison a DNS cache and redirect your domain's traffic — including email — to a server they control. Check the returned category detail and overall data completeness when interpreting its effect on the score.
 </Accordion>
 
 <Accordion title="What is a CAA record?">

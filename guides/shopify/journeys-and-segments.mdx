@@ -1,12 +1,12 @@
 ---
 title: "Journeys and segments"
-description: "Use 19 Shopify event types as journey triggers, segment by RFM and purchase behaviour, and personalise messages with Shopify customer and order data."
+description: "Use Shopify events as journey triggers, segment by RFM and purchase behaviour, and personalise messages with Shopify customer and order data."
 keywords: ["shopify", "journeys", "segments", "events", "rfm", "abandoned-cart", "personalisation"]
 ---
 
-Shopify data starts paying off the moment you build segments and journeys against it. The integration exposes 19 event types you can trigger journeys from, automatically calculates RFM segments and lifetime-value metrics on every customer, and makes Shopify properties available as template variables.
+Shopify data can drive segments and journeys. The integration exposes Shopify events as journey triggers, calculates RFM segments and lifetime-value metrics, and makes Shopify properties available as template variables.
 
-## The 19 Shopify events
+## Shopify events
 
 Every Shopify event Spotzee fires can be the entry trigger on a journey. Six categories.
 
@@ -36,7 +36,7 @@ Every Shopify event Spotzee fires can be the entry trigger on a journey. Six cat
 | Event | Fires when |
 |---|---|
 | `shopify_checkout_started` | A customer begins the checkout process |
-| `shopify_checkout_abandoned` | A checkout is left incomplete after 60 minutes of inactivity |
+| `shopify_checkout_abandoned` | A periodic check finds a checkout inactive for 60–75 minutes |
 
 ### Consent events
 
@@ -57,11 +57,11 @@ Every Shopify event Spotzee fires can be the entry trigger on a journey. Six cat
 
 | Event | Fires when |
 |---|---|
-| `shopify_product_updated` | A product's details change in your catalogue |
+| `shopify_back_in_stock` | A previously unavailable product returns to stock for a subscribed customer |
 
 ## Build an abandoned cart recovery journey
 
-The `shopify_checkout_abandoned` event is the foundation for cart recovery. Spotzee fires it 60 minutes after a checkout was started but not completed.
+The `shopify_checkout_abandoned` event is the foundation for cart recovery. A periodic check detects eligible incomplete checkouts after 60–75 minutes of inactivity.
 
 <Steps>
 <Step title="Create a journey">
@@ -87,7 +87,7 @@ Add another wait (24 hours) and a second action with a discount or free-shipping
 
 A common shape:
 
-```
+```text
 Entry: shopify_checkout_abandoned
   -> delay 2 hours
   -> action: "You left something behind"
@@ -103,7 +103,7 @@ Order events power the full post-purchase lifecycle.
 
 ### Order confirmation + cross-sell
 
-```
+```text
 Entry: shopify_order_placed
   -> action: "Thanks for your order #{{order_number}}"
   -> delay 3 days
@@ -114,7 +114,7 @@ The `shopify_order_placed` event payload includes line items, totals, currency, 
 
 ### Fulfilment notification
 
-```
+```text
 Entry: shopify_order_fulfilled
   -> action: "Your order has been shipped!"
 ```
@@ -123,7 +123,7 @@ For multi-shipment orders, `shopify_order_partially_fulfilled` fires when some i
 
 ### Delivery follow-up
 
-```
+```text
 Entry: shopify_shipment_status (filtered to delivered)
   -> delay 5 days
   -> action: "How's your purchase? Leave a review"
@@ -133,7 +133,7 @@ The `shopify_shipment_status` event fires whenever shipping status changes. Bran
 
 ### Refund retention
 
-```
+```text
 Entry: shopify_order_refunded
   -> delay 1 day
   -> action: "We're sorry it didn't work out. Here's 15% off your next order"
@@ -214,7 +214,7 @@ For `shopify_shipment_status`:
 ```text
 Your order #{{ event.order_number }} is now {{ event.status }}.
 {{#if event.tracking_number}}
-Track it: {{ event.tracking_url }}
+Track it: {{ event.tracking_urls.[0] }}
 {{/if}}
 ```
 

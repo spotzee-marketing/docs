@@ -1,13 +1,13 @@
 ---
 title: "Set up SMS delivery"
-description: "Connect Twilio, Plivo, Telnyx, Vonage, or httpSMS as your SMS provider, configure inbound webhooks, and verify with a test send."
+description: "Connect Twilio, Plivo, Telnyx, Vonage, or httpSMS as your SMS provider and configure inbound webhooks."
 keywords: ["sms", "text", "twilio", "plivo", "telnyx", "vonage", "httpsms", "providers"]
 ---
 
 Spotzee routes SMS sends through a provider you bring. Five providers are supported: Twilio, Plivo, Telnyx, Vonage, and httpSMS. Pick the one your number is registered with and paste the credentials.
 
 <Info>
-SMS provider configuration lives under **Settings** → **Integrations** and requires the project `admin` role. Vonage appears internally as `nexmo` (its legacy name); the UI labels it Vonage.
+SMS provider configuration lives under **Settings** → **Integrations** and requires the project `admin` role.
 </Info>
 
 ## Pick a provider
@@ -17,8 +17,8 @@ Each provider takes a different credential shape:
 | Provider | Credentials | Notes |
 |---|---|---|
 | **Twilio** | Account SID, Auth Token, Phone number | Pre-built inbound webhook for STOP/HELP and replies |
-| **Plivo** | Auth ID, Auth Token, Phone number | Pre-built inbound webhook |
-| **Telnyx** | API Key, Phone number | Pre-built inbound webhook |
+| **Plivo** | Auth ID, Auth Token, Phone number | Inbound webhook handler |
+| **Telnyx** | API Key, Phone number | Inbound webhook handler |
 | **Vonage** | API Key, API Secret, Phone number | Sends through the Vonage SMS API |
 | **httpSMS** | API Key, Phone number | Sends through an Android device acting as the gateway |
 
@@ -50,7 +50,7 @@ Spotzee shows an **Inbound URL** in the provider's setup metadata. Paste that UR
 </Step>
 
 <Step title="Save and test">
-Save and send a test message (see [Test the connection](#test-the-connection)).
+Save and use **Test connection** (see [Test the connection](#test-the-connection)).
 </Step>
 </Steps>
 
@@ -74,7 +74,7 @@ Fill in:
 </Step>
 
 <Step title="Save and test">
-Save and run a test send. If you want inbound replies to flow into Spotzee, point your Plivo number's inbound message URL at the Spotzee inbound endpoint shown in the provider's setup metadata.
+Save and use **Test connection**. The Plivo provider does not show an inbound URL in setup metadata.
 </Step>
 </Steps>
 
@@ -121,7 +121,7 @@ Fill in:
 </Step>
 
 <Step title="Save and test">
-Save and run a test send.
+Save and use **Test connection**.
 </Step>
 </Steps>
 
@@ -146,7 +146,7 @@ Fill in:
 </Step>
 
 <Step title="Save and test">
-Save. Send a test message. The device receives an instruction over httpSMS and dispatches the SMS through the carrier on its SIM.
+Save the provider. To verify delivery, send a message through a campaign using a controlled number.
 </Step>
 </Steps>
 
@@ -155,31 +155,31 @@ Save. Send a test message. The device receives an instruction over httpSMS and d
 
 ## Test the connection
 
-Each provider has a test-send affordance. Run one before you point real campaigns at the provider.
+Twilio, Plivo, Telnyx and Vonage support **Test connection**. httpSMS does not have a connection test in Settings.
 
 <Steps>
 <Step title="Open the provider you saved">
 In **Settings** → **Integrations**, open the provider's row.
 </Step>
 
-<Step title="Send a test message">
-Use the test-send action. Supply a destination number you can read.
+<Step title="Test the connection">
+Choose **Test connection** in the provider form.
 </Step>
 
 <Step title="Check the result">
-A successful send confirms credentials, network access, and the source number's sending capability. A failure surfaces the underlying error message and the provider's status code.
+A successful connection test confirms access to the provider. It does not confirm that an SMS reached a device. A failed test shows an error to investigate.
 </Step>
 </Steps>
 
 ## Set the default provider
 
-Spotzee picks the **default** SMS provider for any send that doesn't name one. Mark one provider as default after saving it. Add more providers as fallbacks; the routing layer prefers the default and only falls back when the default fails or is disabled.
+You can mark an SMS provider as the default in **Settings** → **Integrations**. When you create a campaign, check its selected provider before sending. A campaign needs an explicit provider selection.
 
 ## Inbound replies and STOP/HELP handling
 
-Inbound webhooks are how Spotzee receives replies, including STOP and HELP keywords. Spotzee writes the reply onto the user record, marks the user as opted-out for STOP, and sends back the project's configured **SMS opt-out message** or **SMS help message** (set under **Settings** → **General** → **Push and SMS**).
+Inbound webhooks let Spotzee process replies. A message containing `STOP` unsubscribes the user from all SMS subscriptions; `START` resubscribes them. A message containing `HELP` triggers the configured **SMS help message** when one is set. Other replies become tracked inbound events.
 
-Twilio, Plivo, and Telnyx have explicit Inbound URLs that Spotzee shows in the provider's setup metadata. Vonage and httpSMS use their own inbound message conventions; route them at the same Spotzee endpoint shown in the provider's setup metadata.
+Twilio and Telnyx show an **Inbound URL** in provider setup metadata. Plivo and Vonage have inbound handlers, but their provider forms do not display callback URLs. httpSMS has no inbound handler in Spotzee.
 
 ## Next steps
 

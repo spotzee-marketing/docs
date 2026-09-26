@@ -9,7 +9,7 @@ Three different actions, three different outcomes. Pick the right one for what y
 | Action | What happens to data | Status after | Reversible |
 |---|---|---|---|
 | **Disconnect** | Imported data preserved. Sync paused. | Disconnected (grey) | Yes, by reconnecting |
-| **Delete** | Imported data wiped. Integration removed. | Removed | No |
+| **Delete** | Integration and Shopify-specific records removed; Spotzee contacts remain. | Removed | No |
 | **Reconnect** | Same data preserved. OAuth refreshed. | Connected (green) | n/a |
 
 ## Disconnect
@@ -38,12 +38,12 @@ After disconnect, the status badge flips to **Disconnected** (grey). The store r
 
 ## Delete
 
-**What it does.** Removes the integration entirely. Imported customer records that came from this Shopify store are removed from Spotzee. The integration card disappears from your **Integrations** page. The OAuth grant in Shopify is revoked.
+**What it does.** Removes the integration and its Shopify-specific orders, checkouts, products, collections, sync settings and logs. Shopify fields are cleared from Spotzee contacts, but the contacts themselves remain. The integration card disappears from your **Integrations** page.
 
 **Use it when:**
 
 - You're permanently moving away from a store (closing the store, switching platforms).
-- You imported data into the wrong project and want to wipe and start over.
+- You connected the store to the wrong project and want to remove its integration data.
 - The store has been replaced by a different Shopify store at the same domain (rare, but happens with rebrands).
 
 **Be careful.** Delete is destructive and irreversible. If you might want this data back, disconnect instead and decide later.
@@ -60,15 +60,15 @@ Pick **Delete**. Confirm the destructive action prompt explicitly. Spotzee descr
 </Step>
 
 <Step title="Wait for cleanup">
-Deletion of the customer records can take a few minutes for stores with large imports. The card disappears once cleanup completes.
+Large stores can take time to clear Shopify-specific records. The card disappears once cleanup completes.
 </Step>
 </Steps>
 
-After delete, the only way to bring the data back is to connect the store fresh and run an initial sync. Customer external IDs in Spotzee for that store are reset, so even a fresh connect treats every customer as new.
+To restore Shopify-specific records after deletion, connect the store again and run an initial sync. Existing Spotzee contacts remain separate from that new integration.
 
 ## Reconnect
 
-**What it does.** Refreshes the OAuth grant. Used when status shows **Reconnect required** (amber badge) or when you've added new sync-back permissions and need updated scopes.
+**What it does.** Refreshes the OAuth grant. Use it when status shows **Reconnect required** (amber badge) or the integration reports missing scopes.
 
 **Sync settings, customer list assignment, history, and existing data are all preserved.** Only the OAuth credentials change.
 
@@ -76,7 +76,7 @@ After delete, the only way to bring the data back is to connect the store fresh 
 
 - Status is **Reconnect required**.
 - You uninstalled and reinstalled the Spotzee app in Shopify.
-- You enabled a sync-back toggle that needs a scope you didn't grant on the original install.
+- The integration reports missing scopes.
 - The connecting Shopify user's permissions changed.
 
 **How:**
@@ -101,14 +101,14 @@ A simple decision tree:
 
 - **Want to stop syncing temporarily?** Disconnect. Reversible.
 - **Want to fix an OAuth or scope issue?** Reconnect. No data loss.
-- **Want to permanently remove the store and its data?** Delete. Irreversible. Confirm twice.
+- **Want to permanently remove the integration and its Shopify-specific data?** Delete. Irreversible.
 
 When in doubt, disconnect. You can always come back.
 
 ## Next steps
 
 <Columns cols={2}>
-<Card title="Sync operations" icon="activity" href="/guides/shopify/sync-operations">
+<Card title="Sync operations" icon="chart-line" href="/guides/shopify/sync-operations">
 Status badges, retries, and re-syncs.
 </Card>
 
@@ -120,7 +120,7 @@ The five-item readiness checklist.
 The OAuth flow used by both initial connect and reconnect.
 </Card>
 
-<Card title="Troubleshoot" icon="life-buoy" href="/guides/shopify/troubleshoot">
+<Card title="Troubleshoot" icon="life-ring" href="/guides/shopify/troubleshoot">
 Diagnose connection problems before deciding to delete.
 </Card>
 </Columns>

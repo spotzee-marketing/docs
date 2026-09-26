@@ -1,41 +1,41 @@
 ---
 title: "Trigger a journey"
-description: "Drop a user into a multi-step automation from your backend so welcomes, onboarding, and lifecycle flows fire on cue."
+description: "Drop a contact into a multi-step automation from your backend so welcomes, onboarding, and lifecycle flows fire on cue."
 keywords: ["journey", "trigger", "automation", "lifecycle", "onboarding", "welcome"]
 ---
 
-Journeys are multi-step flows (wait, branch, send, repeat) that Spotzee runs in the background once a user enters them. Use this flow to enter a user into a journey from your backend the moment something happens in your product.
+Journeys are multi-step flows (wait, branch, send, repeat) that Spotzee runs in the background once a contact enters them. Use this flow to enter a contact into a journey from your backend the moment something happens in your product.
 
 ## What you'll build
 
 A backend call that:
 
 1. Picks the right journey for the trigger event.
-2. Enters one user into it at a chosen entrance step.
+2. Enters one contact into it at a chosen entrance step.
 3. Passes per-entrance event data the journey's conditions and templates can use.
 
 ## Prerequisites
 
 <Info>
-  You'll need a `sk_` project key. The journey must already be authored in the Spotzee UI and set to `status: "live"`. Only live journeys accept new entrances.
+  You'll need a `sk_` project key. The journey must already be authored in the Spotzee UI and set to `status: "live"`. Set the journey Live before relying on its normal event-driven operation.
 </Info>
 
 ## Walkthrough
 
 <Steps>
   <Step title="Author and publish the journey">
-    Build the journey in the Spotzee UI: entry condition, branches, sends, waits. Set its status to **Live** when you're ready. Draft and Off journeys reject `POST /journeys/{id}/trigger` calls.
+    Build the journey in the Spotzee UI: entry condition, branches, sends, waits. Set its status to **Live** when you're ready. Do not use the trigger response to infer journey status; confirm the status in the journey view.
   </Step>
   <Step title="Find the journey ID and entrance step">
-    `GET /journeys?limit=100` returns every journey in the project. In production, hold a stable mapping in your config (e.g. `WELCOME_JOURNEY_ID`) rather than discovering it at runtime.
+    `GET /journeys?limit=100` returns up to 100 journeys. Follow pagination for further results. In production, hold a stable mapping in your config (e.g. `WELCOME_JOURNEY_ID`) rather than discovering it at runtime.
 
-    Each journey has one or more **entrance steps** (the `entry` nodes in its graph). The trigger call must specify which one to enter the user at via the `entrance_id` field. This is a numeric step identifier from the journey's published graph.
+    Each journey has one or more **entrance steps** (the `entry` nodes in its graph). The trigger call must specify which one to enter the contact at via the `entrance_id` field. This is a numeric step identifier from the journey's published graph.
   </Step>
   <Step title="Trigger an entrance">
-    The endpoint enters **one user at a time**. The body has three fields: `entrance_id` (which entrance step to use), `user` (the user identifier), and an optional `event` payload available to journey conditions and templates as `{{event}}`.
+    The endpoint enters **one contact at a time**. The body has three fields: `entrance_id` (which entrance step to use), `user` (the contact identifier), and an optional `event` payload available to journey conditions and templates as `{{event}}`.
 
     ```http
-    POST /journeys/{journeyId}/trigger HTTP/1.1
+    POST /api/client/journeys/{journeyId}/trigger HTTP/1.1
     Host: apix.spotzee.com
     Authorization: Bearer sk_…
     Idempotency-Key: welcome:cust_001:signup_2026_04_28
@@ -55,25 +55,25 @@ A backend call that:
     }
     ```
 
-    The `user` object requires `external_id` and accepts the standard user fields (`email`, `phone`, `device_token`, `timezone`, `locale`) plus any additional custom attributes. To enter many users, call this endpoint once per user (typically from a worker that fans out from your queue).
+    The `user` object requires `external_id` and accepts the standard contact fields (`email`, `phone`, `device_token`, `timezone`, `locale`) plus any additional custom attributes. To enter many contacts, call this endpoint once per contact (typically from a worker that fans out from your queue).
   </Step>
   <Step title="Handle the response">
-    On success the response confirms the entrance was queued. If the user wasn't found and the supplied `user` block didn't carry enough information to upsert one, the call returns an error from the [error catalogue](/main-api/errors).
+    On success the response confirms the entrance was queued. If the contact wasn't found and the supplied `user` block didn't carry enough information to upsert one, the call returns an error from the [error catalogue](/main-api/errors).
   </Step>
   <Step title="Verify in the journey view">
-    The journey's runtime view in the Spotzee UI shows fresh entrances within seconds. For email messages sent by the journey, Enterprise high-deliverability projects can forward enabled delivery events from **Settings** → **Webhook Endpoints**.
+    Check the journey's runtime view after processing to verify the entrance. For email messages sent by the journey, Enterprise high-deliverability projects can forward enabled delivery events from **Settings** → **Webhook Endpoints**.
   </Step>
 </Steps>
 
 ## Pitfalls to avoid
 
 <Warning>
-  Don't trigger the same user into the same journey twice for the same event. Most journeys aren't designed to be entered concurrently. Use a deterministic `Idempotency-Key` (typically `<journey>:<user>:<event-id>`) so retries are safe. See [Idempotency](/guides/api-idempotency).
+  Don't trigger the same contact into the same journey twice for the same event. Most journeys aren't designed to be entered concurrently. Keep a stable logical trigger identity. A deterministic `Idempotency-Key` (typically `<journey>:<user>:<event-id>`) protects retries only where enforcement is enabled. See [Idempotency](/guides/api-idempotency).
 </Warning>
 
-- **Don't trigger a Draft journey.** Spotzee returns `409` until the journey is set Live. Promote it in the UI first.
+- **Check the journey status first.** Publish the intended journey configuration before sending production triggers; acceptance of a manual trigger is not proof that the journey is Live.
 - **Don't pack the `event` block with stale info.** Conditions and templates downstream will reference whatever you pass at trigger time. If a step depends on `event.trial_ends_at`, set it correctly when you trigger.
-- **Don't fire triggers in a tight loop without pacing.** Each call enters one user; if you're entering thousands at once, fan out through a queue/worker that respects rate limits. See [Rate limits](/guides/api-rate-limits).
+- **Don't fire triggers in a tight loop without pacing.** Each call enters one contact; if you're entering thousands at once, fan out through a queue/worker that respects rate limits. See [Rate limits](/guides/api-rate-limits).
 
 ## Reference
 

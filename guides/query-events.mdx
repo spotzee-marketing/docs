@@ -1,0 +1,85 @@
+---
+title: "Query events"
+description: "Inspect contact events, request bounce classifications, and count occurrences or unique contacts."
+keywords: ["query events", "event reporting", "bounce classification", "event aggregates", "unique contacts"]
+---
+
+Use event queries to inspect what happened to a contact or campaign. Use aggregates when you need counts or trends instead of individual records. Campaign bounce reports answer a different question: how many messages bounced and which causes were identified.
+
+## Before you begin
+
+Use a project secret API key. Both reads are scoped to that key's project. Choose an inclusive `from` timestamp, an exclusive `to` timestamp, and at least one filter: `external_id`, `anonymous_id`, `event_name`, or `campaign_id`.
+
+## Inspect events
+
+Request events for one campaign:
+
+```bash
+curl --get 'https://apix.spotzee.com/api/client/events' \
+  --header "Authorization: Bearer $SPOTZEE_API_KEY" \
+  --data-urlencode 'from=2026-09-01T00:00:00Z' \
+  --data-urlencode 'to=2026-09-02T00:00:00Z' \
+  --data-urlencode "campaign_id=$CAMPAIGN_ID" \
+  --data-urlencode 'include_payload=false' \
+  --data-urlencode 'include_bounce_classification=true'
+```
+
+Set `SPOTZEE_API_KEY` and `CAMPAIGN_ID` to your project key and campaign identifier. Change the dates to the period you want to inspect. The response contains `results`, `nextCursor`, `prevCursor`, and `limit`.
+
+Event lists allow windows up to 31 days. The default page size is 50, with a maximum of 100. Results default to newest first; use `direction=asc` for oldest first. Pass the returned cursor unchanged and keep the other query parameters unchanged when requesting another page.
+
+Payloads are included by default. Set `include_payload=false` to omit `data`. Classification is a separate opt-in: `include_bounce_classification=true` can return `bounce_classification` without returning the full payload. Unsupported query parameters are rejected; `bounce_category` is a campaign-recipient filter, not an event-query filter.
+
+## Read bounce classifications
+
+Classification covers recognised managed-delivery failures when requested. These public event names are recognised:
+
+| Event names | Failure stage |
+| --- | --- |
+| `email_quota_exceeded` | Submission quota |
+| `email_hard_bounced`, `email_soft_bounced` | Delivery status notification |
+| `email_failed` | Final failure, including submission failures |
+| `email_rejected`, `email_sender_rejected`, `email_recipient_rejected` | Message, sender or recipient rejection |
+| `email_dns_lookup_failed`, `email_null_mx`, `email_ip_lookup_failed` | Address or route lookup |
+| `email_connect_error`, `email_greeting_failed`, `email_ehlo_rejected` | Connection or greeting |
+| `email_tls_error`, `email_tls_unavailable` | TLS negotiation |
+| `delivery.rcpt-to-failed`, `delivery.implicit-tls-error`, `delivery.auth-failed` | Recipient operation, implicit TLS or authentication |
+
+Recognised raw aliases are retained; historical event names are not renamed. These reads do not add webhook subscriptions. Successful delivery, complaints, scheduling notifications, and unrelated custom events do not receive a bounce classification. Other configured providers do not have the same guaranteed coverage.
+
+A recognised failure still returns `category: "unknown"` when its evidence is missing, unmatched, or ambiguous. Read `reason` to distinguish `missing_evidence`, `unmatched`, and `ambiguous`. An event name alone does not establish a cause. See the [category identifiers and UI labels](/guides/campaign-bounce-reporting#category-identifiers-and-ui-labels).
+
+`severity` describes the diagnostic evidence; `final` describes the outcome. A temporary diagnostic can accompany a final failure. Keep both fields when interpreting a result. Treat diagnostic text as untrusted text and escape it before rendering it.
+
+Valid stored classifications are retained. For historical events without one, the response can classify retained evidence without updating the stored event. Missing historical evidence stays unclassified. `classified_at` is the classification timestamp, not the event timestamp or proof of report freshness.
+
+## Count occurrences and unique contacts
+
+Request daily counts for the campaign:
+
+```bash
+curl --get 'https://apix.spotzee.com/api/client/events/aggregations' \
+  --header "Authorization: Bearer $SPOTZEE_API_KEY" \
+  --data-urlencode 'from=2026-09-01T00:00:00Z' \
+  --data-urlencode 'to=2026-10-01T00:00:00Z' \
+  --data-urlencode "campaign_id=$CAMPAIGN_ID" \
+  --data-urlencode 'group_by=event_name' \
+  --data-urlencode 'group_by=day'
+```
+
+Aggregates allow windows up to 366 days. Omit `group_by` for one total row, or group by `event_name`, `campaign`, `user`, and `day`. Each result includes exact `count` and `unique_user_count` values. Days use UTC. Grouped results use cursor pagination, with a default of 50 and maximum of 100 groups per page.
+
+`count` counts event occurrences, and `unique_user_count` counts distinct contacts represented in those events. Repeated delivery attempts can produce multiple events for one message. Neither value is a substitute for a campaign's bounced-message total. Unique-contact counts across overlapping groups must not be added to obtain an overall unique total.
+
+## Handle busy or oversized requests
+
+Event reads can return `503` with `Retry-After` when query capacity is occupied. Wait for the indicated interval before retrying. A response cannot exceed 2 MiB; reduce the page size, omit payloads, or narrow the filters if the request exceeds that limit.
+
+Events become visible after processing. Separate requests are not a frozen snapshot, so counts can change as events arrive.
+
+## Next steps
+
+<Columns cols={2}>
+  <Card title="Campaign bounce reporting" icon="chart-column" href="/guides/campaign-bounce-reporting">Read bounced-message totals and causes.</Card>
+  <Card title="Main API reference" icon="code" href="/main-api/introduction">Open Events for complete query contracts.</Card>
+</Columns>

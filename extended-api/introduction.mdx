@@ -8,7 +8,7 @@ The **Extended API** is a set of low-latency edge utilities that complement the 
 
 ## Base URL
 
-```
+```text
 https://apix.spotzee.com/api/ext
 ```
 
@@ -31,7 +31,7 @@ Authorization: Bearer YOUR_API_KEY
 | SMS | E.164 phone-number validation and ISO country resolution |
 | AI | Subject-line variant generation and 14-criterion subject-line scoring |
 | Text | Readability scores (Flesch + 6 indices, reading time) and sentiment analysis |
-| Data | Generate synthetic person, contact, name, and date records |
+| Data | Generate synthetic records across the categories listed in the generated reference |
 
 ## When to use Extended over Main
 
@@ -40,7 +40,7 @@ Authorization: Bearer YOUR_API_KEY
 | Per-request validation in a signup form | CRUD on users, segments, journeys |
 | Domain-setup wizards in your own UI | Triggering campaigns and journeys |
 | High-volume scoring at the edge | Reading reporting and analytics data |
-| Quota and credit lookups | Managing organisation and project state |
+| Synthetic test-data generation | Managing organisation and project state |
 
 ## Versioning
 
@@ -48,7 +48,7 @@ The Extended API is dated like the Main API. Pin a version with the `Spotzee-Ver
 
 The OpenAPI specification is published at:
 
-```
+```text
 https://apix.spotzee.com/api/ext/openapi.json
 ```
 
@@ -56,9 +56,9 @@ https://apix.spotzee.com/api/ext/openapi.json
 
 Two separate gates apply to Extended API traffic.
 
-**Edge rate limit.** Spotzee's edge network enforces a per-source-IP cap of 1,000 requests per 10 seconds across `apix.spotzee.com/api/*`. Over-limit traffic receives `429 Too Many Requests` with the canonical error envelope. The cap counts every request, authenticated or not.
+**Edge rate limit.** Spotzee's edge network enforces a per-source-IP cap of 4,000 requests per 10 seconds across `apix.spotzee.com/api/*`, with a 10-second block when exceeded. Over-limit traffic receives `429 Too Many Requests` with the canonical error envelope. The cap counts every request, authenticated or not.
 
-**Credit-based quota.** Validation, scoring, lookup, and generation endpoints deduct credits on success. The cost varies by route. Inspect remaining balance via the `Quota` endpoints before high-volume runs.
+**Credit-based quota.** Metered endpoints require available credits, and the cost varies by route. Check your balance in the Spotzee app before high-volume runs; the generated Extended API reference does not expose a public Quota endpoint.
 
 Per-API-key sliding-window rate limits and a doubled budget for MCP traffic are rolling out alongside the Main API hardening rollout. The Extended API does not honour those today.
 

@@ -1,42 +1,40 @@
 ---
-title: "Define custom user attributes"
-description: "Manage the auto-detected user attribute schema, set visibility on each attribute, and rebuild the index after a bulk import."
-keywords: ["data-schema", "attributes", "visibility", "segments", "schema", "users"]
+title: "Define custom contact attributes"
+description: "Review discovered contact attributes and set their visibility."
+keywords: ["data-schema", "attributes", "visibility", "segments", "schema", "contacts"]
 ---
 
-The **Data Schema** tab in your project Settings is where Spotzee surfaces every user attribute it has seen flowing through your data. You don't define attributes by hand. They're discovered as users sync in. What you do control is **visibility**, the rule that decides whether an attribute appears in segment builders, in template variables, or in API payloads.
+The **Data Schema** tab in project Settings lists discovered contact attribute paths. You can set each path's visibility to control where it appears in rule builders and contact API responses. Visibility does not block template rendering.
 
 <Info>
-Data Schema management lives under **Settings** → **Data Schema** and requires the project `admin` role. Spotzee adds new paths automatically when it sees attributes it hasn't seen before; you don't need to pre-register fields.
+Data Schema management lives under **Settings** → **Data Schema** and requires the project `admin` role. A scheduled schema sync discovers new paths from stored contacts and events.
 </Info>
 
 ## How the schema builds itself
 
-Every time Spotzee writes a user (via `POST /users/batch`, `PATCH /users`, or any sync from an integration) or processes an event with a payload, it walks the JSON of the incoming object and records every leaf path. Each new path lands in the **Data Schema** table with:
+An hourly schema sync scans recently updated contacts and events for new leaf paths. A full sync can also rebuild the index from stored records. The **Data Schema** table shows contact paths with:
 
 - The **path** itself (for example, `$.subscription_tier` or `$.shipping_address.city`).
 - The detected **data type** (`string`, `number`, `boolean`, `date`, or `array`).
 - An auto-assigned **visibility** of `public`.
 
-You don't have to do anything to keep the schema current. As your data evolves, the schema follows. What admins manage is the visibility setting, and what the visibility setting means downstream.
+New paths appear after the schema sync runs. Admins can then review their visibility.
 
 ## Visibility levels
 
-Three visibility levels gate what each attribute is allowed to do.
+| Visibility | Rule-path catalogue | Contact API output | Template rendering |
+|---|---|---|---|
+| **Public** | Available to project members | Included | Available |
+| **Hidden** | Omitted from the rule-path catalogue | Omitted | Available |
+| **Classified** | Available to project admins | Included for project admins; omitted for other roles | Available |
 
-| Visibility | Segment builder | Template variables | API output | Use for |
-|---|---|---|---|---|
-| **Public** | Visible | Resolves | Included | Marketing-relevant attributes you want segmenters and template authors to use |
-| **Hidden** | Hidden | Resolves | Included | Internal attributes that shouldn't clutter the segment UI but are still safe to render |
-| **Classified** | Hidden | Doesn't resolve | Stripped from outbound API responses | PII or sensitive data that should never leak into a template or downstream API caller |
-
-Public is the default for newly-discovered paths. Adjust to **Hidden** for noise. Adjust to **Classified** for anything regulatory-sensitive.
+Public is the default for newly discovered paths. Visibility controls the rule-path catalogue and filtered contact API responses; it is not a template privacy boundary. Avoid placing sensitive data in contact attributes used by templates.
 
 ## Set visibility on an attribute
 
 <Steps>
 <Step title="Open Settings → Data Schema">
-Inside the project, open **Settings** and pick the **Data Schema** tab. The table lists every user attribute Spotzee has observed.
+Inside the project, open **Settings** and pick the **Data Schema** tab. The table lists every contact attribute Spotzee has observed.
 </Step>
 
 <Step title="Pick an attribute">
@@ -44,7 +42,7 @@ Click a row to open the visibility editor for that path. The path appears at the
 </Step>
 
 <Step title="Choose visibility">
-Pick **Public**, **Hidden**, or **Classified**. The change saves immediately and applies to every downstream surface that consults visibility.
+Pick **Public**, **Hidden**, or **Classified**. Choose **Save** to apply the visibility change.
 </Step>
 </Steps>
 
@@ -54,35 +52,19 @@ The detected `data_type` decides which segment operators are available for that 
 
 | Data type | Segment operators |
 |---|---|
-| `string` | `=`, `!=`, `starts with`, `not start with`, `ends with`, `contains`, `not contain`, `is set`, `is not set`, `empty` |
-| `number` | `=`, `!=`, `<`, `<=`, `>`, `>=` |
-| `boolean` | `=`, `!=`, `is set`, `is not set` |
-| `date` | `=`, `!=`, `<`, `<=`, `>`, `>=`, `is same day` |
-| `array` | `any`, `none`, `empty`, `is set`, `is not set` |
+| `string` | `=`, `!=`, `starts with`, `not start with`, `contains`, `not contain`, `is set`, `is not set`, `empty` |
+| `number` | `=`, `!=`, `<`, `<=`, `>`, `>=`, `is set`, `is not set` |
+| `boolean` | `=`, `!=` |
+| `date` | `=`, `!=`, `<`, `<=`, `>`, `>=`, `is same day`, `is set`, `is not set` |
+| `array` | `=`, `!=`, `contains`, `empty`, `is set`, `is not set` |
 
-Spotzee infers the data type from the first few values it sees. If the inference is wrong (a field that's typed as a number in your source becomes a string in segments because the first values came in quoted), correct the type at the source. You can't override the type in the UI; it's a function of the actual data.
+Spotzee records the type seen when a path is first discovered. If the inference is wrong (a field that's typed as a number in your source becomes a string in segments because the first values came in quoted), correct the type at the source. You can't override the type in the UI; it's a function of the actual data.
 
 For the full operator reference and how rules combine into segments, see [Build segments](/guides/segments).
 
-## Rebuild the schema
+## Schema refresh
 
-Two situations call for a manual rebuild:
-
-- **After a bulk import** that added many new attribute keys at once, where you want the new paths to land in the table immediately rather than after the usual write-time discovery.
-- **After deleting a large swathe of attributes** that no longer flow in, where you want the table to reflect current reality rather than historical data.
-
-The action lives under **Settings** → **General** → **Advanced** → **Rebuild attribute schema**. It walks every user record in the project and rebuilds the path index. Visibility settings on existing paths are preserved.
-
-The rebuild runs in the background. Larger projects can take a few minutes.
-
-## Tips
-
-A few habits that keep the schema clean as your data evolves:
-
-- **Audit visibility regularly.** New attributes default to `public`. PII paths slipping into Public is the most common compliance issue customers hit.
-- **Use Hidden for transient values.** Things like `last_seen_ip` or `current_session_id` are noise in segment builders even if they're harmless.
-- **Use Classified strictly.** Once a path is Classified, it's stripped from outbound API responses. Be deliberate. Don't reach for Classified just to hide an attribute from segment authors; that's what Hidden is for.
-- **Check after bulk imports.** First sync from a new integration is the best time to triage visibility before the schema gets cluttered.
+Spotzee runs a schema sync every hour over recently updated contacts and events. Use **Rebuild** under **Settings** → **General** → **Advanced** to queue a full schema sync when you need to reconcile the index with stored records. A full sync removes paths no longer present and keeps visibility on paths that remain.
 
 ## Next steps
 
@@ -91,11 +73,11 @@ A few habits that keep the schema clean as your data evolves:
 Use your typed attributes in segment rules.
 </Card>
 
-<Card title="Sync users" icon="users" href="/guides/sync-users">
+<Card title="Sync contacts" icon="users" href="/guides/sync-users">
 Push attribute data into the project via the API.
 </Card>
 
-<Card title="Ingest events" icon="activity" href="/guides/event-ingestion">
+<Card title="Ingest events" icon="chart-line" href="/guides/event-ingestion">
 Send events with payload attributes that land in the schema.
 </Card>
 

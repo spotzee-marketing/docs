@@ -1,13 +1,13 @@
 ---
 title: "Tools"
-description: "Email validation, DNS, deliverability, blacklist, content and data-generation tools that wrap the Spotzee Extended API with credit-based usage."
+description: "Find email validation, DNS, deliverability, blacklist, content and data-generation tools across web, API and project views."
 keywords: ["email validation tools", "deliverability tools", "dns lookup tools", "blacklist monitoring", "spotzee tools", "extended api tools"]
 ---
 
-Spotzee runs a set of tools that wrap the same checks the platform runs on every campaign. Each tool has two surfaces: a one-shot web version at [spotzee.com/tools](https://spotzee.com/tools/) (paste a value, get an answer, no signup) and a programmatic version exposed through the Spotzee Extended API. The guides in this section are written for the API audience, where calls are billed against your Spotzee credit balance.
+Spotzee offers one-off utilities, Extended API endpoints, and tools inside the project workspace. Availability and billing vary by tool; follow each guide for its supported surface and current usage details.
 
 <Info>
-**Two ways to use the tools.** The web versions at [spotzee.com/tools](https://spotzee.com/tools/) support one-off browser checks. The Extended API versions documented here run on credit-based pricing: every Spotzee account starts with $1 starter credit, then each call deducts a small per-call amount from that balance (figures vary by tool, see the [Spotzee pricing page](https://spotzee.com/pricing/) for live numbers). Pick the web version for one-off checks, the API for batch or automated workflows.
+**Choose the supported surface.** Some utilities have a one-off web form at [spotzee.com/tools](https://spotzee.com/tools/), some have an Extended API endpoint, and Blacklist Monitoring and Email Proxy live in the project workspace. Check the linked guide and [pricing page](https://spotzee.com/pricing/) before using a tool.
 </Info>
 
 <Info>
@@ -18,31 +18,31 @@ Use the tool when you need a single answer fast. Read the guide when you need to
 
 | If you want to… | Start here |
 |---|---|
-| Validate whether an email address is real and deliverable | [Email address validator](/guides/tools/email-validation/email-validation) |
-| Filter junk addresses out of a list | [Email syntax validator](/guides/tools/email-validation/email-syntax-validator) |
-| Know which mailbox host a domain uses | [Email provider check](/guides/tools/email-validation/email-provider-check) |
-| Audit SPF, DKIM, DMARC and the rest before a send | [Email health check](/guides/tools/email-validation/email-health-check) |
-| Block disposable signups before they pollute your list | [Disposable email checker](/guides/tools/email-validation/temp-email-checker) |
-| Score a campaign through real spam filters before you send | [Email spam checker](/guides/tools/email-validation/email-spam-checker) |
+| Assess an email address and review its validation status | [Email address validator](/guides/tools/email-validation/email-validation) |
+| Check whether an email address has valid syntax | [Email syntax validator](/guides/tools/email-validation/email-syntax-validator) |
+| Look for a recognised mail host in a domain’s MX records | [Email provider check](/guides/tools/email-validation/email-provider-check) |
+| Inspect public mail and authentication records for a domain | [Email health check](/guides/tools/email-validation/email-health-check) |
+| Check whether an address or domain matches a known disposable provider | [Disposable email checker](/guides/tools/email-validation/temp-email-checker) |
+| Analyse a captured test message before you send | [Email spam checker](/guides/tools/email-validation/email-spam-checker) |
 | Resolve and read an SPF record for any domain | [SPF lookup](/guides/tools/dns-auth/spf-lookup) |
 | Build a correctly formatted SPF record from your senders and IPs | [SPF generator](/guides/tools/dns-auth/spf-generator) |
-| Read a domain's DMARC enforcement policy, alignment, and reporting addresses | [DMARC lookup](/guides/tools/dns-auth/dmarc-lookup) |
+| Retrieve raw DMARC records and inspect their tags | [DMARC lookup](/guides/tools/dns-auth/dmarc-lookup) |
 | Build a correctly formatted DMARC record from your policy and reporting setup | [DMARC generator](/guides/tools/dns-auth/dmarc-generator) |
-| Resolve mail server hostnames and priority order for any domain | [MX lookup](/guides/tools/dns-auth/mx-lookup) |
+| Retrieve MX hostnames and priority values for a domain | [MX lookup](/guides/tools/dns-auth/mx-lookup) |
 | Query A, MX, TXT, CNAME, NS and other DNS record types for any hostname | [DNS lookup](/guides/tools/dns-auth/dns-lookup) |
 | Check a mail-server IP's sender reputation score (0–100) | [Sender score lookup](/guides/tools/dns-auth/senderscore-lookup) |
 | Audit DNSSEC, DANE, CAA and 10 other DNS security controls with an A–F grade | [DNS security health check](/guides/tools/dns-auth/dns-health-check) |
 | Check if your sending domain is on a major email blacklist | [Domain blacklist check](/guides/tools/blacklist-security/domain-blacklist-check) |
 | Check if your mail-server IP is listed on a major DNSBL | [IP blacklist check](/guides/tools/blacklist-security/ip-blacklist-check) |
-| Check a URL for phishing, malware and other threats | [Malicious URL lookup](/guides/tools/blacklist-security/malicious-url-lookup) |
-| Verify a URL is live and reachable before linking to it | [URL verifier](/guides/tools/blacklist-security/url-verifier) |
-| Test whether a TCP port is open on any host or IP | [TCP port checker](/guides/tools/blacklist-security/tcp-verifier) |
+| Check the malicious URL lookup availability before relying on its result | [Malicious URL lookup](/guides/tools/blacklist-security/malicious-url-lookup) |
+| Check whether a URL returns a successful response | [URL verifier](/guides/tools/blacklist-security/url-verifier) |
+| Test whether a host and port accept a connection from the test service | [TCP port checker](/guides/tools/blacklist-security/tcp-verifier) |
 | Score an email subject line for spam risk and readability | [Email subject line scorer](/guides/tools/content-analysis/email-subject-score) |
 | Generate AI subject line alternatives from your draft | [Email subject line suggester](/guides/tools/content-analysis/email-subject-suggest) |
 | Check reading ease and grade level for any email copy | [Readability scorer](/guides/tools/content-analysis/readability-scorer) |
 | Score the emotional tone of email copy or customer feedback | [Sentiment analysis](/guides/tools/content-analysis/sentiment-analysis) |
-| Test whether an SMTP server is reachable and check its capabilities | [SMTP server test](/guides/tools/smtp-testing/smtp-server-test) |
-| Send a real test email to verify SMTP credentials and delivery | [SMTP email test](/guides/tools/smtp-testing/smtp-email-test) |
+| Review the SMTP server test’s availability and limits | [SMTP server test](/guides/tools/smtp-testing/smtp-server-test) |
+| Submit a test email through your SMTP server and inspect server acceptance | [SMTP email test](/guides/tools/smtp-testing/smtp-email-test) |
 | Check a phone number for E.164 format and identify its country | [Phone number validator](/guides/tools/other/phone-validator) |
 | Generate localised person profiles with optional job and biography fields | [Person data generator](/guides/tools/data-generation/person-generator) |
 | Generate contact records with email, phone, account and social fields | [Contact data generator](/guides/tools/data-generation/contact-generator) |
@@ -72,31 +72,31 @@ Use the tool when you need a single answer fast. Read the guide when you need to
 | Generate chemical element and SI unit fixtures for chemistry quizzes and learning apps | [Science data generator](/guides/tools/data-generation/science-generator) |
 | Generate address, city, country, GPS coordinate and zip code fixtures for maps and geo apps | [Location data generator](/guides/tools/data-generation/location-generator) |
 | Generate email, IP, domain, JWT, MAC, password and user agent fixtures for API tests | [Internet data generator](/guides/tools/data-generation/internet-data-generator) |
-| Stop a blacklist listing from killing deliverability | [Blacklist monitoring overview](/guides/tools/blacklist-monitoring/overview) |
-| Trace a delivery problem in your SMTP logs | [Sendmux logs](/guides/tools/sendmux/logs) |
+| Monitor sending IPs and domains for blacklist listings | [Blacklist monitoring overview](/guides/tools/blacklist-monitoring/overview) |
+| Inspect message delivery logs from a connected Sendmux account | [Sendmux logs](/guides/tools/sendmux/logs) |
 
 ## Email validation
 
-Tools that check whether an address is real, who hosts it, and whether the domain is set up to receive mail.
+Tools for checking address format, identifying a recognised mail host, and inspecting domain configuration.
 
 <CardGroup cols={2}>
   <Card title="Email syntax validator" href="/guides/tools/email-validation/email-syntax-validator">
-    Check any address against RFC 5321 / 5322 format rules. Runs in-browser, no API call.
+    Check an address's format before further verification.
   </Card>
   <Card title="Email provider check" href="/guides/tools/email-validation/email-provider-check">
-    Identify the mailbox host (Gmail, Microsoft 365, iCloud, custom) for any domain.
+    Look for a recognised mail host in a domain’s MX records; unrecognised results need review.
   </Card>
   <Card title="Email health check" href="/guides/tools/email-validation/email-health-check">
-    Audit SPF, DKIM, DMARC, BIMI, MTA-STS, TLS-RPT, CAA and blacklist status in one scan.
+    Inspect public mail and authentication records with a score, check results and data completeness.
   </Card>
   <Card title="Disposable email checker" href="/guides/tools/email-validation/temp-email-checker">
-    Flag throwaway addresses against an open-source list of 55,000+ known providers.
+    Check whether an address or domain matches a known disposable-email provider.
   </Card>
   <Card title="Email spam checker" href="/guides/tools/email-validation/email-spam-checker">
-    Send a test message and score SPF, DKIM, DMARC, blacklists, content and links across nine signal groups.
+    Send a test message and review authentication, reputation, content and link scores.
   </Card>
   <Card title="Email address validator" href="/guides/tools/email-validation/email-validation">
-    Validate syntax, MX records, SMTP deliverability, disposable status and role detection for any address.
+    Assess an address and review its validation status, detail code and address flags.
   </Card>
 </CardGroup>
 
@@ -106,25 +106,25 @@ Tools for resolving and auditing the DNS records that underpin email authenticat
 
 <CardGroup cols={2}>
   <Card title="SPF lookup" href="/guides/tools/dns-auth/spf-lookup">
-    Resolve any domain's SPF record, count DNS lookup mechanisms, and read the final qualifier.
+    Retrieve matching SPF TXT values for a domain; review their mechanisms and qualifier.
   </Card>
   <Card title="SPF generator" href="/guides/tools/dns-auth/spf-generator">
     Build a formatted SPF record from your IPs, include: domains and policy qualifier.
   </Card>
   <Card title="DMARC lookup" href="/guides/tools/dns-auth/dmarc-lookup">
-    Read any domain's DMARC enforcement policy, alignment modes, and reporting addresses.
+    Retrieve raw DMARC records and read their policy, alignment and reporting tags.
   </Card>
   <Card title="DMARC generator" href="/guides/tools/dns-auth/dmarc-generator">
     Build a DMARC record from your policy, subdomain settings, and reporting setup.
   </Card>
   <Card title="MX lookup" href="/guides/tools/dns-auth/mx-lookup">
-    Resolve mail server hostnames and priority order for any domain.
+    Resolve mail server hostnames and priority values for a domain.
   </Card>
   <Card title="DNS lookup" href="/guides/tools/dns-auth/dns-lookup">
     Query A, AAAA, MX, TXT, CNAME, NS, SOA and other DNS record types for any hostname.
   </Card>
   <Card title="Sender score lookup" href="/guides/tools/dns-auth/senderscore-lookup">
-    Check any mail-server IP's reputation on the SenderScore index — 0–100 score, rating and 30-day trend.
+    Review an IPv4 address’s sender score, rating and volume tier when available.
   </Card>
   <Card title="DNS security check" href="/guides/tools/dns-auth/dns-health-check">
     Grade DNSSEC, DANE, CAA records, registry lock and 9 other DNS security controls — A–F with prioritised recommendations.
@@ -137,19 +137,19 @@ One-off checks for domain and IP blacklist status.
 
 <CardGroup cols={2}>
   <Card title="Domain blacklist check" href="/guides/tools/blacklist-security/domain-blacklist-check">
-    Scan your sending domain against 17 major DNS blacklists and get a per-blacklist verdict.
+    Check a domain against configured DNS blacklists and review each reported result.
   </Card>
   <Card title="IP blacklist check" href="/guides/tools/blacklist-security/ip-blacklist-check">
-    Check any IPv4 or IPv6 against 69 major email DNSBLs and get a per-blacklist verdict.
+    Check a sending IP against supported DNS blacklists and review each reported result.
   </Card>
   <Card title="Malicious URL lookup" href="/guides/tools/blacklist-security/malicious-url-lookup">
-    Check any URL against threat intelligence feeds for phishing, malware and other harmful content.
+    Review the tool’s availability and limitations before using its result.
   </Card>
   <Card title="URL verifier" href="/guides/tools/blacklist-security/url-verifier">
-    Verify any HTTPS URL is live and reachable before including it in a campaign or ad.
+    Check whether an HTTPS URL returns a successful response from the test service.
   </Card>
   <Card title="TCP port checker" href="/guides/tools/blacklist-security/tcp-verifier">
-    Test whether any TCP port is open and reachable on a domain or IP — useful for SMTP, firewall, and service checks.
+    Check whether a host and port accept a connection from the test service; this does not verify the application protocol.
   </Card>
 </CardGroup>
 
@@ -162,19 +162,19 @@ Tools that score and analyse email content before you send.
     Score any subject line across 14 criteria — spam words, readability, length and sentiment.
   </Card>
   <Card title="Email subject line suggester" href="/guides/tools/content-analysis/email-subject-suggest">
-    Generate 3–10 AI subject line alternatives from any draft — ready to score and A/B test.
+    Generate a requested number of subject line variations from a draft and review them before use.
   </Card>
   <Card title="Readability scorer" href="/guides/tools/content-analysis/readability-scorer">
-    Check reading ease, grade level and reading time across seven formulas for any body of text.
+    Compare readability formula scores and estimated reading time for a piece of text.
   </Card>
   <Card title="Sentiment analysis" href="/guides/tools/content-analysis/sentiment-analysis">
-    Score any text for emotional tone using AFINN word weighting — see positive, neutral and negative signals word by word.
+    Inspect positive and negative word scores in text; review the words in context.
   </Card>
 </CardGroup>
 
 ## Blacklist monitoring
 
-Continuous monitoring for sending IPs and domains against real-time blacklists.
+Scheduled and on-demand checks for sending IPs and domains against email blacklists.
 
 <CardGroup cols={2}>
   <Card title="Overview" href="/guides/tools/blacklist-monitoring/overview">
@@ -184,7 +184,7 @@ Continuous monitoring for sending IPs and domains against real-time blacklists.
     Add IPs, add domains, pick a check cadence, configure alerts.
   </Card>
   <Card title="IPs" href="/guides/tools/blacklist-monitoring/ips">
-    Manage monitored IPs, view per-IP history, run on-demand checks.
+    Manage monitored IPs, review their current status, and queue on-demand checks.
   </Card>
   <Card title="Domains" href="/guides/tools/blacklist-monitoring/domains">
     Manage monitored domains and inspect domain-blacklist results.
@@ -196,23 +196,23 @@ Continuous monitoring for sending IPs and domains against real-time blacklists.
     Add many IPs or domains at once via CSV.
   </Card>
   <Card title="Alerts" href="/guides/tools/blacklist-monitoring/alerts">
-    Configure email and webhook notifications for new listings.
+    Configure digest email recipients and respond to blacklist results.
   </Card>
   <Card title="Troubleshoot" href="/guides/tools/blacklist-monitoring/troubleshoot">
-    Common issues, false positives, and how to interpret historical patterns.
+    Checks for pending resources, paused monitoring, missed digests and CSV import errors.
   </Card>
 </CardGroup>
 
 ## SMTP testing
 
-Tools for testing SMTP server connectivity and sending a real test message.
+SMTP test availability and a separate test for sending a real message.
 
 <CardGroup cols={2}>
   <Card title="SMTP server test" href="/guides/tools/smtp-testing/smtp-server-test">
-    Check any hostname or IP for SMTP connectivity, banner and STARTTLS support — no email sent.
+    Review SMTP server test availability and limitations.
   </Card>
   <Card title="SMTP email test" href="/guides/tools/smtp-testing/smtp-email-test">
-    Send a real test message through your SMTP server to verify credentials, TLS and delivery end-to-end.
+    Submit a test message through your SMTP server, then inspect server acceptance and check the recipient mailbox separately.
   </Card>
 </CardGroup>
 
@@ -294,7 +294,7 @@ Tools that generate synthetic test data — names, contacts, dates and more — 
     Generate placeholder image URLs and SVG data URIs for prototypes, avatars and design-system fixtures.
   </Card>
   <Card title="Music data generator" href="/guides/tools/data-generation/music-generator">
-    Generate album, artist, genre and song name fixtures for music app prototypes and catalog screens.
+    Generate album, artist, genre and song name fixtures for music app prototypes and catalogue screens.
   </Card>
   <Card title="Science data generator" href="/guides/tools/data-generation/science-generator">
     Generate chemical element and SI unit fixtures for chemistry quizzes, learning content and conversion tests.
@@ -311,13 +311,13 @@ Tools that generate synthetic test data — names, contacts, dates and more — 
 
 <CardGroup cols={2}>
   <Card title="Phone number validator" href="/guides/tools/other/phone-validator">
-    Check any phone number for E.164 format, identify the country code and get the normalised international number.
+    Check phone-number format and return an international number and country identifiers when valid.
   </Card>
 </CardGroup>
 
 ## Sendmux integration
 
-The companion tool for Spotzee customers running their own SMTP relay.
+View activity from a connected Sendmux account inside Spotzee.
 
 <CardGroup cols={2}>
   <Card title="Overview" href="/guides/tools/sendmux/overview">

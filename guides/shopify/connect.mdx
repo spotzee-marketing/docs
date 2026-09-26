@@ -52,14 +52,14 @@ Approve on Shopify, then configure sync settings for the new store independently
 </Step>
 </Steps>
 
-The **Integrations** page lists every connected store as a separate card.
+The **Integrations** page lists every connected store as a separate card. Spotzee creates a store-specific customer list when the connection succeeds; you can change the assigned list in sync settings.
 
 ## How multi-store works
 
 Each connected Shopify store is independent. That means:
 
 - **Sync settings differ per store.** Store A can sync orders only; Store B can sync everything.
-- **Customer lists differ per store.** Each store gets its own dedicated Spotzee list, so customers from different stores stay separate.
+- **Customer lists differ per store.** Each new connection gets a store-specific list, and each store has its own list assignment.
 - **Statuses differ per store.** Store A might be Active while Store B is in Reconnect Required.
 - **Events differ per store.** A `shopify_order_placed` event carries the originating store identifier so journeys can branch on which store fired the event.
 
@@ -74,7 +74,7 @@ When the integration shows **Reconnect required** (amber badge), the OAuth grant
 ## Next steps
 
 <Columns cols={2}>
-<Card title="Sync settings" icon="settings" href="/guides/shopify/sync-settings">
+<Card title="Sync settings" icon="gear" href="/guides/shopify/sync-settings">
 Configure what flows in, what flows back, and which list new customers land on.
 </Card>
 
@@ -82,7 +82,7 @@ Configure what flows in, what flows back, and which list new customers land on.
 The five categories of data flowing from Shopify into Spotzee.
 </Card>
 
-<Card title="Troubleshoot" icon="life-buoy" href="/guides/shopify/troubleshoot">
+<Card title="Troubleshoot" icon="life-ring" href="/guides/shopify/troubleshoot">
 OAuth and domain-validation errors during connection.
 </Card>
 

@@ -4,7 +4,7 @@ description: "HTTP status codes, error body shape, and common error codes for th
 keywords: ["errors", "http status", "error codes", "extended api"]
 ---
 
-The Extended API and Main API share one error envelope, served as `application/problem+json` (RFC 7807). Every non-2xx response carries the same fields.
+The Extended API uses a structured error envelope served as `application/problem+json` (RFC 7807). Handle errors using the HTTP status and `code`; some fields are optional. The Main API documents the same field names, with rollout qualifications in its errors reference.
 
 ## Error body shape
 
@@ -38,9 +38,10 @@ The Extended API and Main API share one error envelope, served as `application/p
 |---|---|---|
 | `400 Bad Request` | Invalid input | Malformed email, invalid domain, bad payload, unsupported `Spotzee-Version` |
 | `401 Unauthorized` | Missing or invalid token | No `Authorization` header, expired key |
+| `402 Payment Required` | Credit quota exhausted | Insufficient balance for a metered operation |
 | `403 Forbidden` | Authenticated but not allowed | Key scope insufficient |
 | `404 Not Found` | Resource or record not present | Domain has no DNS record of the requested type |
-| `429 Too Many Requests` | Rate limited or quota exhausted | Honour `Retry-After`; check your remaining quota |
+| `429 Too Many Requests` | Rate limited | Honour `Retry-After` before retrying |
 | `500 Internal Server Error` | Unexpected platform error | Retry with backoff |
 | `503 Service Unavailable` | Temporary capacity issue | Retry with backoff |
 
@@ -61,9 +62,9 @@ The full code catalogue is shared with the Main API:
 
 ## Quota errors
 
-Validation and AI-scoring endpoints are credit-metered. A `quota_exceeded` response indicates the daily or plan-level credit limit has been reached. Inspect remaining credits via the `Quota` endpoints before high-volume runs.
+Metered operations return `402` when available credits do not cover the operation. Check your balance in the Spotzee app before high-volume runs. The generated Extended API reference does not expose a public Quota endpoint.
 
 ## Retry guidance
 
-- **Lookups** (`GET`): retry on `5xx` and `429` with exponential backoff.
-- **SMS dispatch** (`POST`): include an `Idempotency-Key` to make retries safe. Do not retry `4xx`.
+- **Reads and lookups**: use bounded retries with backoff on `5xx` and `429`, honouring `Retry-After` when present. Many lookup endpoints use `POST`.
+- **Metered or sending operations**: inspect the endpoint's effects before retrying. Check idempotency availability and limits; resolve input and credit errors first. The SMS group validates phone numbers and does not expose a message-dispatch endpoint.

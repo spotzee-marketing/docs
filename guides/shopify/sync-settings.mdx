@@ -53,7 +53,7 @@ Each toggle pushes data from Spotzee back to Shopify. Off by default; opt in to 
 
 ## Customer list
 
-Every store needs a Spotzee customer list to receive its imported customers. The customer list picker shows up in the drawer when **Customer profiles** is on.
+Spotzee creates and assigns a customer list when a store connects. The customer list picker shows the assignment when **Customer profiles** is on.
 
 Two options:
 
@@ -66,7 +66,7 @@ Each Shopify store gets its own dedicated list. Lists already assigned to anothe
 
 ### Switching the list
 
-You can change which list is assigned any time. Customers already imported don't move; the change applies to future imports only. To move existing customers, either re-sync (which re-creates them on the new list) or migrate manually.
+You can change the assigned list. Existing contacts keep their Shopify external IDs; a re-sync updates those records rather than creating new contacts.
 
 ## Run the initial sync
 
@@ -100,7 +100,7 @@ Open sync settings whenever you need to:
 ## Next steps
 
 <Columns cols={2}>
-<Card title="Sync operations" icon="activity" href="/guides/shopify/sync-operations">
+<Card title="Sync operations" icon="chart-line" href="/guides/shopify/sync-operations">
 Statuses, retries, and full re-syncs.
 </Card>
 
@@ -112,7 +112,7 @@ View the store record, scopes, and the readiness checklist.
 Build automations on Shopify events.
 </Card>
 
-<Card title="Troubleshoot" icon="life-buoy" href="/guides/shopify/troubleshoot">
+<Card title="Troubleshoot" icon="life-ring" href="/guides/shopify/troubleshoot">
 What to do when sync stalls or data doesn't appear.
 </Card>
 </Columns>

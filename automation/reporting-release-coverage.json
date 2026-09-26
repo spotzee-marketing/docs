@@ -1,0 +1,1425 @@
+{
+  "goal": "Coordinated documentation and managed-delivery/reporting consistency release after operator deployment",
+  "createdAt": "2026-09-25T22:06:34.139064+00:00",
+  "docsBase": "b6df2bf",
+  "existingPages": 137,
+  "newPages": 2,
+  "sourceIncomplete": [],
+  "releaseStatus": "ready for publication: deployed API contracts, reporting checks and rate-limit configuration verified",
+  "pageVerificationNote": "Per-page deployedVerification fields retain the original audit snapshot. Subsequent release-level checks are recorded in evidence/reporting-consistency-20260926.md; they do not imply every workflow was exercised in production.",
+  "recordScope": "Public disposition record. Detailed source review and release evidence are retained privately.",
+  "pages": [
+    {
+      "page": "changelog.mdx",
+      "disposition": "correct",
+      "candidateSha256": "d4a9ac6b803ea6a8edf8f8ca3198cbce1e9a68c874903d16aaaf8cc6b6939344",
+      "url": "/changelog",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "extended-api/errors.mdx",
+      "disposition": "correct",
+      "candidateSha256": "4850157f4b61e09d9f753857714b27b5b58a6f7e9979ba495aea2d4c0f493314",
+      "url": "/extended-api/errors",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "extended-api/introduction.mdx",
+      "disposition": "correct",
+      "candidateSha256": "9ce7afd27824940d1d43d0180b9c7363e9946282c9a750a0736ed122a937909c",
+      "url": "/extended-api/introduction",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/api-client-type.mdx",
+      "disposition": "correct",
+      "candidateSha256": "7ab1b7815e082f46530b5117355e49eb7b4322e5adbdc81ca8e8da9774378eb2",
+      "url": "/guides/api-client-type",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/api-idempotency.mdx",
+      "disposition": "correct",
+      "candidateSha256": "6a196718dc94b28b9f620677b460d2e14041379e89c8a6d7dc0a6fa0525d1f39",
+      "url": "/guides/api-idempotency",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/api-pagination.mdx",
+      "disposition": "correct",
+      "candidateSha256": "2adad3be607ec216f6b617bbfa3817a401cb5ae2e4f8af6005069783b5b34cea",
+      "url": "/guides/api-pagination",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/api-rate-limits.mdx",
+      "disposition": "correct",
+      "candidateSha256": "95341a7f36b2dd0ef91b588e596002719bc9f54da68e44293a56879ee2446849",
+      "url": "/guides/api-rate-limits",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/api-versioning.mdx",
+      "disposition": "correct",
+      "candidateSha256": "0de60d6701612b298204abc3f8e56838a8946007e7e6b36e3e740dcd06c293a3",
+      "url": "/guides/api-versioning",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/api-webhooks.mdx",
+      "disposition": "correct",
+      "candidateSha256": "4653450874e230e5f17cdf8151db3b32d41d2fc4ba9843f3919a74cb4c27c007",
+      "url": "/guides/api-webhooks",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/authentication.mdx",
+      "disposition": "correct",
+      "candidateSha256": "4062e0948d70ed46254c187cf5948603f4d84589df8e40b9fc33f41e611de887",
+      "url": "/guides/authentication",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/billing-and-credits.mdx",
+      "disposition": "correct",
+      "candidateSha256": "681bf2c2f158e8ea494ab68535d4e0f2f0032b1f8c25387f99ad46dc5546a7aa",
+      "url": "/guides/billing-and-credits",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/build-segment-via-api.mdx",
+      "disposition": "correct",
+      "candidateSha256": "728d3eca9aae5b521437d19039820ec21a2a27fc66e1b305c6956e59e31a5f42",
+      "url": "/guides/build-segment-via-api",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/campaign-bounce-reporting.mdx",
+      "disposition": "new",
+      "candidateSha256": "ec7d37557b05b49ae806d9c3e69d59bab8dcaf3d930e254afa5341a839978223",
+      "url": "/guides/campaign-bounce-reporting",
+      "newPage": true,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/channels.mdx",
+      "disposition": "correct",
+      "candidateSha256": "642959a29c495cad159e7cbf01fd8491ae06fb71eab7dbd6d0e3d98b3cfc0295",
+      "url": "/guides/channels",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/concepts.mdx",
+      "disposition": "correct",
+      "candidateSha256": "afb523dfd4cfe28201dcea4646605c63eda454e5280b8ca6eb4b4e0ccbbe79f9",
+      "url": "/guides/concepts",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/configure-email-delivery.mdx",
+      "disposition": "correct",
+      "candidateSha256": "b6a0c5715ff7abb7f311ad3569b8dbf06eaf896599e81f2a68ad1873fab22884",
+      "url": "/guides/configure-email-delivery",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/configure-push-notifications.mdx",
+      "disposition": "correct",
+      "candidateSha256": "9e5095908c3942606c447e3cd8470253c26aa27efb57275ec0b7dc313c36c8e3",
+      "url": "/guides/configure-push-notifications",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/configure-sms-delivery.mdx",
+      "disposition": "correct",
+      "candidateSha256": "87eb68ea060dbbd4dcf915fce15054635aa2819baa0421f09ac705c3e0136bbb",
+      "url": "/guides/configure-sms-delivery",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/crm.mdx",
+      "disposition": "keep",
+      "candidateSha256": "f69f3f107b74b646d5761298d826d1bb1d908954761332b209be207f9408e1c1",
+      "url": "/guides/crm",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/custom-domains.mdx",
+      "disposition": "correct",
+      "candidateSha256": "8b74c34e169b2148138b49fa611fc78b4f6d130807a60c3be25e1fae5bd588bb",
+      "url": "/guides/custom-domains",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/data-schema.mdx",
+      "disposition": "correct",
+      "candidateSha256": "02cb1a494a6c303c83d82a6ff8bc6b39a70b8b4d805dc7ccad880f969fc326d8",
+      "url": "/guides/data-schema",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/event-ingestion.mdx",
+      "disposition": "correct",
+      "candidateSha256": "e73beeea00c267c7e6870708b44ef3bf10efa02792abd353497b15242d325f88",
+      "url": "/guides/event-ingestion",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/invite-teammates.mdx",
+      "disposition": "correct",
+      "candidateSha256": "5daedf4c874ab63e8fa48409b408692814d6197c9e726d205626b040bdb91bbc",
+      "url": "/guides/invite-teammates",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/journey-trigger.mdx",
+      "disposition": "correct",
+      "candidateSha256": "d0e632c4bbcd3decebbfdd9b4a7f56cfb9994d6d551e914e49a60653aea388cb",
+      "url": "/guides/journey-trigger",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/journeys.mdx",
+      "disposition": "correct",
+      "candidateSha256": "a2b66111855f14cec00aa8d498ac02d7d531420f74166dfaafb2cc0609e818b6",
+      "url": "/guides/journeys",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/locales.mdx",
+      "disposition": "correct",
+      "candidateSha256": "bb009dc3c7d7fb2e28cb56c66f3ed2d7678bf8e46c5fb6f3e30dd8ed376e15d8",
+      "url": "/guides/locales",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/manage-api-keys.mdx",
+      "disposition": "correct",
+      "candidateSha256": "c04bcffced8d38e4d76b2e3e6e5d5282dbcbfd4231e379c3d765419511dcc2e5",
+      "url": "/guides/manage-api-keys",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/providers.mdx",
+      "disposition": "correct",
+      "candidateSha256": "b675a348c2610d82a245f33f8043f2d2d79f2b6e8f4395f55db73f982b530eaa",
+      "url": "/guides/providers",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/query-events.mdx",
+      "disposition": "new",
+      "candidateSha256": "333df153f854c00e565bb91d37401941ae4080e273bcf3064f1f839c6663bb10",
+      "url": "/guides/query-events",
+      "newPage": true,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/quickstart.mdx",
+      "disposition": "correct",
+      "candidateSha256": "057fc98cde36c5a53e776425a3527437314fe4cad7d9637cc27865c3ec400b44",
+      "url": "/guides/quickstart",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/salesforce/connect.mdx",
+      "disposition": "keep",
+      "candidateSha256": "81309e58e74cac765b87000899002720f7cc34acf1ac83155d3a80afd06ce522",
+      "url": "/guides/salesforce/connect",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/salesforce/field-mapping.mdx",
+      "disposition": "correct",
+      "candidateSha256": "9ee275e39c55a7119dd45d32bc88dd3a96772835c7830332a32cb0dbfb5aa93f",
+      "url": "/guides/salesforce/field-mapping",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/salesforce/operations.mdx",
+      "disposition": "correct",
+      "candidateSha256": "eeeb725249fc7666faa2ea52f13481f4a0afc41c5de7082fcc329c286d4f5caa",
+      "url": "/guides/salesforce/operations",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/salesforce/overview.mdx",
+      "disposition": "keep",
+      "candidateSha256": "a55c9bd19f538c7df3346e1485aa97146a82acb7328a4f567af04207bb0f8269",
+      "url": "/guides/salesforce/overview",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/salesforce/sync-rules.mdx",
+      "disposition": "correct",
+      "candidateSha256": "ad45e45d90a5f113719e599ee0305d093d8b3dc9d9d36d580b73eb8efda3a41e",
+      "url": "/guides/salesforce/sync-rules",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/salesforce/troubleshoot.mdx",
+      "disposition": "correct",
+      "candidateSha256": "f7570aae24c95d460a35297790ab9fc0bdbbb4a4a93a52446fd920a6d67fc75b",
+      "url": "/guides/salesforce/troubleshoot",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/sdks/android/identify.mdx",
+      "disposition": "correct",
+      "candidateSha256": "91ae4f8b2a642b60e0f53ffaf7af30d3311bf3a30d8dc05fe73472f3ccd7370a",
+      "url": "/guides/sdks/android/identify",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/sdks/android/in-app-and-deeplinks.mdx",
+      "disposition": "correct",
+      "candidateSha256": "51e87f159dab17a26852d22e837b58573ba82a24886c1abb5714cf25cb0ee573",
+      "url": "/guides/sdks/android/in-app-and-deeplinks",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/sdks/android/install.mdx",
+      "disposition": "correct",
+      "candidateSha256": "a9ed721a37ad59eb72d37378b68b50aa2777a78563fcecfafb60f817eea4c329",
+      "url": "/guides/sdks/android/install",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/sdks/android/push-notifications.mdx",
+      "disposition": "keep",
+      "candidateSha256": "7f437a13e19c01a71ac3a613243e37cd9ced5877c3933e2d692181edd9f169b6",
+      "url": "/guides/sdks/android/push-notifications",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/sdks/android/track.mdx",
+      "disposition": "keep",
+      "candidateSha256": "6c3bf1df574dd76400d1a69ffcf2e303e60b138a2e267268cc37e284ca192520",
+      "url": "/guides/sdks/android/track",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/sdks/ios/identify.mdx",
+      "disposition": "correct",
+      "candidateSha256": "84f817055b31cb82abbe5d2d1f67e18866a5c83b5011c113c7e8975f021539a4",
+      "url": "/guides/sdks/ios/identify",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/sdks/ios/in-app-and-deeplinks.mdx",
+      "disposition": "correct",
+      "candidateSha256": "1d003c51780a2a57433d5891cc5927c0c8c728ebe70e7e0e20dc1664e8bd135a",
+      "url": "/guides/sdks/ios/in-app-and-deeplinks",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/sdks/ios/install.mdx",
+      "disposition": "correct",
+      "candidateSha256": "076ed340c98c38d2f4f1264421f23645878ed9b307501881776edead1d4d7a8c",
+      "url": "/guides/sdks/ios/install",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/sdks/ios/push-notifications.mdx",
+      "disposition": "keep",
+      "candidateSha256": "0bed03d06d13768aa0351bd957785e7e18bc0b627f3e2182d73c54a1cc28b979",
+      "url": "/guides/sdks/ios/push-notifications",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/sdks/ios/track.mdx",
+      "disposition": "keep",
+      "candidateSha256": "8fc847bff23c073877795fd66b89247400f943d3bb6fe8bedda25ff02ef18fa0",
+      "url": "/guides/sdks/ios/track",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/sdks/javascript/devices-and-notifications.mdx",
+      "disposition": "correct",
+      "candidateSha256": "7ef716f735b8e04fdbb02e835207d7a1d7d457266c243c0f2827aa4ce09089c2",
+      "url": "/guides/sdks/javascript/devices-and-notifications",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/sdks/javascript/identify.mdx",
+      "disposition": "correct",
+      "candidateSha256": "d39fb4bec79b69c27b2fc7c3e55315faedc4499b572a36c22c398c18a965a429",
+      "url": "/guides/sdks/javascript/identify",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/sdks/javascript/install.mdx",
+      "disposition": "correct",
+      "candidateSha256": "6addb57365f09994dbc68dc640baa2c326604485a6150dd1bb932042e22e4c58",
+      "url": "/guides/sdks/javascript/install",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/sdks/javascript/track.mdx",
+      "disposition": "correct",
+      "candidateSha256": "fde0bb8ead8cb7c46023e520b2ed3099652c1bf155e927008ade4a0b0fd42a33",
+      "url": "/guides/sdks/javascript/track",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/sdks/javascript/typed-client.mdx",
+      "disposition": "correct",
+      "candidateSha256": "5fdcb018d3073fdbb7e3aa71158430327f871daa3d7af5ad7e323b9070f810ba",
+      "url": "/guides/sdks/javascript/typed-client",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/sdks/overview.mdx",
+      "disposition": "correct",
+      "candidateSha256": "a65eed16016dd9d592e4d13e57fdc61c658c794f5a9852e0c75b8ad5b0c63403",
+      "url": "/guides/sdks/overview",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/segments.mdx",
+      "disposition": "correct",
+      "candidateSha256": "d4a442f07777ce35f576103c4fa403b05db2f6a37d9c87989ebb248d0e26f503",
+      "url": "/guides/segments",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/setup-project.mdx",
+      "disposition": "correct",
+      "candidateSha256": "d801878674b24ad07cf9aee5280dd1a9798a5a2d86f8c230b626b9225087f415",
+      "url": "/guides/setup-project",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/shopify/connect.mdx",
+      "disposition": "correct",
+      "candidateSha256": "5ebfe711530b0a12247b41aadb635257d91d2fc1c2ac932545b48a53fbae6c90",
+      "url": "/guides/shopify/connect",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/shopify/data-from-shopify.mdx",
+      "disposition": "correct",
+      "candidateSha256": "f12e64b711d76944a82458b5d3a8c6c59e74cbdd36f9bde92db33223838c94f2",
+      "url": "/guides/shopify/data-from-shopify",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/shopify/data-to-shopify.mdx",
+      "disposition": "correct",
+      "candidateSha256": "f96bd25a8ce2e3007077f54255b839dd91b7435f9c7d6ca1e737c7e72e93c467",
+      "url": "/guides/shopify/data-to-shopify",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/shopify/disconnect.mdx",
+      "disposition": "correct",
+      "candidateSha256": "65842cbf0939ad69c3ef04abbd28f0be7176ea169d9d31bb0aa1650d62b68eca",
+      "url": "/guides/shopify/disconnect",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/shopify/journeys-and-segments.mdx",
+      "disposition": "correct",
+      "candidateSha256": "0554cba93d3eadcecbd1fc11b34cb9a43a0a612734d241f902956f274c9d59a8",
+      "url": "/guides/shopify/journeys-and-segments",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/shopify/overview.mdx",
+      "disposition": "correct",
+      "candidateSha256": "93729c3ca87f935882a979c43ac4e5d975909ab6d92349fb083e452be6d68f4f",
+      "url": "/guides/shopify/overview",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/shopify/store-details.mdx",
+      "disposition": "keep",
+      "candidateSha256": "db2ac1180cdb70ea1ec15923b7b16a3017359343cb85162207a406512b2c18d3",
+      "url": "/guides/shopify/store-details",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/shopify/sync-operations.mdx",
+      "disposition": "keep",
+      "candidateSha256": "817fb401bbf23f470c88728e411dedaa1d3ea5ce27152fd8b2476a594b25e656",
+      "url": "/guides/shopify/sync-operations",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/shopify/sync-settings.mdx",
+      "disposition": "correct",
+      "candidateSha256": "64b07d39d0e10503670cb5062e90cf263e14aca152714d703196fec593d6b008",
+      "url": "/guides/shopify/sync-settings",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/shopify/troubleshoot.mdx",
+      "disposition": "correct",
+      "candidateSha256": "96f2d8c503e47648d5d77521f507849e00bd785c931b933b1c473197f29b5b28",
+      "url": "/guides/shopify/troubleshoot",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/subscription-preferences.mdx",
+      "disposition": "correct",
+      "candidateSha256": "ce0bb63392aee7dbbfe98406bec11df7b040ce2260ec60593925401fde717bf9",
+      "url": "/guides/subscription-preferences",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/switch-organisations.mdx",
+      "disposition": "correct",
+      "candidateSha256": "b4efac628a3739e877118887b2764d3f433b56e8b178bb9d7e2a0a53a1165c24",
+      "url": "/guides/switch-organisations",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/sync-product-source.mdx",
+      "disposition": "correct",
+      "candidateSha256": "5b7154436d68614f81392751559ad84d330add0c6dafe45993427b9fe9fb7ec7",
+      "url": "/guides/sync-product-source",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/sync-users.mdx",
+      "disposition": "correct",
+      "candidateSha256": "09ee8a017bc9ec2234a0bd6ebac5f201a0ef1345d6035ba2ba84638d70aa3967",
+      "url": "/guides/sync-users",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/templates.mdx",
+      "disposition": "correct",
+      "candidateSha256": "0ce66711d7080e1c53392a06848ecdc14fdaf581655b3c98e952cf53f129422a",
+      "url": "/guides/templates",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/tools/blacklist-monitoring/alerts.mdx",
+      "disposition": "correct",
+      "candidateSha256": "98cbe341ea3acb7aa429faf06ab185127129a8a27a3e3caf0e671304bd27f0dd",
+      "url": "/guides/tools/blacklist-monitoring/alerts",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/tools/blacklist-monitoring/bulk.mdx",
+      "disposition": "correct",
+      "candidateSha256": "e03526f89b4ed063cb03d333b92acbc321e82cb8d9e585d7c7e97c003b28959d",
+      "url": "/guides/tools/blacklist-monitoring/bulk",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/tools/blacklist-monitoring/domains.mdx",
+      "disposition": "correct",
+      "candidateSha256": "1b5ab48d032a3d66bc1e3f93c3b0963062c66c0d0c656bfc19097168e282d900",
+      "url": "/guides/tools/blacklist-monitoring/domains",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/tools/blacklist-monitoring/groups.mdx",
+      "disposition": "correct",
+      "candidateSha256": "b27708ab54c5c73fe8dc7d08464752885cc6a6171ddb8d7b0154a89180e8263e",
+      "url": "/guides/tools/blacklist-monitoring/groups",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/tools/blacklist-monitoring/ips.mdx",
+      "disposition": "correct",
+      "candidateSha256": "bf180855a17d498106f2944646dbc1e062dcb883519fbb571a661ab0c94a371f",
+      "url": "/guides/tools/blacklist-monitoring/ips",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/tools/blacklist-monitoring/overview.mdx",
+      "disposition": "correct",
+      "candidateSha256": "85d26bed49af852a428d36855cbafa47d3aeac34a591231c2151d5eb9c3d531a",
+      "url": "/guides/tools/blacklist-monitoring/overview",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/tools/blacklist-monitoring/setup.mdx",
+      "disposition": "correct",
+      "candidateSha256": "303fbe0cd304d77f8123b122da60cccf4d542013c00507b41afb4a540b8c8d90",
+      "url": "/guides/tools/blacklist-monitoring/setup",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/tools/blacklist-monitoring/troubleshoot.mdx",
+      "disposition": "correct",
+      "candidateSha256": "051005b353d7f7b6ccd6105e5e77d650bdcf836c50997d1733ed92cd2d62bccf",
+      "url": "/guides/tools/blacklist-monitoring/troubleshoot",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/tools/blacklist-security/domain-blacklist-check.mdx",
+      "disposition": "rewrite",
+      "candidateSha256": "86e5dfe70c1a69f88ce8820cb26cc5bc0568e587bebc2391b4f92966673d6b0c",
+      "url": "/guides/tools/blacklist-security/domain-blacklist-check",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/tools/blacklist-security/ip-blacklist-check.mdx",
+      "disposition": "rewrite",
+      "candidateSha256": "c4c89e8632c83515417e2e2216a6219ad6f937dd55121034865654811366ef8e",
+      "url": "/guides/tools/blacklist-security/ip-blacklist-check",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/tools/blacklist-security/malicious-url-lookup.mdx",
+      "disposition": "rewrite",
+      "candidateSha256": "4dbbacd65c6edf9e8ec1692e85522e1bb8218961966e52da42fa283c127b718a",
+      "url": "/guides/tools/blacklist-security/malicious-url-lookup",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/tools/blacklist-security/tcp-verifier.mdx",
+      "disposition": "rewrite",
+      "candidateSha256": "3b64d651f43bf86eb23fe96fadd527c590b8f3b78d0d0c6e66fc598270220fa1",
+      "url": "/guides/tools/blacklist-security/tcp-verifier",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/tools/blacklist-security/url-verifier.mdx",
+      "disposition": "correct",
+      "candidateSha256": "3b62cb9d63d35973b62d6565e1737fbea803b7a361c844bad665ae092c43bd87",
+      "url": "/guides/tools/blacklist-security/url-verifier",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/tools/content-analysis/email-subject-score.mdx",
+      "disposition": "correct",
+      "candidateSha256": "e5db943fd5ae171baa043d2b30c6bedea8b40fe47408acb98792c7a7b3ff1b02",
+      "url": "/guides/tools/content-analysis/email-subject-score",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/tools/content-analysis/email-subject-suggest.mdx",
+      "disposition": "correct",
+      "candidateSha256": "d438bf7a6cfcb526cbd8f1acc81846803e903c6ac323b9365af2359c6607de93",
+      "url": "/guides/tools/content-analysis/email-subject-suggest",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/tools/content-analysis/readability-scorer.mdx",
+      "disposition": "correct",
+      "candidateSha256": "aaf977bf2d506c9bcebd034858500bd1c1c8a58b2f17008e709cb00403377590",
+      "url": "/guides/tools/content-analysis/readability-scorer",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/tools/content-analysis/sentiment-analysis.mdx",
+      "disposition": "rewrite",
+      "candidateSha256": "6dc8214b7adea0b54ba5997067d195128b65cdb41cc6154b10b42ad12c66d0ce",
+      "url": "/guides/tools/content-analysis/sentiment-analysis",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/tools/data-generation/airline-generator.mdx",
+      "disposition": "correct",
+      "candidateSha256": "ebe90d0c69a40da4548d113b5097339c81f1589dddd9f15c5edf66c2c854474f",
+      "url": "/guides/tools/data-generation/airline-generator",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/tools/data-generation/animal-generator.mdx",
+      "disposition": "correct",
+      "candidateSha256": "ebcce268988862ddbbc22e53f0916275f335541767f9d13f80894c58cbada3d9",
+      "url": "/guides/tools/data-generation/animal-generator",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/tools/data-generation/book-generator.mdx",
+      "disposition": "correct",
+      "candidateSha256": "3ae35e954c3b0f01a0e178df9b90560cf47a07834be57a2d20600c16710929e7",
+      "url": "/guides/tools/data-generation/book-generator",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/tools/data-generation/boolean-generator.mdx",
+      "disposition": "correct",
+      "candidateSha256": "e0047349e4801344ab1586024a64d4c984f47863245612ccf76c6d480eeb9342",
+      "url": "/guides/tools/data-generation/boolean-generator",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/tools/data-generation/color-generator.mdx",
+      "disposition": "correct",
+      "candidateSha256": "27afdfde9a86d26a1902e47a8a8e681b0ff401ff468d3d21da9714833d07119c",
+      "url": "/guides/tools/data-generation/color-generator",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/tools/data-generation/commerce-generator.mdx",
+      "disposition": "correct",
+      "candidateSha256": "c719a907124bac56b0254001225680ca49db6afdd06d2be683851a093b813f22",
+      "url": "/guides/tools/data-generation/commerce-generator",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/tools/data-generation/company-generator.mdx",
+      "disposition": "correct",
+      "candidateSha256": "dee80e985938ae1ff9ac0b66ded2bc05e39d154ae56de63baa90f506f1af5e72",
+      "url": "/guides/tools/data-generation/company-generator",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/tools/data-generation/contact-generator.mdx",
+      "disposition": "correct",
+      "candidateSha256": "fdc26501bc8150af75bafa5324bc1b49e6114e6b726d4f954f4f2e950ee3b746",
+      "url": "/guides/tools/data-generation/contact-generator",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/tools/data-generation/database-generator.mdx",
+      "disposition": "correct",
+      "candidateSha256": "825e9e1f1b077308b4f723ad6b83e93fd1f67531ec12903c383a1ac2fafc97da",
+      "url": "/guides/tools/data-generation/database-generator",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/tools/data-generation/date-generator.mdx",
+      "disposition": "correct",
+      "candidateSha256": "250e51225d562557fe9b42dbf235090dc57adbbe1bd86996e58f72d1e4cad397",
+      "url": "/guides/tools/data-generation/date-generator",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/tools/data-generation/dev-fixture-generator.mdx",
+      "disposition": "correct",
+      "candidateSha256": "364034eba66db65459066e9c100267e2cdd857f857820a4bd646b81460da009c",
+      "url": "/guides/tools/data-generation/dev-fixture-generator",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/tools/data-generation/finance-generator.mdx",
+      "disposition": "correct",
+      "candidateSha256": "24b7364f9b0e76b60f452a7bb2fd74015206936a93e678bd02291b9cbb3a0cb9",
+      "url": "/guides/tools/data-generation/finance-generator",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/tools/data-generation/food-generator.mdx",
+      "disposition": "correct",
+      "candidateSha256": "57c947ad4edf4a57ed91da3a9310353cebd65a4744c183e1ea33885ee23054bb",
+      "url": "/guides/tools/data-generation/food-generator",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/tools/data-generation/git-generator.mdx",
+      "disposition": "correct",
+      "candidateSha256": "3626542df46c69f489f74a1d7478dab247713312a7836c5536c55a11acbd4fc7",
+      "url": "/guides/tools/data-generation/git-generator",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/tools/data-generation/internet-data-generator.mdx",
+      "disposition": "correct",
+      "candidateSha256": "c1cf2a62bdc54debdeb909e3e9b4537f753cb8977ff4ff1904945bdf5c445bc1",
+      "url": "/guides/tools/data-generation/internet-data-generator",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/tools/data-generation/location-generator.mdx",
+      "disposition": "correct",
+      "candidateSha256": "3e282812c552310a517f074c6530a0bc6f9d2d21ea8d95decc9ae8c22625a0d7",
+      "url": "/guides/tools/data-generation/location-generator",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/tools/data-generation/lorem-ipsum-generator.mdx",
+      "disposition": "correct",
+      "candidateSha256": "7b5230058d435ee9cea520b519210f25804adf248488ddd2d933e92ff28cea66",
+      "url": "/guides/tools/data-generation/lorem-ipsum-generator",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/tools/data-generation/music-generator.mdx",
+      "disposition": "correct",
+      "candidateSha256": "feff5b15b9a1daae4a9e9f74a9bba8fc877f9cca87545cd59613eb623f8a4a92",
+      "url": "/guides/tools/data-generation/music-generator",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/tools/data-generation/name-generator.mdx",
+      "disposition": "correct",
+      "candidateSha256": "7ac9ec05271488c91d268b7fea4ab7caa5270eb5bb504ee33a77e36a6c1b3848",
+      "url": "/guides/tools/data-generation/name-generator",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/tools/data-generation/person-generator.mdx",
+      "disposition": "correct",
+      "candidateSha256": "f4bdd1578159e217619240e01d7451060c9b16ac0b73eaac8ead03132eb8f425",
+      "url": "/guides/tools/data-generation/person-generator",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/tools/data-generation/phone-generator.mdx",
+      "disposition": "correct",
+      "candidateSha256": "5ed0c04badf23fcb2bb06505f9a7848d8b2b0395a78b0035425b27fea60026a9",
+      "url": "/guides/tools/data-generation/phone-generator",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/tools/data-generation/placeholder-image-generator.mdx",
+      "disposition": "correct",
+      "candidateSha256": "5273b8e2c1bf72bce0548bb8d90e842b48428fe3d6b45d1b7a67c3a7e3f9fe97",
+      "url": "/guides/tools/data-generation/placeholder-image-generator",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/tools/data-generation/random-number-generator.mdx",
+      "disposition": "correct",
+      "candidateSha256": "f9abae1ac4fa43e31bfcf86839d05f1f413e87b7638e7cc82a4dd9ed78847177",
+      "url": "/guides/tools/data-generation/random-number-generator",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/tools/data-generation/random-string-generator.mdx",
+      "disposition": "correct",
+      "candidateSha256": "03f5a4f17c9dfeb5a67bc264168fc6396f1cae3ae22b1309114c4b44dc1cdf9f",
+      "url": "/guides/tools/data-generation/random-string-generator",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/tools/data-generation/science-generator.mdx",
+      "disposition": "correct",
+      "candidateSha256": "8e2eca270c5400d8e353cf059940663f9c632ae3a39a322b742cbd72014bbc4c",
+      "url": "/guides/tools/data-generation/science-generator",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/tools/data-generation/tech-jargon-generator.mdx",
+      "disposition": "correct",
+      "candidateSha256": "23d22ee4313353dabda8aa5542fffc9333bed9ccdfc57730080843c98cf4deb3",
+      "url": "/guides/tools/data-generation/tech-jargon-generator",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/tools/data-generation/vehicle-generator.mdx",
+      "disposition": "correct",
+      "candidateSha256": "65fe49182e6602c179393f8f3c04bc9aa55d9861e4253a0e8373d8d0c0b5f1fb",
+      "url": "/guides/tools/data-generation/vehicle-generator",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/tools/data-generation/word-generator.mdx",
+      "disposition": "correct",
+      "candidateSha256": "b17fd84b6929c37f369cf5e94649322e5bdb0c3e38238558808c37f488221472",
+      "url": "/guides/tools/data-generation/word-generator",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/tools/dns-auth/dmarc-generator.mdx",
+      "disposition": "correct",
+      "candidateSha256": "c7d9693c30900ad0737a75bed7090d3ad34a3100f097f99517e450e2328e877c",
+      "url": "/guides/tools/dns-auth/dmarc-generator",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/tools/dns-auth/dmarc-lookup.mdx",
+      "disposition": "correct",
+      "candidateSha256": "4761542b59774a3647f8bcf64b262ff97e2708031ce10502598e96f712a45375",
+      "url": "/guides/tools/dns-auth/dmarc-lookup",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/tools/dns-auth/dns-health-check.mdx",
+      "disposition": "correct",
+      "candidateSha256": "f821391e7e019b6ec27bd7f594de73235ff33b53018f57acc03b4a5979c7d271",
+      "url": "/guides/tools/dns-auth/dns-health-check",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/tools/dns-auth/dns-lookup.mdx",
+      "disposition": "correct",
+      "candidateSha256": "7536c3fb81efefba9db3f54d5a2454c3a4091fca90bcdd35b796052658fc9376",
+      "url": "/guides/tools/dns-auth/dns-lookup",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/tools/dns-auth/mx-lookup.mdx",
+      "disposition": "correct",
+      "candidateSha256": "dbd82dc3dc97fe7bf1b6abcc1a8ce9a463db1e50ae4caa41efb4058440cf4d07",
+      "url": "/guides/tools/dns-auth/mx-lookup",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/tools/dns-auth/senderscore-lookup.mdx",
+      "disposition": "correct",
+      "candidateSha256": "a5a92b8cda9a033b9c8fd78c467225fca5156a1e389897b181396aafeacd36d7",
+      "url": "/guides/tools/dns-auth/senderscore-lookup",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/tools/dns-auth/spf-generator.mdx",
+      "disposition": "correct",
+      "candidateSha256": "5ebcf8ffc761a4ce5fc6648d5f0d43013131ea083f3ce3e1f4af6bad382e2247",
+      "url": "/guides/tools/dns-auth/spf-generator",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/tools/dns-auth/spf-lookup.mdx",
+      "disposition": "correct",
+      "candidateSha256": "3308f0d2628d2a727024e78e164f9800f53c48c32dde0db24345164d2e1e9942",
+      "url": "/guides/tools/dns-auth/spf-lookup",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/tools/email-validation/email-health-check.mdx",
+      "disposition": "correct",
+      "candidateSha256": "a946f76b2f08eded43440eac1db2988bc5c2b96bbdec7a13f99e42f405679dbe",
+      "url": "/guides/tools/email-validation/email-health-check",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/tools/email-validation/email-provider-check.mdx",
+      "disposition": "rewrite",
+      "candidateSha256": "244aba6815106a4be5ffcffe8ecf8bfe20636f29335331b7a7cc5a6fd5ad801b",
+      "url": "/guides/tools/email-validation/email-provider-check",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/tools/email-validation/email-spam-checker.mdx",
+      "disposition": "rewrite",
+      "candidateSha256": "9be5ab315fa849f8c4faf4263110fcc49623f4cc914a4b0cfd9e5aa7c377a3e2",
+      "url": "/guides/tools/email-validation/email-spam-checker",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/tools/email-validation/email-syntax-validator.mdx",
+      "disposition": "rewrite",
+      "candidateSha256": "57e05eb643fc7f76098e8e1552fb3023442e915684f8cc4a3ff397d16f59cbb2",
+      "url": "/guides/tools/email-validation/email-syntax-validator",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/tools/email-validation/email-validation.mdx",
+      "disposition": "rewrite",
+      "candidateSha256": "e95b8757f92b44b5deccacf738341ab0fef51a37a3bc07455d7101fdf67859e8",
+      "url": "/guides/tools/email-validation/email-validation",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/tools/email-validation/temp-email-checker.mdx",
+      "disposition": "rewrite",
+      "candidateSha256": "61a30f165e99545f282bb1928223889be7173db2da6befc50d56d23153f2c03b",
+      "url": "/guides/tools/email-validation/temp-email-checker",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/tools/other/phone-validator.mdx",
+      "disposition": "correct",
+      "candidateSha256": "01e42a74bc7d24fecef1633dc8e4577152c686bd86b881dedd25e556d0e58b83",
+      "url": "/guides/tools/other/phone-validator",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/tools/overview.mdx",
+      "disposition": "correct",
+      "candidateSha256": "edde305a691d9f83b3daecc02a1d119172eb604f77125406bacd7c55646a24b7",
+      "url": "/guides/tools/overview",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/tools/sendmux/logs.mdx",
+      "disposition": "correct",
+      "candidateSha256": "717d3fd89e9968fda4703525a0b6b98bfcca229e9a71527dc0bf8cf950b6393e",
+      "url": "/guides/tools/sendmux/logs",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/tools/sendmux/overview.mdx",
+      "disposition": "correct",
+      "candidateSha256": "5d20138e0a9cf38f04f491709042eb2be4bf6c5194edbe605567c0fc990136f6",
+      "url": "/guides/tools/sendmux/overview",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/tools/smtp-testing/smtp-email-test.mdx",
+      "disposition": "rewrite",
+      "candidateSha256": "7c651b8b14c990689f162108732214b8b98fbf83622f48c202e3a96fb7c91a72",
+      "url": "/guides/tools/smtp-testing/smtp-email-test",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/tools/smtp-testing/smtp-server-test.mdx",
+      "disposition": "rewrite",
+      "candidateSha256": "c9f3600d02a2864d0b259c00c5cdb6306ab72ee055330fce873404feed09e868",
+      "url": "/guides/tools/smtp-testing/smtp-server-test",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/trigger-campaign.mdx",
+      "disposition": "correct",
+      "candidateSha256": "d3f41a0595d2f241b36fb7e76c21a5ea4d79aa2370193e1202367f220499fc5f",
+      "url": "/guides/trigger-campaign",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "guides/webhook-endpoints.mdx",
+      "disposition": "correct",
+      "candidateSha256": "bcfbbdc0983c0b9109d3ef3cdf1d9946d81f388344ac15481c11ba96e2ca9505",
+      "url": "/guides/webhook-endpoints",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "index.mdx",
+      "disposition": "correct",
+      "candidateSha256": "3d809f41cb39427b422194c130bcb63fec6c08c3d66a03979566b27475d4707f",
+      "url": "/index",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "main-api/errors.mdx",
+      "disposition": "correct",
+      "candidateSha256": "358c9312ef5bc274d5a0cc11e11b319c656cba042f5c042a6f80abba6050dee9",
+      "url": "/main-api/errors",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    },
+    {
+      "page": "main-api/introduction.mdx",
+      "disposition": "correct",
+      "candidateSha256": "0ee5aa263047c2ee61a8392c4a700faedc10103419676510b5c5c4b82bfbb4b7",
+      "url": "/main-api/introduction",
+      "newPage": false,
+      "sourceComplete": true,
+      "deployedVerification": "pending",
+      "publication": "held"
+    }
+  ],
+  "generatedReferences": [
+    {
+      "reference": "Main API",
+      "specUrl": "https://apix.spotzee.com/api/openapi.json",
+      "capturedLiveSpecSha256": "9c26d50d9d997e93741d54967a4abd4a296fae3d19b657326b65baab15af8abe",
+      "paths": 70,
+      "operations": 109,
+      "navigationCoverage": "complete",
+      "deployedCandidateMatch": "verified",
+      "publication": "held"
+    },
+    {
+      "reference": "Extended API",
+      "specUrl": "https://apix.spotzee.com/api/ext/openapi.json",
+      "capturedLiveSpecSha256": "628442aa99de5ad4c9ede2d8737f6c20ac6acebfdcd07a07975c92b69ccabefd",
+      "paths": 56,
+      "operations": 56,
+      "navigationCoverage": "complete",
+      "deployedCandidateMatch": "verified",
+      "publication": "held"
+    }
+  ]
+}

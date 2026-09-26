@@ -17,7 +17,7 @@ Two attributes shape every template: its **channel type** and its **locale**.
 - **Channel type** decides which fields the template carries. An email template has `from`, `subject`, and `html`. A push template has `title`, `body`, and `url`. The two types share no fields.
 - **Locale** lets you author variants of the same template for different audiences. A campaign sending in English and German would carry one email template per locale.
 
-When Spotzee dispatches a campaign send, it picks the template whose channel matches the channel the user is enrolled on, then picks the locale variant whose locale matches the user's locale (with fallback to the project default locale).
+When Spotzee dispatches a campaign send, it picks the template whose channel matches the channel the user is enrolled on, then picks a locale variant using the user's locale, the project default locale, or an available template.
 
 ## Channel field reference
 
@@ -74,7 +74,7 @@ Webhook templates fire an HTTP request from Spotzee to a destination of your cho
 | `endpoint` | The destination URL. Supports variables. |
 | `headers` | Key-value map of request headers. Values support variables. |
 | `body` | Request body for `POST`, `PUT`, `PATCH`. JSON object whose values support variables. Ignored for `GET` and `DELETE`. |
-| `cacheKey` | Optional. When set, identical requests with the same cache key are deduplicated. |
+| `cache_key` | Optional. When set, a successful response is reused for the same rendered key within the campaign for one hour. |
 
 </Tab>
 <Tab title="In-app">
@@ -129,7 +129,7 @@ Multi-locale projects rely on per-template locales. The pattern is straightforwa
 2. Create the default-locale template inside your campaign.
 3. Add per-locale variants for each additional audience (`en-US`, `de-DE`, `es-MX`, and so on).
 
-When Spotzee dispatches a send, it picks the variant whose locale matches the user's locale. If no exact match exists, Spotzee falls back to the project default locale's variant. A user with no locale set falls through to the default too.
+When Spotzee dispatches a send, it first looks for an exact match with the user's locale, then a variant with the same language. It next tries the project default locale, first exactly and then by language. If none match, it uses the first available template.
 
 ## Email editor modes
 
