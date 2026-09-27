@@ -5,7 +5,7 @@
   "existingPages": 137,
   "newPages": 2,
   "sourceIncomplete": [],
-  "releaseStatus": "ready for publication: deployed API contracts, reporting checks and rate-limit configuration verified",
+  "releaseStatus": "Initial documentation release published at 67d06c86; see releaseCloseout for verification scope",
   "pageVerificationNote": "Per-page deployedVerification fields retain the original audit snapshot. Subsequent release-level checks are recorded in evidence/reporting-consistency-20260926.md; they do not imply every workflow was exercised in production.",
   "recordScope": "Public disposition record. Detailed source review and release evidence are retained privately.",
   "pages": [
@@ -112,7 +112,7 @@
     {
       "page": "guides/billing-and-credits.mdx",
       "disposition": "correct",
-      "candidateSha256": "681bf2c2f158e8ea494ab68535d4e0f2f0032b1f8c25387f99ad46dc5546a7aa",
+      "candidateSha256": "7b39e61f216747638368f3ee21b2c1ebd2c65d1756d7b8cda8a89e4c0df35ebf",
       "url": "/guides/billing-and-credits",
       "newPage": false,
       "sourceComplete": true,
@@ -1421,5 +1421,20 @@
       "deployedCandidateMatch": "verified",
       "publication": "held"
     }
-  ]
+  ],
+  "releaseCloseout": {
+    "verifiedOn": "2026-09-27",
+    "docsMerge": "67d06c86b6b82bc3ee7276b0433a66486ddca96a",
+    "deployment": "Mintlify Deployment completed successfully",
+    "canonicalBase": "https://spotzee.com/docs",
+    "browserVerifiedPaths": [
+      "/guides/query-events",
+      "/guides/campaign-bounce-reporting",
+      "/main-api/introduction",
+      "/extended-api/introduction",
+      "/guides/api-rate-limits"
+    ],
+    "auditSnapshot": "The per-page deployedVerification and publication values record the candidate before publication; they were intentionally preserved.",
+    "verificationScope": "Five published pages browser-verified. This does not claim that every guide workflow was exercised live or that production query latency was measured."
+  }
 }

@@ -1,6 +1,6 @@
 # Documentation validation — 26 September 2026
 
-Status: ready for documentation review and publication; deployed API contracts and current rate limits are verified.
+Status: published and browser-verified on 27 September 2026. The audit and release-gate sections below record the pre-publication candidate.
 
 ## Coverage
 
@@ -30,7 +30,7 @@ Both live API specifications match the reviewed contracts. Current rate-limit co
 
 The sampled event day contained one result, so live event pagination was not exercised. Local pagination contract tests remain the evidence for that case. These release checks do not claim that every guide workflow was exercised in production, or that production query latency was measured.
 
-## Release gate
+## Release gate (pre-publication record)
 
 The deployed contract and rate-limit gates are satisfied. After documentation review and publication, verify:
 
@@ -38,3 +38,21 @@ The deployed contract and rate-limit gates are satisfied. After documentation re
 - <https://docs.spotzee.com/guides/campaign-bounce-reporting>
 - <https://docs.spotzee.com/main-api/introduction>
 - <https://docs.spotzee.com/extended-api/introduction>
+
+## Publication closeout — 27 September 2026
+
+Documentation merge `67d06c86` completed, and the Mintlify deployment check succeeded. Browser navigation from `docs.spotzee.com` reached the canonical `spotzee.com/docs` pages below; each rendered its title and expected release content:
+
+| Canonical page | Browser result |
+| --- | --- |
+| <https://spotzee.com/docs/guides/query-events> | Query events and classification guidance rendered |
+| <https://spotzee.com/docs/guides/campaign-bounce-reporting> | Bounce categories and unclassified guidance rendered |
+| <https://spotzee.com/docs/main-api/introduction> | Main API and Events navigation rendered |
+| <https://spotzee.com/docs/extended-api/introduction> | Extended API and the corrected limit rendered |
+| <https://spotzee.com/docs/guides/api-rate-limits> | Corrected limits, block duration and retry guidance rendered |
+
+Automated HTTP checks to the requested `docs.spotzee.com` URLs returned `403`; normal browser navigation rendered all five pages. Four earlier pages whose saved review lacked individual current-hash render rows—Authentication, Billing and credits, Core concepts, and CRM—were rechecked in a local preview. Each returned HTTP 200 and rendered with no console errors, broken images or document overflow.
+
+The Billing and credits guide's user-limit and per-call wording was checked against the billing source, then rendered at its final file hash in a local preview. Mintlify validation and broken-link checks passed; the rendered page showed neither the superseded seat wording nor console errors, broken images or document overflow.
+
+A later bounded event-pagination check returned two disjoint pages of two events each, with payloads omitted and classification not requested. It closes the earlier sampled-day pagination gap without claiming that every guide workflow was exercised live. Performance evidence is local only; no production p95 is claimed. A current migration-state check cannot establish the historical deployment-step log. The animal-generator external destination remains inconclusive after a timeout and a later `403`.
