@@ -1,0 +1,48 @@
+{
+  "createdAt": "2026-09-27",
+  "status": "finalised",
+  "recordScope": "Public-safe hash-bound supplement for two factual terminology corrections; owner-source citations and detailed review remain private. Historical finalisation ledger unchanged.",
+  "pageSha256": {
+    "guides/billing-and-credits.mdx": "7b39e61f216747638368f3ee21b2c1ebd2c65d1756d7b8cda8a89e4c0df35ebf"
+  },
+  "counts": {
+    "ineligible-manual": 2
+  },
+  "blockedManualReview": 0,
+  "units": [
+    {
+      "id": "guides/billing-and-credits.mdx#line-7",
+      "page": "guides/billing-and-credits.mdx",
+      "sourceStartLine": 7,
+      "editableCharacters": 181,
+      "sourceSha256": "3d4a0df8f15b28ba47c36de3867ba31a3ddf9a520446330ed7f4dab0c3049d73",
+      "finalSha256": "3d4a0df8f15b28ba47c36de3867ba31a3ddf9a520446330ed7f4dab0c3049d73",
+      "eligibility": "ineligible-manual",
+      "disposition": "ineligible-manual",
+      "changedFromSource": false,
+      "manualChecks": [
+        "Billed user count checked against owner source",
+        "No team-seat claim remains in the corrected units",
+        "Australian spelling, voice, links, numbers and structure preserved"
+      ],
+      "eligibilityReason": "The changed source-backed introduction and list item together contain fewer than 50 words for a single-page submission."
+    },
+    {
+      "id": "guides/billing-and-credits.mdx#line-124",
+      "page": "guides/billing-and-credits.mdx",
+      "sourceStartLine": 124,
+      "editableCharacters": 35,
+      "sourceSha256": "d829f2cb971b708158252dffc9a5151e4c8a33a2e6375a292cde5b86c4a8a73e",
+      "finalSha256": "d829f2cb971b708158252dffc9a5151e4c8a33a2e6375a292cde5b86c4a8a73e",
+      "eligibility": "ineligible-manual",
+      "disposition": "ineligible-manual",
+      "changedFromSource": false,
+      "manualChecks": [
+        "Billed user count checked against owner source",
+        "No team-seat claim remains in the corrected units",
+        "Australian spelling, voice, links, numbers and structure preserved"
+      ],
+      "eligibilityReason": "This list item has fewer than 50 readable characters; the whole changed submission is below the provider floor."
+    }
+  ]
+}
