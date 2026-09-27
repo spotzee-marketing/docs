@@ -3,7 +3,7 @@
   "status": "finalised",
   "recordScope": "Public-safe hash-bound supplement for two factual terminology corrections; owner-source citations and detailed review remain private. Historical finalisation ledger unchanged.",
   "pageSha256": {
-    "guides/billing-and-credits.mdx": "7b39e61f216747638368f3ee21b2c1ebd2c65d1756d7b8cda8a89e4c0df35ebf"
+    "guides/billing-and-credits.mdx": "c567867c73ced0459013c606ea493bf4b9b35a92072264f7a80d3bd66e4798be"
   },
   "counts": {
     "ineligible-manual": 2
