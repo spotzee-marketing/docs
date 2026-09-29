@@ -37,6 +37,7 @@
         "groups": [
           {
             "group": "Get started",
+            "icon": "play",
             "pages": [
               "index",
               "guides/quickstart",
@@ -49,6 +50,7 @@
           },
           {
             "group": "Build",
+            "icon": "layer-group",
             "pages": [
               "guides/crm",
               "guides/journeys",
@@ -61,6 +63,7 @@
           },
           {
             "group": "Configure",
+            "icon": "sliders",
             "pages": [
               "guides/manage-api-keys",
               "guides/configure-email-delivery",
@@ -75,6 +78,7 @@
           },
           {
             "group": "SDKs",
+            "icon": "code",
             "pages": [
               "guides/sdks/overview",
               {
@@ -111,6 +115,7 @@
           },
           {
             "group": "Integrate",
+            "icon": "plug",
             "pages": [
               {
                 "group": "Salesforce",
@@ -142,6 +147,7 @@
           },
           {
             "group": "Reporting",
+            "icon": "chart-line",
             "pages": [
               "guides/query-events",
               "guides/campaign-bounce-reporting"
@@ -149,6 +155,7 @@
           },
           {
             "group": "Tools",
+            "icon": "wrench",
             "pages": [
               "guides/tools/overview",
               {
@@ -264,6 +271,7 @@
           },
           {
             "group": "API conventions",
+            "icon": "book-open",
             "pages": [
               "guides/api-versioning",
               "guides/api-rate-limits",
@@ -275,6 +283,7 @@
           },
           {
             "group": "Recipes",
+            "icon": "lightbulb",
             "pages": [
               "guides/sync-users",
               "guides/sync-product-source",
@@ -282,12 +291,6 @@
               "guides/build-segment-via-api",
               "guides/trigger-campaign",
               "guides/journey-trigger"
-            ]
-          },
-          {
-            "group": "Releases",
-            "pages": [
-              "changelog"
             ]
           }
         ]
@@ -301,6 +304,7 @@
         "groups": [
           {
             "group": "Overview",
+            "icon": "book-open",
             "pages": [
               "main-api/introduction",
               "main-api/errors"
@@ -308,71 +312,214 @@
           },
           {
             "group": "Projects",
-            "tag": "Projects"
+            "icon": "folder",
+            "pages": [
+              "GET /projects",
+              "POST /projects",
+              "GET /me",
+              "PATCH /projects/{projectId}",
+              "POST /projects/{projectId}/onboarding-metadata"
+            ]
           },
           {
             "group": "Users",
-            "tag": "Users"
+            "icon": "users",
+            "pages": [
+              "GET /users",
+              "PATCH /users",
+              "DELETE /users",
+              "POST /users/batch",
+              "GET /users/me",
+              "GET /users/{userId}",
+              "DELETE /users/{userId}",
+              "POST /users/{userId}/sessions"
+            ]
           },
           {
             "group": "CRM",
-            "tag": "CRM"
+            "icon": "address-book",
+            "pages": [
+              "GET /crm/properties",
+              "GET /crm/contacts",
+              "GET /crm/contacts/{contactId}",
+              "PATCH /crm/contacts/{contactId}/properties",
+              "PATCH /crm/contacts/{contactId}/stage",
+              "GET /crm/companies",
+              "POST /crm/companies",
+              "GET /crm/companies/{companyId}",
+              "PATCH /crm/companies/{companyId}",
+              "GET /crm/companies/{companyId}/contacts",
+              "GET /crm/companies/{companyId}/activities",
+              "GET /crm/activities",
+              "POST /crm/activities",
+              "GET /crm/pipeline/stages",
+              "GET /crm/views"
+            ]
           },
           {
             "group": "Source Sync",
-            "tag": "Source Sync"
+            "icon": "arrows-rotate",
+            "pages": [
+              "POST /source-systems/identities",
+              "DELETE /source-systems/identities/{source}/{sourcePersonId}",
+              "POST /source-systems/companies",
+              "GET /source-systems/companies/{source}/{sourceCompanyId}",
+              "DELETE /source-systems/companies/{source}/{sourceCompanyId}",
+              "POST /source-systems/property-manifests",
+              "POST /source-systems/memberships"
+            ]
           },
           {
             "group": "Events",
-            "tag": "Events"
+            "icon": "bolt",
+            "pages": [
+              "POST /events",
+              "GET /events",
+              "GET /events/aggregations"
+            ]
           },
           {
             "group": "Lists",
-            "tag": "Lists"
+            "icon": "list",
+            "pages": [
+              "GET /lists",
+              "POST /lists",
+              "GET /lists/{listId}",
+              "PATCH /lists/{listId}",
+              "DELETE /lists/{listId}"
+            ]
           },
           {
             "group": "Subscriptions",
-            "tag": "Subscriptions"
+            "icon": "bell",
+            "pages": [
+              "PATCH /subscriptions/me",
+              "GET /subscriptions",
+              "POST /subscriptions",
+              "GET /subscriptions/{subscriptionId}",
+              "PATCH /subscriptions/{subscriptionId}",
+              "POST /subscriptions/batch",
+              "GET /users/{userId}/subscriptions",
+              "PATCH /users/{userId}/subscriptions"
+            ]
           },
           {
             "group": "Templates",
-            "tag": "Templates"
+            "icon": "file-lines",
+            "pages": [
+              "GET /templates",
+              "POST /templates",
+              "GET /templates/{templateId}",
+              "PATCH /templates/{templateId}",
+              "DELETE /templates/{templateId}",
+              "POST /templates/{templateId}/preview",
+              "POST /templates/{templateId}/proof"
+            ]
           },
           {
             "group": "Campaigns",
-            "tag": "Campaigns"
+            "icon": "paper-plane",
+            "pages": [
+              "GET /campaigns",
+              "POST /campaigns",
+              "GET /campaigns/{campaignId}",
+              "PATCH /campaigns/{campaignId}",
+              "DELETE /campaigns/{campaignId}",
+              "GET /campaigns/{campaignId}/recipients",
+              "POST /campaigns/{campaignId}/duplicate",
+              "GET /campaigns/{campaignId}/preview",
+              "POST /campaigns/{campaignId}/trigger"
+            ]
           },
           {
             "group": "Journeys",
-            "tag": "Journeys"
+            "icon": "route",
+            "pages": [
+              "GET /journeys",
+              "POST /journeys",
+              "GET /journeys/{journeyId}",
+              "PATCH /journeys/{journeyId}",
+              "DELETE /journeys/{journeyId}",
+              "POST /journeys/{journeyId}/trigger"
+            ]
           },
           {
             "group": "Tags",
-            "tag": "Tags"
+            "icon": "tags",
+            "pages": [
+              "GET /tags",
+              "POST /tags",
+              "GET /tags/{tagId}",
+              "PATCH /tags/{tagId}",
+              "DELETE /tags/{tagId}"
+            ]
           },
           {
             "group": "API keys",
-            "tag": "API keys"
+            "icon": "key",
+            "pages": [
+              "GET /keys",
+              "POST /keys",
+              "GET /keys/{keyId}",
+              "PATCH /keys/{keyId}",
+              "DELETE /keys/{keyId}"
+            ]
           },
           {
             "group": "Organisation",
-            "tag": "Organisation"
+            "icon": "building",
+            "pages": [
+              "GET /organizations/me",
+              "GET /organizations/api-keys",
+              "POST /organizations/api-keys",
+              "GET /organizations/api-keys/{keyId}",
+              "PATCH /organizations/api-keys/{keyId}",
+              "DELETE /organizations/api-keys/{keyId}"
+            ]
           },
           {
             "group": "Webhooks",
-            "tag": "Webhooks"
+            "icon": "link",
+            "pages": [
+              "GET /webhooks",
+              "POST /webhooks",
+              "POST /webhooks/{endpointId}/rotate-secret",
+              "GET /webhooks/{endpointId}",
+              "PATCH /webhooks/{endpointId}",
+              "DELETE /webhooks/{endpointId}"
+            ]
           },
           {
             "group": "Billing recovery",
-            "tag": "Billing recovery"
+            "icon": "credit-card",
+            "pages": [
+              "GET /organizations/recoveries/status",
+              "GET /organizations/recoveries/projects",
+              "GET /organizations/recoveries/users",
+              "POST /organizations/recoveries/users/archives/preview",
+              "POST /organizations/recoveries/users/archives",
+              "GET /organizations/recoveries/jobs/{jobId}",
+              "POST /organizations/recoveries/jobs/{jobId}/recounts",
+              "POST /organizations/recoveries/users/restorations"
+            ]
           },
           {
             "group": "Form definitions",
-            "tag": "Form definitions"
+            "icon": "clipboard-list",
+            "pages": [
+              "GET /form-definitions",
+              "POST /form-definitions",
+              "GET /form-definitions/{formDefinitionId}",
+              "PATCH /form-definitions/{formDefinitionId}",
+              "DELETE /form-definitions/{formDefinitionId}"
+            ]
           },
           {
             "group": "Form submissions",
-            "tag": "Form submissions"
+            "icon": "file-circle-check",
+            "pages": [
+              "POST /forms/{publicToken}/submissions"
+            ]
           }
         ]
       },
@@ -385,6 +532,7 @@
         "groups": [
           {
             "group": "Overview",
+            "icon": "book-open",
             "pages": [
               "extended-api/introduction",
               "extended-api/errors"
@@ -392,27 +540,95 @@
           },
           {
             "group": "AI",
-            "tag": "AI"
+            "icon": "robot",
+            "pages": [
+              "POST /ai/email/subject-line-suggestion",
+              "POST /ai/email/subject-line-score"
+            ]
           },
           {
             "group": "DNS",
-            "tag": "DNS"
+            "icon": "globe",
+            "pages": [
+              "POST /generic/dns/dns-record-lookup",
+              "POST /generic/dns/tcp-verifier",
+              "POST /generic/dns/url-verifier",
+              "POST /generic/dns/dns-health-check"
+            ]
           },
           {
             "group": "Email",
-            "tag": "Email"
+            "icon": "envelope",
+            "pages": [
+              "POST /generic/email/spf-generator",
+              "POST /generic/email/spf-lookup",
+              "POST /generic/email/mx-lookup",
+              "POST /generic/email/smtp-server-test",
+              "POST /generic/email/smtp-email-test",
+              "POST /generic/email/email-syntax-validator",
+              "POST /generic/email/dmarc-generator",
+              "POST /generic/email/dmarc-lookup",
+              "POST /generic/email/senderscore-lookup",
+              "POST /generic/email/temporary-email-checker",
+              "POST /generic/email/email-provider-check",
+              "GET /generic/email/email-tester",
+              "GET /generic/email/email-tester-results/{uniqueCode}",
+              "POST /generic/email/email-health-check",
+              "POST /generic/email/malicious-url-lookup",
+              "POST /generic/email/email-validation",
+              "POST /generic/email/ip-blacklist-check",
+              "POST /generic/email/domain-blacklist-check"
+            ]
           },
           {
             "group": "SMS",
-            "tag": "SMS"
+            "icon": "comment",
+            "pages": [
+              "POST /generic/sms/phone-mobile-syntax-validator"
+            ]
           },
           {
             "group": "Text",
-            "tag": "Text"
+            "icon": "align-left",
+            "pages": [
+              "POST /generic/text/readability-score",
+              "POST /generic/text/sentiment-score"
+            ]
           },
           {
             "group": "Data",
-            "tag": "Data"
+            "icon": "database",
+            "pages": [
+              "POST /generic/data/generate/person",
+              "POST /generic/data/generate/contact",
+              "POST /generic/data/generate/phone",
+              "POST /generic/data/generate/company",
+              "POST /generic/data/generate/commerce",
+              "POST /generic/data/generate/finance",
+              "POST /generic/data/generate/food",
+              "POST /generic/data/generate/git",
+              "POST /generic/data/generate/animal",
+              "POST /generic/data/generate/book",
+              "POST /generic/data/generate/vehicle",
+              "POST /generic/data/generate/system",
+              "POST /generic/data/generate/color",
+              "POST /generic/data/generate/lorem",
+              "POST /generic/data/generate/word",
+              "POST /generic/data/generate/string",
+              "POST /generic/data/generate/number",
+              "POST /generic/data/generate/airline",
+              "POST /generic/data/generate/database",
+              "POST /generic/data/generate/datatype",
+              "POST /generic/data/generate/hacker",
+              "POST /generic/data/generate/image",
+              "POST /generic/data/generate/music",
+              "POST /generic/data/generate/science",
+              "POST /generic/data/generate/helpers",
+              "POST /generic/data/generate/name",
+              "POST /generic/data/generate/date",
+              "POST /generic/data/generate/location",
+              "POST /generic/data/generate/internet"
+            ]
           }
         ]
       }
@@ -423,6 +639,11 @@
           "anchor": "App",
           "href": "https://app.spotzee.com",
           "icon": "gauge"
+        },
+        {
+          "anchor": "Website",
+          "href": "https://spotzee.com",
+          "icon": "globe"
         }
       ]
     }
@@ -434,6 +655,10 @@
   },
   "navbar": {
     "links": [
+      {
+        "label": "Changelog",
+        "href": "/changelog"
+      },
       {
         "label": "Website",
         "href": "https://spotzee.com"

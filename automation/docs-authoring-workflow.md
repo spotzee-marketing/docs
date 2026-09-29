@@ -6,9 +6,30 @@ Use this workflow for every new, moved, or materially edited reader-facing docum
 
 Keep Guides, Main API and Extended API as separate tabs. Generate endpoint contracts from their owning OpenAPI sources; put tasks and explanations in Guides. Keep SDKs and integration guidance before secondary tools. Preserve moved public URLs with redirects.
 
+Give every top-level navigation group an icon from the configured icon library. API groups list explicit `METHOD /path` entries in `pages` so their icons and order render; `tag` is a display badge, not an OpenAPI tag selector. When public endpoints are added, renamed or removed, reconcile both API tabs with their owning specifications and verify endpoint coverage and existing page URLs.
+
 Public SDK and integration names needed to install or use them are approved, including language, runtime and framework names in that public-tooling context. This exception does not permit disclosure of backend implementation, storage, infrastructure or internal source paths. Verify every public term against its reader task.
 
 Audit every existing page and both generated references against owning source and deployed behaviour. Record keep, correct, rewrite, merge, move or retire, plus source evidence and verification state. Retain accurate pages. A source-only review is not deployed verification. Hold a coordinated release until every batch passes, the operator deploys the API/worker changes, and the live specifications match.
+
+## Product updates
+
+Keep `/changelog` as the product-wide release feed: `title: "Product updates"`, a reader-facing description and `rss: true`, without `noindex`. Link it once from `docs.json` → `navbar.links`; keep it out of sidebar groups. The RSS feed is `/changelog/rss.xml`.
+
+For a released feature, changed behaviour, customer-visible fix, or public API/SDK change, update the affected guides and references as well as the changelog. Check the owning product change and release evidence before writing; do not infer a release from a draft plan or an unmerged change. If documentation does not need an update, record the reason in the product change's documentation-impact receipt.
+
+The product repository owns what shipped; this repository owns presentation. Verify every claim against the owning implementation and release evidence. Record source citations privately; publish only customer-facing behaviour and required actions. Preserve qualifications, limits and existing release history. Apply the confidentiality and finalisation gates below.
+
+Use existing `changelog.mdx` entries as the format examples:
+
+- Wrap each release in `<Update label="D Month YYYY" tags={[...]} rss={{ title: "..." }}>`, newest first. Labels contain dates, without version numbers.
+- Use only `New features`, `Improvements` and `Bug fixes` as tags.
+- Order sections as named-feature `##` headings, `## Improvements`, then `## Bug fixes`; omit sections with no changes.
+- Write each item as a standalone prose paragraph, without bullet points. Use Australian English and sentence case, and explain the effect on the reader.
+- Give `rss.title` a standalone summary. Link to the affected guide for instructions rather than duplicating the guide.
+- Keep API-version identifiers in the relevant entry or versioning guide; the feed covers the whole product.
+
+Before release, verify the rendered entries, tag filters, RSS link and navigation placement, then run the repository's validation gates. Documentation-only styling and navigation changes need no invented product release entry.
 
 ## 1. Read before writing
 

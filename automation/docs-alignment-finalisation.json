@@ -1,0 +1,74 @@
+{
+  "scope": "Three source-verified error-contract prose corrections; remaining prose unchanged apart from bullet markers. Metadata, dates and headings are excluded from humanisation.",
+  "basis": "automation/docs-authoring-workflow.md technical-reference and short-unit dispositions",
+  "rows": [
+    {
+      "id": "changelog#p001",
+      "eligibility": "ineligible-manual",
+      "editableCharacters": 39,
+      "sourceSha256": "b7fb2cbfc50c960e648d7eb0c245840d7ff03ec5c6ed39e56f9bf21e79b2a875",
+      "finalSha256": "b7fb2cbfc50c960e648d7eb0c245840d7ff03ec5c6ed39e56f9bf21e79b2a875",
+      "changedFromSource": false,
+      "transport": null,
+      "attempt": 0,
+      "scoreSource": null,
+      "scoreRaw": null,
+      "scoreFinal": null,
+      "repairs": [],
+      "manualChecks": [
+        "verified against existing Main API and Extended API errors references",
+        "technical field names and rollout qualifications retained",
+        "Australian English and confidentiality checked"
+      ],
+      "disposition": "ineligible-manual"
+    },
+    {
+      "id": "changelog#p002",
+      "eligibility": "ineligible-technical",
+      "editableCharacters": 226,
+      "sourceSha256": "6af2f39e66ef375f639577da00d77652de0bb4383ffe3b7728d40e1209ba6a73",
+      "finalSha256": "6af2f39e66ef375f639577da00d77652de0bb4383ffe3b7728d40e1209ba6a73",
+      "changedFromSource": false,
+      "transport": null,
+      "attempt": 0,
+      "scoreSource": null,
+      "scoreRaw": null,
+      "scoreFinal": null,
+      "repairs": [],
+      "manualChecks": [
+        "verified against existing Main API and Extended API errors references",
+        "technical field names and rollout qualifications retained",
+        "Australian English and confidentiality checked"
+      ],
+      "disposition": "ineligible-technical"
+    },
+    {
+      "id": "changelog#p003",
+      "eligibility": "ineligible-technical",
+      "editableCharacters": 198,
+      "sourceSha256": "9146eec419791ff67a1dc4c860926659fe7a79856b6b815549e827572bdba08a",
+      "finalSha256": "9146eec419791ff67a1dc4c860926659fe7a79856b6b815549e827572bdba08a",
+      "changedFromSource": false,
+      "transport": null,
+      "attempt": 0,
+      "scoreSource": null,
+      "scoreRaw": null,
+      "scoreFinal": null,
+      "repairs": [],
+      "manualChecks": [
+        "verified against existing Main API and Extended API errors references",
+        "technical field names and rollout qualifications retained",
+        "Australian English and confidentiality checked"
+      ],
+      "disposition": "ineligible-technical"
+    }
+  ],
+  "preservation": {
+    "fourReleaseEntries": true,
+    "codeBlocksUnchanged": true,
+    "tableUnchanged": true,
+    "existingLinksRetained": true,
+    "existingKeywordsRetained": true,
+    "existingBodyProseRetainedExceptThreeErrorContractCorrections": true
+  }
+}
