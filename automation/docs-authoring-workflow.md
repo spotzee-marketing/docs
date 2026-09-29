@@ -27,6 +27,7 @@ Use existing `changelog.mdx` entries as the format examples:
 - Order sections as named-feature `##` headings, `## Improvements`, then `## Bug fixes`; omit sections with no changes.
 - Write each item as a standalone prose paragraph, without bullet points. Use Australian English and sentence case, and explain the effect on the reader.
 - Give `rss.title` a standalone summary. Link to the affected guide for instructions rather than duplicating the guide.
+- When entries share a date label, give later entries explicit unique `id` values matching their page anchors so RSS links reach the correct entry.
 - Keep API-version identifiers in the relevant entry or versioning guide; the feed covers the whole product.
 
 Before release, verify the rendered entries, tag filters, RSS link and navigation placement, then run the repository's validation gates. Documentation-only styling and navigation changes need no invented product release entry.
