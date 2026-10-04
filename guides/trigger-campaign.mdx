@@ -73,7 +73,7 @@ A backend call that:
   Use a triggered campaign for a single per-contact message. Use a journey when you need several steps, waits, or branches. See [Trigger a journey](/guides/journey-trigger).
 </Warning>
 
-- **Prevent duplicate logical triggers.** Keep a stable request identity and check whether a timed-out call was accepted before retrying. An `Idempotency-Key` protects retries only where enforcement is enabled; see [Idempotency](/guides/api-idempotency).
+- **Prevent duplicate email triggers.** Send an `Idempotency-Key` on the first request and reuse it with the same body after a timeout. A replay confirms the original acceptance without creating another send. Requests without a key are independent; see [Idempotency](/guides/api-idempotency).
 - **Don't expect templates to render with arbitrary data.** Template variables resolve against the contact attributes (`{{user.…}}`) and the event payload (`{{event.…}}`). Anything not in either shows up as blank.
 - **Don't trigger in a tight loop without batching.** Each call fires one send for one contact; if you're sending to a large audience, queue and pace the calls (or use a `blast`-type campaign against a list instead).
 
