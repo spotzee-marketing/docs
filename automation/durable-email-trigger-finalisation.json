@@ -1,0 +1,39 @@
+{
+  "createdAt": "2026-10-04",
+  "status": "prepared source; publication pending verified application release and reviewed release changelog",
+  "recordScope": "Public-safe hashes for changed technical reference units; source evidence retained privately.",
+  "counts": { "ineligible-technical": 3, "blocked-manual-review": 0 },
+  "frozenContent": ["Headings and table rows remain outside humanisation; changes are limited to verified endpoint availability, retention and replay semantics."],
+  "units": [
+    {
+      "id": "idempotency-note",
+      "page": "guides/api-idempotency.mdx",
+      "sourceSha256": "1e7927ce84d0320508b9519d78932a5dd3a07fcc17e10c8fa1ca3cc99bb4e3cd",
+      "finalSha256": "1e7927ce84d0320508b9519d78932a5dd3a07fcc17e10c8fa1ca3cc99bb4e3cd",
+      "eligibility": "ineligible-technical",
+      "disposition": "ineligible-technical",
+      "changedFromSource": false,
+      "manualChecks": ["Every clause specifies endpoint availability or a retry instruction", "Email-only qualification and same-key/same-body constraints verified", "Australian spelling and technical tokens preserved"]
+    },
+    {
+      "id": "idempotency-ttl",
+      "page": "guides/api-idempotency.mdx",
+      "sourceSha256": "734ac958ff8f4a1b6ea1bb724990bbbc611516056e3d74ae0d32d55f00f8d07f",
+      "finalSha256": "734ac958ff8f4a1b6ea1bb724990bbbc611516056e3d74ae0d32d55f00f8d07f",
+      "eligibility": "ineligible-technical",
+      "disposition": "ineligible-technical",
+      "changedFromSource": false,
+      "manualChecks": ["Every clause specifies retention or retry behaviour", "24-hour minimum and unfinished/reconciliation exception verified", "No automatic expiry or delivery guarantee introduced"]
+    },
+    {
+      "id": "email-trigger-retry",
+      "page": "guides/trigger-campaign.mdx",
+      "sourceSha256": "b927366f2bebeddcb8449b8d1a538ba67a7bdb0c07a94da97f29553c82e1b5dc",
+      "finalSha256": "b927366f2bebeddcb8449b8d1a538ba67a7bdb0c07a94da97f29553c82e1b5dc",
+      "eligibility": "ineligible-technical",
+      "disposition": "ineligible-technical",
+      "changedFromSource": false,
+      "manualChecks": ["Every clause is a source-backed retry instruction or acceptance assertion", "Requests without a key remain independent", "Acceptance distinguished from delivery; link preserved"]
+    }
+  ]
+}

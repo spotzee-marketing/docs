@@ -7,7 +7,7 @@ keywords: ["idempotency", "idempotency-key", "retries", "duplicate prevention", 
 Where enforcement is enabled, an idempotency key lets a repeated `POST` or `PATCH` replay its cached response. Check availability and caching limits before relying on it to prevent duplicate work.
 
 <Note>
-  Idempotency-Key enforcement is live on the Extended API today and rolling out to the Main API. Including the header on Main API requests is forward-compatible: today it has no effect, and once the rollout completes, retries with the same key replay the cached response.
+  Idempotency-Key enforcement applies to the Extended API and Main API email campaign triggers. Other Main API endpoints depend on rollout availability. For email triggers, use the same key and body when retrying the same logical send.
 </Note>
 
 ## How it works
@@ -43,7 +43,7 @@ Content-Type: application/json
 
 - **Scope**: keys are scoped per API key, so distinct API keys have separate replay caches. Within one API key, use a unique idempotency key across all paths and methods; changing the URL does not create a separate replay scope.
 - **Per-surface scope**: the Main API and Extended API maintain independent caches. The same `Idempotency-Key` sent to both surfaces is treated as two distinct requests. Pick a fresh key per surface if you want isolation, or reuse it deliberately knowing each surface will replay independently.
-- **TTL**: cached responses live for 24 hours. After that, a request with the same key runs as a brand-new operation.
+- **TTL**: cached responses normally live for 24 hours. Email campaign triggers retain their key for at least 24 hours and while processing or reconciliation remains unfinished. Do not assume that waiting 24 hours makes the same key a new send.
 - **Eligible methods**: `POST` and `PATCH`. `GET`, `HEAD`, and `DELETE` are idempotent by definition and ignore the header.
 
 ## What Spotzee does on replay
@@ -52,7 +52,8 @@ Content-Type: application/json
 |---|---|
 | Same key, same body | Original response is returned. The `Idempotent-Replayed: true` response header confirms it's a replay. |
 | Same key, different body | `409 idempotency_key_mismatch`. Keys are tied to the exact request body. Use a fresh key for distinct requests. |
-| Same key, in-flight (Main API) | `409 idempotency_in_progress` with `Retry-After`. The original request is still running; retry shortly. |
+| Same key, accepted email campaign trigger | `200` with `{"success":true}` and `Idempotent-Replayed: true`, including while delivery processing continues. This confirms the original acceptance, not delivery. |
+| Same key, in-flight (other Main API endpoints with enforcement) | `409 idempotency_in_progress` with `Retry-After`. The original request is still running; retry shortly. |
 | Same key, in-flight (Extended API) | The duplicate runs and is cached on completion. There is no in-flight 409 on this surface. Successive replays after the first response lands return the cached copy. |
 
 ## Errors
@@ -103,7 +104,7 @@ Reuse a key for the same logical operation. For example, retrying the same conta
 - You're processing a queue and each message is a distinct operation.
 - You're running a backfill. Each row is its own logical request.
 
-## Caching rules
+## Other endpoints' caching rules
 
 - `2xx` responses are cached.
 - `4xx` responses are eligible for caching except `408`, `425`, and `429`.
