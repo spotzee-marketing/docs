@@ -7,6 +7,15 @@ rss: true
 
 The Spotzee API uses date-based versions. Pin a version with the `Spotzee-Version` request header. See [API versioning](/guides/api-versioning) for the full pinning model.
 
+<Update label="16 October 2026" tags={["Bug fixes"]} rss={{ title: "Email-validation results and service errors" }}>
+  ## Bug fixes
+
+Email validation distinguishes an invalid address from a failed check. Result code `6` means `invalid`; validation-service failures return `503` with `code: "internal_error"` rather than a successful address verdict. See [Email address validation](/guides/tools/email-validation/email-validation) for result codes and error handling.
+
+Returned email addresses, correction suggestions and detailed reasons retain their text. An execution time of `0` remains numeric.
+
+</Update>
+
 <Update label="15 September 2026" tags={["New features"]} rss={{ title: "Custom email headers in templates" }}>
   ## Template email headers
 
