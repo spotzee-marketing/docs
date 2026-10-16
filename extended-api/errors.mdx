@@ -43,7 +43,7 @@ The Extended API uses a structured error envelope served as `application/problem
 | `404 Not Found` | Resource or record not present | Domain has no DNS record of the requested type |
 | `429 Too Many Requests` | Rate limited | Honour `Retry-After` before retrying |
 | `500 Internal Server Error` | Unexpected platform error | Retry with backoff |
-| `503 Service Unavailable` | Temporary capacity issue | Retry with backoff |
+| `503 Service Unavailable` | Service temporarily unavailable | A lookup could not be completed; retry with backoff |
 
 ## Common error codes
 
@@ -58,7 +58,7 @@ The full code catalogue is shared with the Main API:
 | `quota_exceeded` | Credit-metered operation; insufficient balance. |
 | `rate_limited` | Token bucket exhausted; check `Retry-After`. |
 | `version_unsupported` / `version_required` | `Spotzee-Version` header value not a known release. |
-| `internal_error` | Unhandled. Quote `request_id` in support tickets. |
+| `internal_error` | Unexpected platform error or an unavailable validation service. Quote `request_id` in support tickets. |
 
 ## Quota errors
 
