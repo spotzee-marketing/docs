@@ -17,11 +17,31 @@ Run a one-off check at [spotzee.com/tools/email-validation](https://spotzee.com/
     Use the web form or submit the `email` field to `POST /generic/email/email-validation`.
   </Step>
   <Step title="Review the status">
-    Read `result` and `expanded_result` together. Spotzee maps an `ok` result from the validation service to `valid` in its response.
+    Read `result`, `resultcode` and `expanded_result` together. Use the result codes below to distinguish an invalid address from an inconclusive assessment.
   </Step>
   <Step title="Review address flags">
     The response also includes `free` and `role` flags and, when available, a `didyoumean` suggestion. A suggested correction still needs confirmation from the address owner.
   </Step>
 </Steps>
+
+## Interpret the result
+
+Successful checks return these result codes:
+
+| `resultcode` | `result` | Meaning |
+|---|---|---|
+| `1` | `valid` | The address passed the validation check. |
+| `2` | `catch_all` | The domain accepts mail for unrecognised addresses; the individual mailbox is not confirmed. |
+| `3` | `unknown` | The check could not determine the address's status. |
+| `5` | `disposable` | The address uses a disposable email service. |
+| `6` | `invalid` | The address failed the validation check. |
+
+Read `expanded_result` for the detailed reason; it can be empty. For example, `resultcode: 6` with `expanded_result: "no_mailbox"` means the mailbox was not found. Code `6` alone does not identify a DNS failure or timeout.
+
+The response preserves the returned `email`, `didyoumean` and `expanded_result` text. `executiontime` is numeric, including when it is `0`.
+
+## Handle errors
+
+Malformed input returns `400`. A failed validation request or an unusable validation response returns `503` with `code: "internal_error"` in the [standard error body](/extended-api/errors). This includes validation-service errors represented by code `4`. A service-configuration error returns `500` with the same error code. An error response does not establish whether the address is valid.
 
 A syntax-only check cannot establish whether an address receives mail. Use the [email syntax validator](/guides/tools/email-validation/email-syntax-validator) when you need only to reject malformed input.
