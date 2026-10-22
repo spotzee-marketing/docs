@@ -36,7 +36,7 @@ Main API conventions have different rollout states. Cursor pagination and the `X
 |---|---|
 | Versioning | [API versioning](/guides/api-versioning): `Spotzee-Version` header |
 | Rate limits | [Rate limits](/guides/api-rate-limits): per-IP edge limits today, per-key budgets rolling out |
-| Idempotency | [Idempotency](/guides/api-idempotency): `Idempotency-Key` rolling out on Main API |
+| Idempotency | [Idempotency](/guides/api-idempotency): `Idempotency-Key` enforced for email campaign triggers; other endpoints depend on rollout availability |
 | Pagination | [Pagination](/guides/api-pagination): endpoint-specific cursor fields and limits |
 | Webhooks | [Webhooks](/guides/api-webhooks): endpoint configuration, enabled event subscriptions, and signed deliveries |
 | Correlation | Every response includes `X-Request-Id`. Quote it when reporting issues. |

@@ -1,0 +1,29 @@
+{
+  "createdAt": "2026-10-22",
+  "status": "application release verified; documentation merge and reviewed release changelog publication pending",
+  "recordScope": "Public-safe hashes for the release refresh; source evidence retained privately. The original preparation ledger remains unchanged.",
+  "counts": { "ineligible-technical": 1, "excluded-frozen": 1, "blocked-manual-review": 0 },
+  "frozenContent": ["Existing preparation units remain byte-identical. Headings, table structure, frontmatter, code tokens, numbers and link destinations remain outside humanisation."],
+  "units": [
+    {
+      "id": "idempotency-in-progress",
+      "page": "guides/api-idempotency.mdx",
+      "sourceSha256": "dfd3b3494bf25b67125e133bba48d8374c3006e39aabf392280da2af0aee639a",
+      "finalSha256": "dfd3b3494bf25b67125e133bba48d8374c3006e39aabf392280da2af0aee639a",
+      "eligibility": "excluded-frozen",
+      "disposition": "excluded-frozen",
+      "changedFromSource": false,
+      "manualChecks": ["Table row is excluded from humanisation", "In-progress response is qualified to other Main API endpoints with enforcement", "Accepted email trigger replay remains distinct from delivery"]
+    },
+    {
+      "id": "email-trigger-release",
+      "page": "changelog.mdx",
+      "sourceSha256": "546b8eeb51767fa4b8525e1f90fe0be3f40d0cf76b26b212499d66c6c2d3666a",
+      "finalSha256": "546b8eeb51767fa4b8525e1f90fe0be3f40d0cf76b26b212499d66c6c2d3666a",
+      "eligibility": "ineligible-technical",
+      "disposition": "ineligible-technical",
+      "changedFromSource": false,
+      "manualChecks": ["One atomic technical-reference paragraph; every clause specifies source-backed API behaviour or a retry instruction", "No marketing, narrative or performance claim", "Same-key and same-body constraints, acceptance distinction, 24-hour minimum, unfinished-work exception and independent requests preserved", "Australian English, technical tokens, response body and link destination preserved"]
+    }
+  ]
+}
