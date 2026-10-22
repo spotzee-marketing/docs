@@ -7,6 +7,13 @@ rss: true
 
 The Spotzee API uses date-based versions. Pin a version with the `Spotzee-Version` request header. See [API versioning](/guides/api-versioning) for the full pinning model.
 
+<Update label="22 October 2026" tags={["Improvements"]} rss={{ title: "Email campaign trigger retries" }}>
+  ## Improvements
+
+Email campaign triggers support retries with the same `Idempotency-Key` and request body. Replays return `200` with `{"success":true}` and `Idempotent-Replayed: true`, confirming acceptance rather than delivery. Keys remain retained for at least 24 hours and while processing or reconciliation is unfinished. Requests without a key are independent sends. See [Idempotency](/guides/api-idempotency) for retry rules.
+
+</Update>
+
 <Update label="16 October 2026" tags={["Bug fixes"]} rss={{ title: "Email-validation results and service errors" }}>
   ## Bug fixes
 
