@@ -61,6 +61,10 @@ Unclassified means the available evidence does not identify a cause. It does not
 
 A bounced-message report describes message outcomes. Event queries describe occurrences during a time window. One message can have several temporary failure events before its final outcome, and `email_failed` can include a submission failure. The resulting counts answer different questions and need not match.
 
+`final` describes delivery-finality. For a temporary submission response without evidence of retry exhaustion, the event is non-final even if the original sending process has stopped. Diagnostic `severity` remains independent. A confirmed final failure can still have temporary severity, and `severity: "unknown"` alone does not establish delivery failure. `final: false` also covers unconfirmed outcomes, without proving delivery or promising another attempt.
+
+`email_completed` records processing completion only. Match events using the message reference within the contact and campaign, because `email_delivered` confirms acceptance by the recipient's server for that message without establishing inbox placement. Another send to the same contact can have a different outcome.
+
 Historical events can receive response-only enrichment from retained evidence. That does not rewrite stored events or fill missing classifications on campaign messages. Keep unclassified messages in your totals, and use the diagnostic evidence before deciding whether to retry or correct contact details.
 
 See the generated **Campaigns** reference in the [Main API](/main-api/introduction) for complete campaign and recipient response contracts.
