@@ -1,6 +1,6 @@
 # Documentation authoring workflow
 
-Use this workflow for every new, moved, or materially edited reader-facing documentation page or prose block. Complete the placement gate before writing and the humanisation finalisation gate before release when the change qualifies.
+Use this workflow for every new, moved, or materially edited reader-facing documentation page or prose block. Complete the placement gate before writing and apply the humanize skill before release when the change qualifies.
 
 ## Spotzee release boundaries
 
@@ -18,7 +18,7 @@ Keep `/changelog` as the product-wide release feed: `title: "Product updates"`, 
 
 For a released feature, changed behaviour, customer-visible fix, or public API/SDK change, update the affected guides and references as well as the changelog. Check the owning product change and release evidence before writing; do not infer a release from a draft plan or an unmerged change. If documentation does not need an update, record the reason in the product change's documentation-impact receipt.
 
-The product repository owns what shipped; this repository owns presentation. Verify every claim against the owning implementation and release evidence. Record source citations privately; publish only customer-facing behaviour and required actions. Preserve qualifications, limits and existing release history. Apply the confidentiality and finalisation gates below.
+The product repository owns what shipped; this repository owns presentation. Verify every claim against the owning implementation and release evidence. Record source citations privately; publish only customer-facing behaviour and required actions. Preserve qualifications, limits and existing release history. Apply the confidentiality, humanisation and preservation checks below.
 
 Use existing `changelog.mdx` entries as the format examples:
 
@@ -92,23 +92,17 @@ Humanisation is required when the change adds reader-facing prose, changes sente
 
 Humanisation is not required for an exact technical-token correction, metadata-only edit, punctuation-only edit, generated artifact, code-only change, or agent-only instruction. Record `Humanisation: skipped — <exact exemption>` when skipping it.
 
-This workflow enables the canonical contract's `ineligible-technical` disposition for documentation and technical guides. Apply the contract's complete criteria before any provider call and only to one atomic technical-reference paragraph or list item. Do not exempt a whole page or section, or any explanatory, tutorial, transitional, or promotional prose, merely because it discusses a technical subject. Preserve a qualifying unit byte-identically and record its source evidence, protected assertions, manual checks, and eligibility reason in the ledger.
+## 5. Apply the humanize skill
 
-Historical `reference-class` ledgers remain byte-identical evidence only. They do not authorise a material edit or replace the ledger required by the canonical contract.
-
-## 5. Apply the canonical finalisation contract
-
-Read the organisation’s private humanisation finalisation contract before finalisation. Obtain it from the documentation maintainer if it is not available in the working environment. Its eligibility, transport, repair, retry, scoring, and ledger rules are authoritative.
-
-Inventory the prose units and freeze their protected spans. Use the contract's `ineligible-manual` route for qualifying short units or a whole piece below the submission floor, preserving source bytes and recording manual checks. Process eligible submissions through **detect, humanise, repair, re-detect, ledger**. Follow the contract's reviewer decision for retries and its conditions for retaining the reviewed source; provider errors require `blocked-manual-review` with the exact error.
+Read `~/.agents/skills/humanize/SKILL.md` before rewriting qualifying prose. The same skill is available through `~/.claude/skills/humanize`. Follow its rewrite protocol, hard rules, literal pre-output scan and self-checks. Use its technical register for developer documentation and preserve the verified meaning.
 
 This workflow additionally protects supplied SEO and long-tail keywords, technical entities, code tokens, commands, URLs, source links, numbers, units, product/protocol/provider names, schema fields, verified factual claims, frontmatter, heading hierarchy, code, tables, list structure, image markup, FAQ questions, link destinations, Australian English, and the repository's concise developer-docs voice.
 
-Record exactly one disposition per unit in a hash-bound ledger, with zero `blocked-manual-review` rows before release. Keep source citations, provider output and detailed review files in private storage; preserve historical ledgers byte-identically. This repository is public: `.mintignore` excludes files from the website only. Track only public-safe workflow rules, page IDs, hashes, dispositions and validation summaries here.
+Keep source citations and detailed review notes in private storage. Preserve historical review evidence. This repository is public: `.mintignore` excludes files from the website only. Track only public-safe workflow rules and validation summaries here.
 
 ## 6. Pass the preservation gate
 
-Fail the gate if any protected occurrence is reduced without an explicit, task-authorised correction. A passing ledger does not replace these preservation checks.
+Fail the gate if any protected occurrence is reduced without an explicit, task-authorised correction. Complete these preservation checks after applying the skill.
 
 Compare the frozen baseline and final copy and confirm:
 
@@ -129,7 +123,7 @@ Report:
 ```text
 Placement: <tab → group → subgroup → page>
 Disposition: <keep | move | split | merge>
-Humanisation: <skipped — exact exemption | finalised — dispositions and ledger path | held — blocked-manual-review count and exact reason>
+Humanisation: <skipped — exact exemption | complete — humanize skill applied and checked | held — exact reason>
 Preservation: <protected counts unchanged; claims verified>
 Status: <checks and release state>
 ```
