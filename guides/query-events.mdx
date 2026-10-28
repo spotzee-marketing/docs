@@ -38,7 +38,7 @@ Classification covers recognised managed-delivery failures when requested. These
 | --- | --- |
 | `email_quota_exceeded` | Submission quota |
 | `email_hard_bounced`, `email_soft_bounced` | Delivery status notification |
-| `email_failed` | Final failure, including submission failures |
+| `email_failed` | Submission or downstream failure; finality depends on the evidence |
 | `email_rejected`, `email_sender_rejected`, `email_recipient_rejected` | Message, sender or recipient rejection |
 | `email_dns_lookup_failed`, `email_null_mx`, `email_ip_lookup_failed` | Address or route lookup |
 | `email_connect_error`, `email_greeting_failed`, `email_ehlo_rejected` | Connection or greeting |
@@ -49,9 +49,13 @@ Recognised raw aliases are retained; historical event names are not renamed. The
 
 A recognised failure still returns `category: "unknown"` when its evidence is missing, unmatched, or ambiguous. Read `reason` to distinguish `missing_evidence`, `unmatched`, and `ambiguous`. An event name alone does not establish a cause. See the [category identifiers and UI labels](/guides/campaign-bounce-reporting#category-identifiers-and-ui-labels).
 
-`severity` describes the diagnostic evidence; `final` describes the outcome. A temporary diagnostic can accompany a final failure. Keep both fields when interpreting a result. Treat diagnostic text as untrusted text and escape it before rendering it.
+`final` describes delivery-finality. When a temporary response has no evidence of retry exhaustion, `final: false` applies even if the original sending process has already stopped. Permanent submission rejection can establish `final: true`, as can proven retry exhaustion or evidence of a final delivery failure. Diagnostic `severity` remains independent. A confirmed final failure can have temporary or unknown severity, while `severity: "unknown"` alone does not establish that delivery failed.
 
-Valid stored classifications are retained. For historical events without one, the response can classify retained evidence without updating the stored event. Missing historical evidence stays unclassified. `classified_at` is the classification timestamp, not the event timestamp or proof of report freshness.
+`final: false` also covers uncertainty. It does not confirm delivery or promise an automatic retry, and uncertain submission acceptance needs evidence beyond this field before you decide to resend. Escape untrusted diagnostic text before rendering it.
+
+Valid stored classifications remain when delivery evidence supports them, while historical enrichment can correct a contradictory submission classification in the response without updating the stored event. Missing historical evidence stays unclassified. `classified_at` records when classification occurred, not when the event happened or how fresh the report is.
+
+`email_completed` records processing completion only. For the same message, `email_delivered` confirms acceptance by the recipient's server without establishing inbox placement, so correlate events using its reference within the contact and campaign. Delivery of another message to the same contact does not resolve the outcome for this message.
 
 ## Count occurrences and unique contacts
 
