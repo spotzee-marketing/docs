@@ -7,6 +7,13 @@ rss: true
 
 The Spotzee API uses date-based versions. Pin a version with the `Spotzee-Version` request header. See [API versioning](/guides/api-versioning) for the full pinning model.
 
+<Update label="28 October 2026" tags={["Bug fixes"]} rss={{ title: "Email failure finality" }}>
+  ## Bug fixes
+
+Email failure details distinguish temporary submission errors from confirmed final failures. A temporary response without evidence of retry exhaustion no longer appears as a final failure. Final delivery failures retain their status, including those with temporary diagnostic severity. See [Query events](/guides/query-events) for finality and delivery-event meanings.
+
+</Update>
+
 <Update label="22 October 2026" tags={["Improvements"]} rss={{ title: "Email campaign trigger retries" }}>
   ## Improvements
 
