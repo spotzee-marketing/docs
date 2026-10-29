@@ -16,6 +16,20 @@ An `entrance` node has one of three modes:
 
 A journey can have multiple entrance nodes for the same flow (e.g. one entrance per signup source).
 
+## Control repeat entries
+
+Schedule frequency controls when the entrance checks its segment. Use **Multiple Entries** to control repeat entry.
+
+With **Multiple Entries** off, the same contact record can enter each entrance only once, even if the contact completes the journey and the schedule checks the segment again on a later day. Turn it on to allow re-entry after a run ends.
+
+To allow a contact to enter that entrance while an earlier run is still active, turn on **Simultaneous Entries**, which appears only when **Multiple Entries** is on. Changing the schedule preserves both entry settings.
+
+## Set schedule dates and times
+
+Schedule dates and times follow the project's timezone. Choose **On Date** for a run that happens once, or set a **Start Date** for a recurring schedule.
+
+Recurring schedules accept hours from **0** to **23**. Use **0** for midnight. Choosing an **End Date** includes the whole final day, so a run at the selected hour can still occur on that date.
+
 ## Step types
 
 | Step | Purpose |
