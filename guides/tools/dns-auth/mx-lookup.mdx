@@ -1,7 +1,7 @@
 ---
 title: "MX Lookup"
 description: "MX lookup that resolves any domain's Mail Exchanger records, shows each mail server hostname and priority order, and confirms whether the domain can receive email."
-keywords: ["mx lookup", "mx record lookup", "check mx records", "free mx lookup", "mx record checker", "mx lookup online", "how to check mx records", "mx record lookup 2026", "mx lookup financial services"]
+keywords: ["mx lookup", "mx record lookup", "check mx records", "free mx lookup", "mx record checker", "mx lookup online", "how to check mx records", "mx record lookup 2026"]
 ---
 
 An MX lookup resolves the Mail Exchanger records published for a domain. MX records tell the internet which mail servers are responsible for receiving inbound email. Each record carries a hostname and a priority value — lower numbers are tried first. When any server wants to deliver email to `you@example.com`, it performs an MX lookup on `example.com`, connects to the highest-priority server, and falls back to lower-priority entries if the first is unreachable.
@@ -17,8 +17,6 @@ This guide is for the API audience. Each call to `POST /generic/email/mx-lookup`
 MX records are the first thing a sending server checks when delivering email. Missing MX records can indicate an inbound-mail configuration issue, although address-record fallback can apply. Records pointing at a decommissioned server after a migration means inbound email silently disappears. Neither failure is obvious on the sender's side.
 
 For deliverability work, MX records are also an intelligence signal. The primary MX hostname usually reveals the email service provider — Google Workspace, Microsoft 365, Proofpoint, Mimecast, or a custom server. That matters when segmenting outbound lists, diagnosing provider-specific delivery rates, or vetting counterparties before onboarding.
-
-And for regulated firms, verifying inbound infrastructure is part of counterparty due diligence. A financial services firm still routing mail through a legacy on-premises server while claiming a cloud provider in their SPF record is a misconfiguration flag worth surfacing.
 
 ## How it works
 

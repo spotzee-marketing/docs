@@ -1,7 +1,7 @@
 ---
 title: "DMARC Lookup"
 description: "DMARC lookup that resolves any domain's enforcement policy, alignment settings, and reporting addresses from the _dmarc TXT record. No signup required."
-keywords: ["dmarc lookup", "dmarc record check", "check dmarc record", "free dmarc lookup", "dmarc checker online", "how to check dmarc record", "dmarc lookup 2026", "dmarc policy checker", "dmarc record check financial services"]
+keywords: ["dmarc lookup", "dmarc record check", "check dmarc record", "free dmarc lookup", "dmarc checker online", "how to check dmarc record", "dmarc lookup 2026", "dmarc policy checker"]
 ---
 
 A DMARC lookup reads the Domain-based Message Authentication, Reporting and Conformance record published as a TXT record at `_dmarc.yourdomain.com`. DMARC tells receiving mail servers what to do with messages that fail SPF or DKIM alignment — `none` (monitor only), `quarantine` (divert to junk), or `reject` — and where to send authentication failure reports.
@@ -16,7 +16,7 @@ This guide is written for the API audience. Each call to `POST /generic/email/dm
 
 DMARC is the layer that binds SPF and DKIM authentication to the From header — the address the recipient actually sees. Without it, a sender can pass SPF on a different envelope domain while the visible From is entirely spoofed. With `p=none`, you gather reports but do nothing. With `p=quarantine` or `p=reject`, you close the door on domain spoofing.
 
-Mailbox providers have sender-authentication requirements for bulk mail. Check current provider guidance before changing policy. For regulated communications, retain the published record and any reports as evidence of your domain-authentication settings.
+Mailbox providers have sender-authentication requirements for bulk mail. Check current provider guidance before changing policy.
 
 But most organisations still haven't finished the rollout. A domain stuck at `p=none` is doing the monitoring work without getting any protection. A domain at `p=quarantine; pct=50` is enforcing policy on half of failing messages. Neither is the destination.
 

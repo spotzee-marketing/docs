@@ -18,8 +18,6 @@ DNS records are the source of truth for how a domain behaves on the internet. An
 
 These are live production problems — every one of them is visible from a DNS lookup before they become incidents. Results can be cached, so allow for DNS propagation and the returned TTL before treating a new value as settled.
 
-For regulated firms, DNS records are also an audit surface. Querying and documenting the DNS state of your own domains and counterparty domains is part of infrastructure due diligence — particularly TXT records for SPF and domain ownership, MX records for inbound mail routing, and CAA records for TLS certificate authority authorisation.
-
 ## Record types
 
 | Type | Resolves | Common use |

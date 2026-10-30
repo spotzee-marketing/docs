@@ -16,9 +16,7 @@ This guide is for the API audience. Each call to `POST /generic/email/spf-genera
 
 SPF is the first layer of the email-authentication baseline. Without it, any sender can forge your domain in the envelope sender and pass basic delivery checks. A correctly formatted SPF record, paired with DKIM and DMARC, closes that door.
 
-For regulated firms, a misconfigured SPF record is a compliance risk, not just a deliverability one. Mailbox providers may junk or reject unauthenticated mail, the customer never sees it, and the firm has no audit trail of what was delivered. Retain your published record and change history as part of your domain-control review.
-
-And the mechanics bite harder than most teams expect. The RFC 7208 limit of ten DNS lookups applies per message evaluation, not per record. Each `include:` your record references resolves to its own mechanisms, which may include further `include:` entries. A record with five `include:` entries can consume ten or more lookups during evaluation. The generator counts your direct mechanisms and flags the risk.
+The RFC 7208 limit of ten DNS lookups applies per message evaluation, not per record. Each `include:` your record references resolves to its own mechanisms, which may include further `include:` entries. A record with five `include:` entries can consume ten or more lookups during evaluation. The generator counts your direct mechanisms and flags the risk.
 
 ## How to create an SPF record
 
