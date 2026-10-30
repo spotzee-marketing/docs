@@ -11,7 +11,8 @@ Repositions the existing documentation homepage and site description as an all-i
 - `git diff --check`: exit 0. All 15 changed MDX files retain title/description, docs.json parses. All 133 existing guide paths, changed-page headings and code fences retained; navigation config unchanged except site description.
 - Full confidentiality scan reviewed: existing matches are public SDK examples or user-configured providers; no internal implementation term introduced by this diff. Detailed preservation/confidentiality audit: `.claude/artifacts/website-stopgap/docs-checks.md` and `docs-confidentiality-scan.log`.
 - Initial validation found carried-over local graph report links, not published docs defects. Moved worktree-only graph cache under ignored artifacts; final official checks pass. No validation rules suppressed.
-- Responsive/theme preview and public post-release readback remain pending, not claimed passed. Existing-account billing statements preserved from source; no authenticated product verification performed here.
+- Local generated docs preview checked homepage and Billing and credits at 1440x900 and 390x844, both light/dark: 8 screenshots, width/scrollWidth 1440/1440 or 390/390, zero uncaught errors and zero console errors. Screenshots: `.claude/artifacts/website-stopgap/docs-{home,billing}-{desktop,mobile}-{light,dark}.png`. Preview processes 52786/52822 stopped and verified absent; port 3718 no listener. No repository build cache exists.
+- Docs PR https://github.com/spotzee-marketing/docs/pull/16. Mintlify Deployment check SKIPPED for the branch; this is not a published deployment. Official local validation/link receipts above stand; public post-release readback remains pending. Existing-account billing statements preserved from source; no authenticated product verification performed here.
 
 ## Release
 
