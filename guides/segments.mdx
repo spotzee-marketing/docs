@@ -61,7 +61,6 @@ Use the rolling window for "in the last 30 days"-style rules. Use the fixed rang
 - **Engaged in last 30 days**: `email_opened` or `email_clicked` event with frequency `count >= 1`, rolling 30-day window.
 - **At-risk**: `email_opened` last occurrence > 60 days ago AND `data.lifetime_value > 500`.
 - **High-intent**: `page_viewed` with `data.path = "/pricing"`, frequency `count >= 1` over rolling 7 days, AND `data.is_customer = false`.
-- **Renewal due** (financial-services attribute): `data.policy_renewal_date` within the next 30 days.
 
 ## Reference
 

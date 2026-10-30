@@ -1,7 +1,7 @@
 ---
 title: "DMARC Generator"
 description: "DMARC generator that builds a correctly formatted v=DMARC1 record from your policy, subdomain settings, and reporting addresses. Ready to publish at _dmarc.yourdomain.com."
-keywords: ["dmarc generator", "create dmarc record", "dmarc record generator", "free dmarc record generator", "dmarc policy generator", "how to create dmarc record", "dmarc record builder", "dmarc generator online", "dmarc generator financial services"]
+keywords: ["dmarc generator", "create dmarc record", "dmarc record generator", "free dmarc record generator", "dmarc policy generator", "how to create dmarc record", "dmarc record builder", "dmarc generator online"]
 ---
 
 A DMARC generator builds the `v=DMARC1` TXT record that tells receiving mail servers how to handle messages that fail SPF or DKIM alignment. Getting the syntax right matters: a missing semicolon, an invalid tag value, or a mistyped `mailto:` URI renders the record malformed — receivers quietly ignore it, and you get neither enforcement nor reports.
@@ -16,7 +16,7 @@ This guide is for the API audience. Each call to `POST /generic/email/dmarc-gene
 
 DMARC is the policy layer that turns SPF and DKIM authentication into enforcement. Without a DMARC record, even a domain with perfect SPF and DKIM provides no protection against From-header spoofing — the address the recipient actually sees in their inbox. With `p=reject`, messages that fail authentication are dropped before they reach any inbox.
 
-The publishing requirement now has teeth. Mailbox providers publish sender-authentication requirements for bulk mail. Check their current guidance before changing your policy. For regulated communications, retain evidence of your domain-authentication settings and monitor changes. Keep the published record and authentication reports as part of your own domain-control review.
+Mailbox providers publish sender-authentication requirements for bulk mail. Check their current guidance before changing your policy.
 
 Most domains are stuck. They published `p=none` at some point, stopped there, and have no plan to escalate. A generator makes the next step easy — change the policy, regenerate, republish.
 
