@@ -117,7 +117,7 @@ Use helpers and blocks for formatting and conditional content:
 
 For a contact with `firstName` set to `Sam`, `signup_at` set to `2026-09-15T00:00:00Z` and `lifetime_value` set to the number `1250`, these examples produce `Sam`, `Sep 15, 2026`, `Hello Sam` and `$1,250.00`.
 
-Double braces escape HTML-sensitive characters. For example, `A&B` becomes `A&amp;B`. Use triple braces, such as `{{{user.sender_group}}}`, only when you intend unescaped output. Missing properties normally produce an empty string; use an `if` block to supply a fallback.
+In HTML bodies and other fields, double braces escape HTML-sensitive characters. For example, `A&B` becomes `A&amp;B`. Email plain-text bodies preserve literal characters such as `>`, `=` and `&`, keeping instructions readable and links intact. Use triple braces, such as `{{{user.sender_group}}}`, only when you intend unescaped output. Missing properties normally produce an empty string; use an `if` block to supply a fallback.
 
 The same expression syntax works in subject lines, preheaders, plain-text and HTML email bodies, custom email-header values, SMS bodies, push titles, push bodies, push URLs, push custom maps, webhook endpoints, webhook headers and webhook bodies.
 
