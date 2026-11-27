@@ -1,6 +1,6 @@
 ---
 title: "Rate limits"
-description: "Per-IP rate limits at the edge for the Spotzee API, the 429 envelope, and what's rolling out next."
+description: "Per-IP and event list rate limits for the Spotzee API, the 429 response, and retry guidance."
 keywords: ["rate limits", "throttling", "429", "retry-after", "backoff"]
 ---
 
@@ -12,6 +12,12 @@ The Spotzee API enforces per-source-IP rate limits at the edge today. Two rules 
 | General API limit | `/api/*` (covers `/api/client/*`, `/api/admin/*`, `/api/ext/*`) | 4,000 requests per 10 seconds per IP | Block (HTTP 429) | 10 seconds |
 
 Requests to `/api/client/*` count towards both limits. Either rule can block an IP, depending on its traffic. Both rules count matching requests from each source IP, authenticated or not.
+
+## Event list reads
+
+`GET /api/client/events` has a budget of 6,000 requests per project secret API key in a 60-second rolling window. Pulls using the same key share this budget, even when they come from different IPs.
+
+The event list response reports the budget as `X-RateLimit-Limit`, the remaining requests as `X-RateLimit-Remaining` and the estimated seconds until the window clears as `X-RateLimit-Reset`. When the key reaches its budget, the API returns `429` with code `rate_limited` and a `Retry-After` header in seconds. For paging and resuming a bulk pull, see [Query events](/guides/query-events#pull-events-in-bulk).
 
 ## Response on a block
 
@@ -44,7 +50,7 @@ HTTP/1.1 429 Too Many Requests
     If you see a second `429`, honour `Retry-After` when present. Otherwise, double your delay (exponential backoff) up to a sensible cap, for example 60 seconds.
   </Step>
   <Step title="Cap concurrency per IP">
-    Both limits count by source IP. Outbound traffic from a single host is the one to pace.
+    Pace outbound traffic from each source IP. For event lists, also pace jobs that share a project key.
   </Step>
 </Steps>
 
@@ -74,7 +80,7 @@ The Extended API meters certain operations separately from request rate limits. 
 
 ## Rolling out
 
-Per-key read/write budgets, `X-RateLimit-*` headers and a doubled MCP budget depend on rollout availability. Do not use them to exceed the per-IP limits or assume that setting a client-type header grants extra capacity. The self-throttling pattern (honour `Retry-After` when present, add jitter, exponential backoff) works against either layer.
+For other routes, per-key read/write budgets, `X-RateLimit-*` headers and a doubled MCP budget depend on rollout availability. Stay within the per-IP limits regardless of the client-type header. Honour `Retry-After` when present and use jitter and exponential backoff on either layer.
 
 ## Next steps
 

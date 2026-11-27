@@ -30,6 +30,14 @@ Event lists allow windows up to 31 days. The default page size is 50, with a max
 
 Payloads are included by default. Set `include_payload=false` to omit `data`. Classification is a separate opt-in: `include_bounce_classification=true` can return `bounce_classification` without returning the full payload. Unsupported query parameters are rejected; `bounce_category` is a campaign-recipient filter, not an event-query filter.
 
+## Pull events in bulk
+
+Split a backfill into short, fixed date windows. Fetch pages in order within each window. Set `limit=100` to make fewer requests when the resulting pages fit within the response size limit.
+
+After processing a page, save its `nextCursor` so you can resume the pull. Use it as `cursor` with the same date range, filters, page size and sort direction. When `nextCursor` is `null`, move to the next window.
+
+If the API returns `429` or a busy `503` with `Retry-After`, wait for the indicated interval and retry the same page before advancing the cursor. See [event list rate limits](/guides/api-rate-limits#event-list-reads) for the per-key budget.
+
 ## Read bounce classifications
 
 Classification covers recognised managed-delivery failures when requested. These public event names are recognised:
