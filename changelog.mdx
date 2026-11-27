@@ -7,6 +7,13 @@ rss: true
 
 The Spotzee API uses date-based versions. Pin a version with the `Spotzee-Version` request header. See [API versioning](/guides/api-versioning) for the full pinning model.
 
+<Update label="28 November 2026" tags={["Improvements"]} rss={{ title: "Rate-limit guidance for bulk event reads" }}>
+  ## Improvements
+
+The event list reports how many requests your project key has left in its rate-limit window. If you reach the limit, the response tells you how long to wait before retrying. See [Query events](/guides/query-events#pull-events-in-bulk) for bulk pulls and resuming from a saved cursor.
+
+</Update>
+
 <Update label="12 November 2026" tags={["Bug fixes"]} rss={{ title: "Readable plain-text email instructions and links" }}>
   ## Bug fixes
 
